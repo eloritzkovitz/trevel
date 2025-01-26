@@ -1,0 +1,106 @@
+### Register a new user
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "Elor@elormail",
+  "password": "123456"
+}
+
+### Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "Elor@elormail",
+  "password": "123456"
+}
+
+### Refresh token
+POST http://localhost:3000/auth/refresh
+Content-Type: application/json
+
+{
+
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZTRhYjVjMDU2MDUxN2U0NjllNTAiLCJyYW5kb20iOiIwLjE1ODkxMTQyNzUzNjA0NzkyIiwiaWF0IjoxNzM2Njk3MTAxLCJleHAiOjE3MzczMDE5MDF9.18uphsxcXoUcG63ADAWCbhclS2NOsIP7Maw6spGuL84"
+}
+
+### Logout
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZTRhYjVjMDU2MDUxN2U0NjllNTAiLCJyYW5kb20iOiIwLjc4MzA2Nzk2ODY4MDQwNzYiLCJpYXQiOjE3MzY2OTcxMjEsImV4cCI6MTczNzMwMTkyMX0.bmNMJADEslzsMJG3JyrU7HPvHAZ2VDVWZiPPTTngi3A"
+}
+
+### Add a New Post
+POST http://localhost:3000/posts
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZDM3ZmNlYTVhODYwODM5YzdiZGMiLCJyYW5kb20iOiIwLjMwMTc1Mjg4MTY4NjE2NTkiLCJpYXQiOjE3MzY2OTI2ODAsImV4cCI6MTczNjcwMzQ4MH0.pk10Z8UOVfnd5vF28vlMtXSDIS8ohRUR8cBLp2KaBG4
+
+{ 
+  "title": "First Post",
+  "content": "This is my first post!",
+  "sender": "Elor"
+}
+
+### Get post by id
+
+GET http://localhost:3000/posts/677c451bdb9d5917464523b9
+
+### Get all posts by sender
+
+GET http://localhost:3000/posts?sender=6784f4b186565e92f5378ec5
+
+### Get all posts
+
+GET http://localhost:3000/posts
+
+### Update post
+
+PUT http://localhost:3000/posts/677c451bdb9d5917464523b9
+Content-Type: application/json
+
+{ 
+  "title": "First Post - Edited",
+  "content": "This is my first post, now edited!",
+  "sender": "Elor"
+}
+
+### Delete post
+
+DELETE http://localhost:3000/posts/677c451bdb9d5917464523b9
+
+### Add a new comment
+
+POST http://localhost:3000/comments
+Content-Type: application/json
+
+{ 
+  "postId": "677c451bdb9d5917464523b9",
+  "content": "This is my first comment!",
+  "sender": "Adi"
+}
+
+### Get all comment
+
+GET http://localhost:3000/comments
+
+### Get comments by post id
+
+GET http://localhost:3000/comments?postId=677c451bdb9d5917464523b9
+
+### Update comment
+
+PUT http://localhost:3000/comments/677c4d3e0b9a6dc090dd9772
+Content-Type: application/json
+
+{ 
+  "postId": "677c451bdb9d5917464523b9",
+  "content": "This is my first comment, edited!",
+  "sender": "Adi"
+}
+
+### Delete comment
+
+DELETE http://localhost:3000/comments/677c4d3e0b9a6dc090dd9772
