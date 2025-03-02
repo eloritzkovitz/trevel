@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Navbar: React.FC = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container">
+      <div className="container">      
         <Link className="navbar-brand" to="/">
+          <img src={logo} alt="Trevel Logo" style={{ height: '50px', marginRight: '10px'}} />
           Trevel
         </Link>
         <button
