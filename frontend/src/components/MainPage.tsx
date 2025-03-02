@@ -1,4 +1,5 @@
 import React from "react";
+import PostsList from "./PostsList";
 
 const MainPage: React.FC = () => {
   return (
@@ -42,50 +43,16 @@ const MainPage: React.FC = () => {
       {/* Main Content */}
       <div className="container mt-4">
         <div className="row">
-          {/* Sidebar */}
-          <div className="col-md-3">
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">Categories</h5>
-                <ul className="list-group">
-                  <li className="list-group-item">Beaches</li>
-                  <li className="list-group-item">Mountains</li>
-                  <li className="list-group-item">Cities</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Feed Section */}
-          <div className="col-md-9">
+          {/* Feed Section */}          
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title">Recent Posts</h5>
-                <div className="d-flex flex-column gap-3">
-                  {/* Example Post */}
-                  <div className="card">
-                    <div className="card-body">
-                      <h6 className="card-title">Trip to Bali 🌴</h6>
-                      <p className="card-text">
-                        Had an amazing time in Bali! The beaches were stunning.
-                      </p>
-                      <button className="btn btn-outline-primary btn-sm">
-                        Like ❤️
-                      </button>
-                      <button className="btn btn-outline-secondary btn-sm ms-2">
-                        Comment 💬
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* More posts can be added dynamically */}
-                </div>
+                <PostsList />
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div>    
   );
 };
 

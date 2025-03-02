@@ -1,4 +1,5 @@
 import React from "react";
+import PostsList from "./PostsList";
 
 const Signup: React.FC = () => {
   return (
@@ -6,7 +7,7 @@ const Signup: React.FC = () => {
       {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" href="/">
             Trevel
           </a>
           <button
@@ -20,7 +21,7 @@ const Signup: React.FC = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <a className="nav-link" href="#">
+                <a className="nav-link" href="/">
                   Home
                 </a>
               </li>
@@ -41,8 +42,9 @@ const Signup: React.FC = () => {
 
       {/* Main Content */}
       <div className="container mt-4">
-        <div className="row">
-          {/* Profile Section */}          
+        <div className="row justify-content-center">
+          {/* Profile Section */}
+          <div className="col-md-8">
             <div className="card mb-4">
               <div className="card-body text-center">
                 <img src="https://via.placeholder.com/150" className="rounded-circle mb-3" alt="UserPhoto" />
@@ -50,34 +52,18 @@ const Signup: React.FC = () => {
                 <p className="card-text">Travel Enthusiast | Blogger</p>
               </div>
             </div>
+
             {/* Posts Section */}
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title">Recent Posts</h5>
-                <div className="d-flex flex-column gap-3">
-                  {/* Example Post */}
-                  <div className="card">
-                    <div className="card-body">
-                      <h6 className="card-title">Trip to Bali 🌴</h6>
-                      <p className="card-text">
-                        Had an amazing time in Bali! The beaches were stunning.
-                      </p>
-                      <button className="btn btn-outline-primary btn-sm">
-                        Like ❤️
-                      </button>
-                      <button className="btn btn-outline-secondary btn-sm ms-2">
-                        Comment 💬
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* More posts can be added dynamically */}
-                </div>
+                <PostsList />
               </div>
             </div>
           </div>
         </div>
-      </div>    
+      </div>
+    </div>
   );
 };
 
