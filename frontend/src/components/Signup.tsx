@@ -1,6 +1,36 @@
 import React from "react";
+import userService, { User } from "../services/user-service";
+
+interface FormData {
+  email: string
+  password: string
+  img: File[]
+}
 
 const Signup: React.FC = () => {
+
+  // Submit form
+  const onSubmit = (data: FormData) => {
+    console.log(data)
+    const { request } = userService.uploadImage(data.img[0])
+    request.then((response) => {
+      console.log(response.data)
+        const user: User = {
+            email: data.email,
+            password: data.password,
+            avatar: response.data.url            
+        }
+        const { request } = userService.register(user)
+        request.then((response) => {
+            console.log(response.data)
+        }).catch((error) => {
+            console.error(error)
+        })
+    }).catch((error) => {
+        console.error(error)
+    })
+  }
+
   return (
     <div className="container-fluid bg-light min-vh-100">
       <div style={{ textAlign: 'center' }}>        
