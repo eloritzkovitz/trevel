@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { useForm } from 'react-hook-form'
+import { useNavigate } from "react-router-dom";
 import userService, { User } from "../services/user-service";
 
 interface FormData {
@@ -15,31 +16,39 @@ const Signup: FC = () => {
   // const inputFileRef = useRef<HTMLInputElement>(null);
   const { register, handleSubmit, watch } = useForm<FormData>();
   const [img] = watch(["img"]);
+  const navigate = useNavigate();
   //const inputFileRef: { current: HTMLInputElement | null } = { current: null };
 
   // Submit form
   const onSubmit = (data: FormData) => {
     console.log(data);
-    const { request } = userService.uploadImage(data.img[0]);
-    request.then((response) => {      
+    const { request: uploadRequest } = userService.uploadImage(data.img[0]);
+    // Upload image
+    uploadRequest.then((response) => {
       console.log(response.data);
-        const user: User = {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            password: data.password,
-            profilePicture: response.data.url            
-        }        
-        const { request } = userService.register(user);
-        request.then((response) => {
-            console.log(response.data);
-        }).catch((error) => {
-            console.error(error);
-        })
-    }).catch((error) => {
+      
+      // Get user data
+      const user: User = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        profilePicture: response.data.url,
+      };
+
+      // Register a new user
+      const { request: registerRequest } = userService.register(user);
+      registerRequest.then((response) => {
+        console.log(response.data);
+
+        navigate('/login'); // Redirect to login page after successful registration
+      }).catch((error) => {
         console.error(error);
-    })
-  }
+      });
+    }).catch((error) => {
+      console.error(error);
+    });
+  };
 
   // Handle file input for image upload
   useEffect(() => {    

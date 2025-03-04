@@ -11,6 +11,8 @@ var app: Express;
 
 type User = IUser & { token?: string };
 const testUser: User = {
+  firstName: "User1",
+  lastName: "Test",
   email: "test@user.com",
   password: "testpassword",
 };
