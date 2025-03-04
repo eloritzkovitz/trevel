@@ -13,7 +13,7 @@ interface FormData {
 
 const Signup: FC = () => {  
   const [resultMessage, setResultMessage] = useState<string | null>(null);
-  const { register, handleSubmit, watch } = useForm<FormData>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
   const [profilePicture] = watch(["profilePicture"]);
   const navigate = useNavigate();  
 
@@ -43,20 +43,65 @@ const Signup: FC = () => {
             <div className="form-row" style={{ marginTop: '20px' }}>
               <label>Register to join Trevel</label>
               <div className="form-group col-md-6" style={{ marginTop: '20px' }}>
-                <input type="text" className="form-control" id="inputFirstName" placeholder="First Name" {...register("firstName", { required: true })} />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="inputFirstName" 
+                  placeholder="First Name" 
+                  {...register("firstName", { required: "First name is required" })} 
+                />
+                {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
               </div>
               <div className="form-group col-md-6">
-                <input type="text" className="form-control" id="inputLastName" placeholder="Last Name" {...register("lastName", { required: true })} />
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  id="inputLastName" 
+                  placeholder="Last Name" 
+                  {...register("lastName", { required: "Last name is required" })} 
+                />
+                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
               </div>
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="email" className="form-control" id="exampleInputEmail1" placeholder="Email" {...register("email", { required: true })} />
+              <input 
+                type="email" 
+                className="form-control" 
+                id="inputEmailAddress" 
+                placeholder="Email" 
+                {...register("email", { 
+                  required: "Email is required", 
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    message: "Invalid email address. Please enter a valid email address"
+                  }
+                })} 
+              />
+              {errors.email && <span className="text-danger">{errors.email.message}</span>}
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" {...register("password", { required: true })} />
+              <input 
+                type="password" 
+                className="form-control" 
+                id="inputPassword" 
+                placeholder="Password" 
+                {...register("password", { 
+                  required: "Password is required", 
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters long."
+                  }
+                })} 
+              />
+              {errors.password && <span className="text-danger">{errors.password.message}</span>}
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="file" className="form-control" {...register("profilePicture", { required: true })} />
+              <input 
+                type="file" 
+                className="form-control" 
+                {...register("profilePicture", { required: "Uploading a profile picture is required." })} 
+              />
+              {errors.profilePicture && <span className="text-danger">{errors.profilePicture.message}</span>}
             </div>
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>
