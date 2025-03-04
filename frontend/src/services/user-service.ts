@@ -5,6 +5,8 @@ export { CanceledError }
 // User interface
 export interface User {
     _id?: string,
+    firstName: string,
+    lastName: string,
     email: string,
     password: string,
     avatar?: string
@@ -19,6 +21,7 @@ const register = (user: User) => {
     return { request, abort: () => abortController.abort() }
 }
 
+// Upload image
 const uploadImage = (img: File) => {
     // const abortController = new AbortController()
     const formData = new FormData();
@@ -31,4 +34,13 @@ const uploadImage = (img: File) => {
     return { request }
 }
 
-export default { register, uploadImage }
+// Log in
+const login = (email: string, password: string) => {
+    const abortController = new AbortController()
+    const request = apiClient.post<User>('/auth/login',
+        { email, password },
+        { signal: abortController.signal })
+    return { request, abort: () => abortController.abort() }
+}
+
+export default { register, uploadImage, login }
