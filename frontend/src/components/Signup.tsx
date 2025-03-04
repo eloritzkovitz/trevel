@@ -48,7 +48,7 @@ const Signup: FC = () => {
                   className="form-control" 
                   id="inputFirstName" 
                   placeholder="First Name" 
-                  {...register("firstName", { required: "First name is required" })} 
+                  {...register("firstName", { required: "Required." })} 
                 />
                 {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
               </div>
@@ -58,7 +58,7 @@ const Signup: FC = () => {
                   className="form-control" 
                   id="inputLastName" 
                   placeholder="Last Name" 
-                  {...register("lastName", { required: "Last name is required" })} 
+                  {...register("lastName", { required: "Required." })} 
                 />
                 {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
               </div>

@@ -20,7 +20,7 @@ const Login: FC = () => {
     const { request } = userService.login(data.email, data.password);
     request.then((response) => {
       console.log(response.data);
-      login(); // Set isAuthenticated
+      login(response.data.accessToken, response.data.refreshToken); // Store tokens and update auth state
       navigate('/'); // Redirect to main page after successful login
     }).catch((error) => {
       console.error(error);
