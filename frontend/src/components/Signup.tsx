@@ -28,7 +28,7 @@ const Signup: FC = () => {
             lastName: data.lastName,
             email: data.email,
             password: data.password,
-            avatar: response.data.url            
+            profilePicture: response.data.url            
         }        
         const { request } = userService.register(user);
         request.then((response) => {
@@ -56,7 +56,7 @@ const Signup: FC = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-row" style={{ marginTop: '20px' }}>
               <label>Register to join Trevel</label>
-              <div className="form-group col-md-6">
+              <div className="form-group col-md-6" style={{ marginTop: '20px' }}>
                 <input type="text" className="form-control" id="inputFirstName" placeholder="First Name" {...register("firstName", { required: true })} />
               </div>
               <div className="form-group col-md-6">
@@ -75,6 +75,7 @@ const Signup: FC = () => {
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>
         </div>
+        <a href="/login">Already have an account?</a>
       </div>
     </div>
   );

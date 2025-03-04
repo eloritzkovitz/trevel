@@ -3,6 +3,7 @@ import userModel, { IUser } from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Document } from 'mongoose';
+import path from 'path';
 
 // Register function
 const register = async (req: Request, res: Response) => {
@@ -10,9 +11,13 @@ const register = async (req: Request, res: Response) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        const profilePicture = req.file ? `/uploads/${req.file.filename}` : undefined;
         const user = await userModel.create({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
             email: req.body.email,
             password: hashedPassword,
+            profilePicture,          
         });
         res.status(200).send(user);
     } catch (err) {

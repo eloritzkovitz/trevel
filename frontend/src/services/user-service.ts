@@ -9,7 +9,7 @@ export interface User {
     lastName: string,
     email: string,
     password: string,
-    avatar?: string
+    profilePicture?: string
 }
 
 // Register a new user
