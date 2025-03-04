@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import userService from "../services/user-service";
+import { useAuth } from "../context/AuthContext";
 
 interface FormData {  
   email: string;
@@ -11,6 +12,7 @@ interface FormData {
 const Login: FC = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Submit form
@@ -18,6 +20,7 @@ const Login: FC = () => {
     const { request } = userService.login(data.email, data.password);
     request.then((response) => {
       console.log(response.data);
+      login(); // Set isAuthenticated
       navigate('/'); // Redirect to main page after successful login
     }).catch((error) => {
       console.error(error);
