@@ -70,10 +70,10 @@ const Signup: FC = () => {
                 id="inputEmailAddress" 
                 placeholder="Email" 
                 {...register("email", { 
-                  required: "Email is required", 
+                  required: "Required", 
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                    message: "Invalid email address. Please enter a valid email address"
+                    message: "Invalid email address. Please enter a valid email address."
                   }
                 })} 
               />
@@ -86,7 +86,7 @@ const Signup: FC = () => {
                 id="inputPassword" 
                 placeholder="Password" 
                 {...register("password", { 
-                  required: "Password is required", 
+                  required: "Required", 
                   minLength: {
                     value: 8,
                     message: "Password must be at least 8 characters long."

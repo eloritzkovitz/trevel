@@ -38,10 +38,10 @@ const Login: FC = () => {
               <label>Log in</label>
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="email" className="form-control" id="exampleInputEmail1" placeholder="Email" {...register("email", { required: true })} />
+              <input type="email" className="form-control" id="inputEmail" placeholder="Email" {...register("email", { required: true })} />
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" {...register("password", { required: true })} />
+              <input type="password" className="form-control" id="inputPassword" placeholder="Password" {...register("password", { required: true })} />
             </div>
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>
