@@ -15,11 +15,15 @@ type User = IUser & {
 };
 
 const testUser: User = {
+  firstName: "User1",
+  lastName: "Test",
   email: "test@user.com",
   password: "testpassword",
 }
 
 const testUser2: User = {
+  firstName: "User2",
+  lastName: "Test",
   email: "test2@user.com",
   password: "testpassword123",
 }
