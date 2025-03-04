@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { useForm } from 'react-hook-form'
 import { useNavigate } from "react-router-dom";
 import userService, { User } from "../services/user-service";
@@ -8,54 +8,31 @@ interface FormData {
   lastName: string;
   email: string;
   password: string;
-  img: File[];
+  profilePicture: File[];
 }
 
-const Signup: FC = () => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  // const inputFileRef = useRef<HTMLInputElement>(null);
+const Signup: FC = () => {  
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
   const { register, handleSubmit, watch } = useForm<FormData>();
-  const [img] = watch(["img"]);
-  const navigate = useNavigate();
-  //const inputFileRef: { current: HTMLInputElement | null } = { current: null };
+  const [profilePicture] = watch(["profilePicture"]);
+  const navigate = useNavigate();  
 
   // Submit form
   const onSubmit = (data: FormData) => {
-    console.log(data);
-    const { request: uploadRequest } = userService.uploadImage(data.img[0]);
-    // Upload image
-    uploadRequest.then((response) => {
-      console.log(response.data);
-      
-      // Get user data
-      const user: User = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-        profilePicture: response.data.url,
-      };
-
-      // Register a new user
-      const { request: registerRequest } = userService.register(user);
-      registerRequest.then((response) => {
-        console.log(response.data);
-
-        navigate('/login'); // Redirect to login page after successful registration
-      }).catch((error) => {
-        console.error(error);
-      });
+    const user: User = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      password: data.password,
+    };
+    const { request: registerRequest } = userService.register(user, data.profilePicture[0]);
+    registerRequest.then(() => {
+      navigate('/login'); // Redirect to login page after successful registration
     }).catch((error) => {
       console.error(error);
+      setResultMessage("Registration failed. Please try again.");
     });
   };
-
-  // Handle file input for image upload
-  useEffect(() => {    
-    if (img != null && img[0]) {
-        setSelectedImage(img[0])
-    }
-  }, [img]);
 
   return (
     <div className="container-fluid bg-light min-vh-100">
@@ -79,10 +56,15 @@ const Signup: FC = () => {
               <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" {...register("password", { required: true })} />
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="file" className="form-control" {...register("img", { required: true })} />
+              <input type="file" className="form-control" {...register("profilePicture", { required: true })} />
             </div>
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>
+          {resultMessage && (
+            <div className="alert alert-info" style={{ marginTop: '20px' }}>
+              {resultMessage}
+            </div>
+          )}
         </div>
         <a href="/login">Already have an account?</a>
       </div>
