@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
             {user && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/profile">
+                  <Link className="nav-link" to={`/profile/${user._id}`}>
                     <img 
                       src={user.profilePicture} 
                       alt="Profile" 

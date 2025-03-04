@@ -165,6 +165,8 @@ router.post("/refresh", authController.refresh);
  */
 router.get("/user", authMiddleware, authController.getUserData);
 
+router.get("/user/:userId", authMiddleware, authController.getUserData);
+
 /**
  * @swagger
  * /auth/logout:
