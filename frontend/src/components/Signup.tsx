@@ -14,7 +14,7 @@ interface FormData {
 const Signup: FC = () => {  
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
-  const [profilePicture] = watch(["profilePicture"]);
+  const profilePicture = watch("profilePicture");
   const navigate = useNavigate();  
 
   // Submit form
@@ -103,6 +103,15 @@ const Signup: FC = () => {
               />
               {errors.profilePicture && <span className="text-danger">{errors.profilePicture.message}</span>}
             </div>
+            {profilePicture && profilePicture.length > 0 && (
+              <div className="form-group" style={{ marginTop: '20px' }}>
+                <img 
+                  src={URL.createObjectURL(profilePicture[0])} 
+                  alt="Profile Preview" 
+                  style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
+                />
+              </div>
+            )}
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>
           {resultMessage && (
