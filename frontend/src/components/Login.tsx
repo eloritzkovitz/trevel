@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import userService from "../services/user-service";
+import { useAuth } from "../context/AuthContext";
 
 interface FormData {  
   email: string;
@@ -11,6 +12,7 @@ interface FormData {
 const Login: FC = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Submit form
@@ -18,6 +20,7 @@ const Login: FC = () => {
     const { request } = userService.login(data.email, data.password);
     request.then((response) => {
       console.log(response.data);
+      login(response.data.accessToken, response.data.refreshToken); // Store tokens and update auth state
       navigate('/'); // Redirect to main page after successful login
     }).catch((error) => {
       console.error(error);
@@ -35,10 +38,10 @@ const Login: FC = () => {
               <label>Log in</label>
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="email" className="form-control" id="exampleInputEmail1" placeholder="Email" {...register("email", { required: true })} />
+              <input type="email" className="form-control" id="inputEmail" placeholder="Email" {...register("email", { required: true })} />
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
-              <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password" {...register("password", { required: true })} />
+              <input type="password" className="form-control" id="inputPassword" placeholder="Password" {...register("password", { required: true })} />
             </div>
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
           </form>

@@ -1,8 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
+  const { logout } = useAuth();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container">      
@@ -31,10 +34,8 @@ const Navbar: React.FC = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link btn btn-danger text-white" to="#">
-                Logout
-              </Link>
-            </li>
+            <button className="btn btn-link nav-link" onClick={logout}>Logout</button>
+          </li>
           </ul>
         </div>
       </div>
