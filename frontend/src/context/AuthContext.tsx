@@ -1,8 +1,16 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import Cookies from "js-cookie";
+import userService from "../services/user-service";
+
+interface User {
+  firstName: string;
+  lastName: string;
+  profilePicture?: string;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: User | null;
   login: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
 }
@@ -12,11 +20,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Define the AuthProvider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);  
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const token = Cookies.get("accessToken");
     if (token) {
       setIsAuthenticated(true);
+      userService.getUserData().then(setUser).catch(() => {
+        setIsAuthenticated(false);
+        setUser(null);
+      });
     }
   }, []);
 
@@ -24,18 +37,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (accessToken: string, refreshToken: string) => {
     Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'strict' });
     Cookies.set("refreshToken", refreshToken, { secure: true, sameSite: 'strict' });
-    setIsAuthenticated(true);    
+    setIsAuthenticated(true);  
+    userService.getUserData().then(setUser);  
   };
 
   // Remove authentication on logout
   const logout = () => {
     Cookies.remove("accessToken");
     Cookies.remove("refreshToken");
-    setIsAuthenticated(false);    
+    setIsAuthenticated(false); 
+    setUser(null);   
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

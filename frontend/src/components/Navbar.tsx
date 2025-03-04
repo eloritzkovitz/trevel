@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -28,14 +28,23 @@ const Navbar: React.FC = () => {
                 Home
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/profile">
-                Profile
-              </Link>
-            </li>
-            <li className="nav-item">
-            <button className="btn btn-link nav-link" onClick={logout}>Logout</button>
-          </li>
+            {user && (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/profile">
+                    <img 
+                      src={user.profilePicture} 
+                      alt="Profile" 
+                      style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} 
+                    />
+                    {user.firstName} {user.lastName}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-link nav-link" onClick={logout}>Logout</button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

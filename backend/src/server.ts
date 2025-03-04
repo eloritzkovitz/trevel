@@ -7,6 +7,7 @@ import commentRoutes from "./routes/commentRoutes";
 import authRoutes from "./routes/authRoutes";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
+import path from "path";
 
 // Set application
 dotenv.config();
@@ -22,6 +23,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/auth", authRoutes);
+app.use('/uploads', express.static(path.join(__dirname, '../dist/uploads')));
 
 // Swagger documentation
 const options = {

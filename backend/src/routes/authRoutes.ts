@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import authController from "../controllers/authController";
+import authController, { authMiddleware } from "../controllers/authController";
 import upload from "../middleware/upload";
 
 /**
@@ -62,7 +62,7 @@ import upload from "../middleware/upload";
 *             schema:
 *               $ref: '#/components/schemas/User'
 */
-router.post("/register", upload.single('profilePicture'), authController.register);
+router.post("/register", authController.register);
 
 /**
  * @swagger
@@ -140,6 +140,30 @@ router.post("/login", authController.login);
  *         description: Server error
  */
 router.post("/refresh", authController.refresh);
+
+/**
+ * @swagger
+ * /auth/user:
+ *   get:
+ *     summary: Get user data
+ *     description: Retrieve the user data
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: The user data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get("/user", authMiddleware, authController.getUserData);
 
 /**
  * @swagger

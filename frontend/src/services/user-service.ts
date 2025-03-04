@@ -1,4 +1,5 @@
 import apiClient, { CanceledError } from "./api-client";
+import Cookies from "js-cookie";
 
 export { CanceledError }
 
@@ -13,18 +14,11 @@ export interface User {
 }
 
 // Register a new user
-const register = (user: User, img: File) => {
-    const formData = new FormData();
-    formData.append("firstName", user.firstName);
-    formData.append("lastName", user.lastName);
-    formData.append("email", user.email);
-    formData.append("password", user.password);
-    formData.append("profilePicture", img);
-
+const register = (user: User) => {
     const abortController = new AbortController();
-    const request = apiClient.post<User>('/auth/register', formData, {
+    const request = apiClient.post<User>('/auth/register', user, {
         headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
         },
         signal: abortController.signal
     });
@@ -40,4 +34,18 @@ const login = (email: string, password: string) => {
     return { request, abort: () => abortController.abort() };
 }
 
-export default { register, login }
+// Get user data
+const getUserData = async (): Promise<User> => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+        throw new Error("No access token found.");
+    }
+    const response = await apiClient.get<User>('/auth/user', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    return response.data;
+};
+
+export default { register, login, getUserData };

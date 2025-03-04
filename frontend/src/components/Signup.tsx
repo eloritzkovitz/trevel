@@ -7,14 +7,12 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
-  profilePicture: File[];
+  password: string;  
 }
 
 const Signup: FC = () => {  
   const [resultMessage, setResultMessage] = useState<string | null>(null);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
-  const profilePicture = watch("profilePicture");
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();  
   const navigate = useNavigate();  
 
   // Submit form
@@ -25,7 +23,7 @@ const Signup: FC = () => {
       email: data.email,
       password: data.password,
     };
-    const { request: registerRequest } = userService.register(user, data.profilePicture[0]);
+    const { request: registerRequest } = userService.register(user);
     registerRequest.then(() => {
       navigate('/login'); // Redirect to login page after successful registration
     }).catch((error) => {
@@ -95,30 +93,8 @@ const Signup: FC = () => {
               />
               {errors.password && <span className="text-danger">{errors.password.message}</span>}
             </div>
-            <div className="form-group" style={{ marginTop: '20px' }}>
-              <input 
-                type="file" 
-                className="form-control" 
-                {...register("profilePicture", { required: "Uploading a profile picture is required." })} 
-              />
-              {errors.profilePicture && <span className="text-danger">{errors.profilePicture.message}</span>}
-            </div>
-            {profilePicture && profilePicture.length > 0 && (
-              <div className="form-group" style={{ marginTop: '20px' }}>
-                <img 
-                  src={URL.createObjectURL(profilePicture[0])} 
-                  alt="Profile Preview" 
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
-                />
-              </div>
-            )}
             <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
-          </form>
-          {resultMessage && (
-            <div className="alert alert-info" style={{ marginTop: '20px' }}>
-              {resultMessage}
-            </div>
-          )}
+          </form>          
         </div>
         <a href="/login">Already have an account?</a>
       </div>
