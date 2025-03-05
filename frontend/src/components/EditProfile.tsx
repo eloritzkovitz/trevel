@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import userService from "../services/user-service";
+import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 
-const EditProfile: React.FC<{ show: boolean; handleClose: () => void }> = ({ show, handleClose }) => {
+const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void }> = ({ show, handleClose, onUpdate }) => {
   const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
   const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
@@ -37,6 +37,7 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void }> = ({ sho
     try {
       const updatedUser = await userService.updateUser(loggedInUser!._id!, formData);
       setLoggedInUser(updatedUser);
+      onUpdate(updatedUser);
       setStatusMessage("Profile updated successfully!");
       setStatusType("success");
       setTimeout(() => {

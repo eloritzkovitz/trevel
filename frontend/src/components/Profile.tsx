@@ -58,7 +58,13 @@ const Profile: React.FC = () => {
       </div>
       
       {/* Edit Profile Modal */}
-      {isEditProfileOpen && <EditProfile show={isEditProfileOpen} handleClose={() => setIsEditProfileOpen(false)} />}
+      {isEditProfileOpen && (
+        <EditProfile
+          show={isEditProfileOpen}
+          handleClose={() => setIsEditProfileOpen(false)}
+          onUpdate={setUser}
+        />
+      )}
     </div>
   );
 };
