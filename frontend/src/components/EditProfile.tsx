@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import userService from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
@@ -10,6 +10,8 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void }> = ({ sho
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
   const navigate = useNavigate();
 
   // Handle profile picture change
@@ -35,9 +37,16 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void }> = ({ sho
     try {
       const updatedUser = await userService.updateUser(loggedInUser!._id!, formData);
       setLoggedInUser(updatedUser);
-      navigate(`/profile/${loggedInUser!._id}`);
-      handleClose(); // Close modal after success
+      setStatusMessage("Profile updated successfully!");
+      setStatusType("success");
+      setTimeout(() => {
+        setStatusMessage(null);
+        handleClose();
+        navigate(`/profile/${loggedInUser!._id}`);
+      }, 2000);
     } catch (error) {
+      setStatusMessage("Failed to update profile.");
+      setStatusType("danger");
       console.error("Failed to update profile", error);
     }
   };
@@ -87,6 +96,11 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void }> = ({ sho
             Save Changes
           </Button>
         </Form>
+        {statusMessage && statusType && (
+          <Alert variant={statusType} className="mt-3">
+            {statusMessage}
+          </Alert>
+        )}
       </Modal.Body>
     </Modal>
   );
