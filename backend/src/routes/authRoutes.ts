@@ -163,9 +163,58 @@ router.post("/refresh", authController.refresh);
  *       500:
  *         description: Server error
  */
-router.get("/user", authMiddleware, authController.getUserData);
-
 router.get("/user/:userId", authMiddleware, authController.getUserData);
+
+/**
+ * @swagger
+ * /auth/user/{userId}:
+ *   put:
+ *     summary: Update user data
+ *     description: Update user details including first name, last name, password, and profile picture
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.put("/user/:userId", authMiddleware, upload.single("profilePicture"), authController.updateUser);
 
 /**
  * @swagger

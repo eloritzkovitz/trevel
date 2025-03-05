@@ -35,13 +35,12 @@ const login = (email: string, password: string) => {
 }
 
 // Get user data
-const getUserData = async (userId?: string): Promise<User> => {
+const getUserData = async (userId: string): Promise<User> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    const url = userId ? `/auth/user/${userId}` : '/auth/user/';
-    const response = await apiClient.get<User>(url, {
+    const response = await apiClient.get<User>(`/auth/user/${userId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

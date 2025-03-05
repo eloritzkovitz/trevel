@@ -28,10 +28,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = Cookies.get("accessToken");
     if (token) {
       setIsAuthenticated(true);
-      userService.getUserData().then(setUser).catch(() => {
-        setIsAuthenticated(false);
-        setUser(null);
-      });
+      if (user && user._id) {
+        userService.getUserData(user._id).then(setUser).catch(() => {
+          setIsAuthenticated(false);
+          setUser(null);
+        });
+      }
     }
   }, []);
 
@@ -39,8 +41,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (accessToken: string, refreshToken: string) => {
     Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'strict' });
     Cookies.set("refreshToken", refreshToken, { secure: true, sameSite: 'strict' });
-    setIsAuthenticated(true);  
-    userService.getUserData().then(setUser);  
+    setIsAuthenticated(true);
+    userService.getUserData(accessToken).then(setUser);
   };
 
   // Remove authentication on logout

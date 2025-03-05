@@ -113,6 +113,34 @@ const getUserData = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+// Update user data
+const updateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.params.userId;
+        const user = await userModel.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        // Update user details
+        user.firstName = req.body.firstName || user.firstName;
+        user.lastName = req.body.lastName || user.lastName;
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(req.body.password, salt);
+        }
+        if (req.file) {
+            user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+        }
+
+        await user.save();
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user data', error });
+    }
+};
+
 type tUser = Document<unknown, {}, IUser> & IUser & Required<{
     _id: string;
 }> & {
@@ -238,6 +266,7 @@ export default {
     register,
     login,
     getUserData,
+    updateUser,
     refresh,
     logout
 };
