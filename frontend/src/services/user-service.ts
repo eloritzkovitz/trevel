@@ -49,4 +49,18 @@ const getUserData = async (userId?: string): Promise<User> => {
     return response.data;
 };
 
-export default { register, login, getUserData };
+// Update user data
+const updateUser = async (userId: string, formData: FormData): Promise<User> => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      throw new Error("No access token found.");
+    }
+    const response = await apiClient.put<User>(`/auth/user/${userId}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+};
+
+export default { register, login, getUserData, updateUser };
