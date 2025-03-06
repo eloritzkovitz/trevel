@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import userService from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 interface FormData {  
   email: string;
@@ -27,23 +28,30 @@ const Login: FC = () => {
       setErrorMessage("Login failed. Please check your credentials and try again.");
     });
   };
+
+  // Google OAuth response handlers
+  const googleResponseMessage = (credentialResponse: CredentialResponse) => {    
+    console.log(credentialResponse);
+  };
+
+  const googleErrorMessage = () => {
+    console.log("Google Error");
+  };
   
   return (
     <div className="container-fluid bg-light min-vh-100">
       <div style={{ textAlign: 'center' }}>
         <h1>Trevel</h1>
         <div className="card" style={{ height: 'auto', width: '300px', margin: 'auto', padding: '20px', marginTop: '20px', boxShadow: '0px 0px 0px 2px rgba(136, 136, 136, 0.1)' }}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-row" style={{ marginTop: '20px' }}>
-              <label>Log in</label>
-            </div>
+          <form onSubmit={handleSubmit(onSubmit)}>            
             <div className="form-group" style={{ marginTop: '20px' }}>
               <input type="email" className="form-control" id="inputEmail" placeholder="Email" {...register("email", { required: true })} />
             </div>
             <div className="form-group" style={{ marginTop: '20px' }}>
               <input type="password" className="form-control" id="inputPassword" placeholder="Password" {...register("password", { required: true })} />
             </div>
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '20px', marginBottom: '20px' }}>Sign in</button>
+            <GoogleLogin onSuccess={googleResponseMessage} onError={googleErrorMessage} />
           </form>
           {errorMessage && (
             <div className="alert alert-danger" style={{ marginTop: '20px' }}>

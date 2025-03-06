@@ -1,8 +1,61 @@
-import { NextFunction, Request, Response } from 'express';
-import userModel, { IUser } from '../models/User';
+import { Request, Response } from 'express';
+import userModel from '../models/User';
+import { generateToken, verifyRefreshToken } from '../utils/tokenService';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { Document } from 'mongoose';
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Google sign-in
+const googleSignIn = async (req: Request, res: Response) => {
+    try {
+        const { idToken } = req.body;
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload) {
+            res.status(400).send('Invalid Google ID token');
+            return;
+        }
+
+        const { sub, email, given_name, family_name, picture } = payload;
+        let user = await userModel.findOne({ email });
+
+        if (!user) {
+            user = await userModel.create({
+                firstName: given_name,
+                lastName: family_name,
+                email,
+                password: sub, // Use Google sub as a placeholder password
+                profilePicture: picture,
+                joinDate: new Date().toISOString()
+            });
+        }
+
+        const tokens = generateToken(user._id);
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        if (!user.refreshToken) {
+            user.refreshToken = [];
+        }
+        user.refreshToken.push(tokens.refreshToken);
+        await user.save();
+
+        res.status(200).send({
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            _id: user._id
+        });
+    } catch (err) {
+        res.status(400).send(err);
+        return;
+    }
+};
 
 // Register function
 const register = async (req: Request, res: Response) => {
@@ -23,38 +76,6 @@ const register = async (req: Request, res: Response) => {
     } catch (err) {
         res.status(400).send(err);
     }
-};
-
-type tTokens = {
-    accessToken: string,
-    refreshToken: string
-}
-
-// Generate token function
-const generateToken = (userId: string): tTokens | null => {
-    if (!process.env.TOKEN_SECRET) {
-        return null;
-    }
-    // generate token
-    const random = Math.random().toString();
-    const accessToken = jwt.sign({
-        _id: userId,
-        random: random
-    },
-        process.env.TOKEN_SECRET,
-        { expiresIn: process.env.TOKEN_EXPIRES });
-
-    const refreshToken = jwt.sign({
-        _id: userId,
-        random: random
-    },
-        process.env.TOKEN_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRES });    
-
-    return {
-        accessToken: accessToken,
-        refreshToken: refreshToken
-    };
 };
 
 // Login function
@@ -147,52 +168,6 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-type tUser = Document<unknown, {}, IUser> & IUser & Required<{
-    _id: string;
-}> & {
-    __v: number;
-}
-
-const verifyRefreshToken = (refreshToken: string | undefined) => {
-    return new Promise<tUser>((resolve, reject) => {
-        if (!refreshToken) {
-            reject("Refresh token is required");
-            return;
-        }
-        if (!process.env.TOKEN_SECRET) {
-            reject("Token secret is missing");
-            return;
-        }
-        jwt.verify(refreshToken, process.env.TOKEN_SECRET, async (err: any, payload: any) => {
-            if (err) {
-                reject("fail");
-                return;
-            }
-            const userId = payload._id;
-            try {
-                const user = await userModel.findById(userId);
-                if (!user) {
-                    reject("fail");
-                    return;
-                }
-                if (!user.refreshToken || !user.refreshToken.includes(refreshToken)) {
-                    user.refreshToken = [];
-                    await user.save();
-                    reject("fail");
-                    return;
-                }
-                const tokens = user.refreshToken!.filter((token) => token !== refreshToken);
-                user.refreshToken = tokens;
-
-                resolve(user);
-            } catch (err) {
-                reject("fail");
-                return;
-            }
-        });
-    });
-};
-
 // Logout function
 const logout = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
@@ -240,36 +215,9 @@ const refresh = async (req: Request, res: Response) => {
     }
 };
 
-type Payload = {
-    _id: string;
-};
-
-// Middleware to check if the user is authenticated
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const authorization = req.header('authorization');
-    const token = authorization && authorization.split(' ')[1];
-
-    if (!token) {
-        res.status(401).send('Access Denied');
-        return;
-    }
-    if (!process.env.TOKEN_SECRET) {
-        res.status(500).send('Server Error');
-        return;
-    }
-
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, payload) => {
-        if (err) {
-            res.status(401).send('Access Denied');
-            return;
-        }
-        req.params.userId = (payload as Payload)._id;
-        next();
-    });
-};
-
 export default {
     register,
+    googleSignIn,
     login,
     getUserData,
     updateUser,

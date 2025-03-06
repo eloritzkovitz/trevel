@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { useForm } from 'react-hook-form'
 import { useNavigate } from "react-router-dom";
 import userService, { User } from "../services/user-service";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 interface FormData {
   firstName: string;
@@ -22,6 +23,7 @@ const Signup: FC = () => {
       lastName: data.lastName,
       email: data.email,
       password: data.password,
+      joinDate: new Date().toISOString()
     };
     const { request: registerRequest } = userService.register(user);
     registerRequest.then(() => {
@@ -31,6 +33,15 @@ const Signup: FC = () => {
       setResultMessage("Registration failed. Please try again.");
     });
   };
+
+  // Google OAuth response handlers
+  const googleResponseMessage = (credentialResponse: CredentialResponse) => {    
+    console.log(credentialResponse);
+  };
+
+  const googleErrorMessage = () => {
+    console.log("Google Error");
+  };  
 
   return (
     <div className="container-fluid bg-light min-vh-100">
@@ -93,7 +104,8 @@ const Signup: FC = () => {
               />
               {errors.password && <span className="text-danger">{errors.password.message}</span>}
             </div>
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '20px' }}>Submit</button>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '20px', marginBottom : '20px' }}>Register</button>
+            <GoogleLogin onSuccess={googleResponseMessage} onError={googleErrorMessage} />
           </form>          
         </div>
         <a href="/login">Already have an account?</a>
