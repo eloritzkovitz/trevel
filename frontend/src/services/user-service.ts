@@ -13,6 +13,7 @@ export interface User {
     profilePicture?: string    
     bio?: string; 
     location?: string;
+    website?: string;
     joinDate: string;
 }
 

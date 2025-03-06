@@ -6,6 +6,8 @@ import PostsList from "./PostsList";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Profile: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -44,10 +46,24 @@ const Profile: React.FC = () => {
                   style={{ width: '100px', height: '100px' }} 
                 />
                 <h4 className="card-title">{user.firstName} {user.lastName}</h4>
-                <p className="card-title">{user.email}</p>
-                <p className="card-text">{user.bio}</p>
-                <p className="card-text">{user.location}</p>
-                <p className="card-text">{user.joinDate}</p>
+                <p className="card-text">{user.bio || <em>No bio available</em>}</p>
+                <p className="card-text">
+                  <FontAwesomeIcon icon={faEnvelope} style={{ marginRight: '5px' }} /> {user.email}
+                </p>
+                <p className="card-text">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} style={{ marginRight: '5px' }} /> {user.location || <em>No location available</em>}
+                </p>
+                <p className="card-text">
+                  <FontAwesomeIcon icon={faGlobe} style={{ marginRight: '5px' }} /> 
+                  {user.website ? (
+                    <a href={user.website} target="_blank" rel="noopener noreferrer">{user.website}</a>
+                  ) : (
+                    <em>No website available</em>
+                  )}
+                </p>
+                <p className="card-text">
+                  <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: '5px' }} /> {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : <em>Join date not available</em>}
+                </p>
                 {isOwnProfile && (
                   <>
                     <Button variant="primary" style={({ marginRight: '10px' })}>

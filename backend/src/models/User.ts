@@ -9,6 +9,7 @@ export interface IUser {
   profilePicture?: string;
   bio?: string
   location?: string;
+  website?: string;
   joinDate?: string;  
   refreshToken?: string[];
 }
@@ -38,6 +39,9 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String,
   },
   location: {
+    type: String,
+  },
+  website: {
     type: String,
   },
   joinDate: {
