@@ -3,7 +3,6 @@ import userModel, { IUser } from '../models/User';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Document } from 'mongoose';
-import path from 'path';
 
 // Register function
 const register = async (req: Request, res: Response) => {
@@ -17,7 +16,8 @@ const register = async (req: Request, res: Response) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: hashedPassword,
-            profilePicture,          
+            profilePicture,
+            joinDate: new Date().toISOString        
         });
         res.status(200).send(user);
     } catch (err) {
@@ -126,6 +126,8 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
         // Update user details
         user.firstName = req.body.firstName || user.firstName;
         user.lastName = req.body.lastName || user.lastName;
+        user.bio = req.body.bio || user.bio;
+        user.location = req.body.location || user.location;
         if (req.body.password) {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(req.body.password, salt);

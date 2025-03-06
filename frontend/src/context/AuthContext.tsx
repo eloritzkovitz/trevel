@@ -1,13 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import Cookies from "js-cookie";
-import userService from "../services/user-service";
-
-interface User {
-  _id?: string;
-  firstName: string;
-  lastName: string;
-  profilePicture?: string;
-}
+import userService, { User } from "../services/user-service";
 
 interface AuthContextType {
   isAuthenticated: boolean;

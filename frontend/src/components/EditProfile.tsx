@@ -10,6 +10,8 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [bio, setBio] = useState(loggedInUser?.bio || "");
+  const [location, setLocation] = useState(loggedInUser?.location || "");  
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
@@ -36,6 +38,8 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     const formData = new FormData();
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
+    formData.append("bio", bio);
+    formData.append("location", location);    
     if (password) {
       formData.append("password", password);
     }
@@ -87,6 +91,25 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Bio</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Location</Form.Label>
+            <Form.Control
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
             />
           </Form.Group>
 

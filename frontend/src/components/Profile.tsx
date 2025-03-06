@@ -44,7 +44,10 @@ const Profile: React.FC = () => {
                   style={{ width: '100px', height: '100px' }} 
                 />
                 <h4 className="card-title">{user.firstName} {user.lastName}</h4>
-                <p className="card-text">Travel Enthusiast | Blogger</p>
+                <p className="card-title">{user.email}</p>
+                <p className="card-text">{user.bio}</p>
+                <p className="card-text">{user.location}</p>
+                <p className="card-text">{user.joinDate}</p>
                 {isOwnProfile && (
                   <>
                     <Button variant="primary" style={({ marginRight: '10px' })}>

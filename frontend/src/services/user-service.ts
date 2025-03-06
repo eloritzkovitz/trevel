@@ -10,7 +10,10 @@ export interface User {
     lastName: string,
     email: string,
     password: string,
-    profilePicture?: string
+    profilePicture?: string    
+    bio?: string; 
+    location?: string;
+    joinDate: string;
 }
 
 // Register a new user
