@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
+import PostsList from "./PostsList";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "react-bootstrap";
@@ -46,11 +47,22 @@ const Profile: React.FC = () => {
                 <p className="card-text">Travel Enthusiast | Blogger</p>
                 {isOwnProfile && (
                   <>
+                    <Button variant="primary" style={({ marginRight: '10px' })}>
+                      New Post
+                    </Button>
                     <Button variant="primary" onClick={() => setIsEditProfileOpen(true)}>
                       Edit Profile
                     </Button>
                   </>
                 )}
+              </div>
+            </div>
+          
+          {/* Posts Section */}
+          <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Recent Posts</h5>
+                <PostsList userId={userId} />
               </div>
             </div>
           </div>
