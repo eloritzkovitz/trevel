@@ -9,7 +9,7 @@ const MainPage: React.FC = () => {
       <Navbar/>
 
       {/* Main Content */}
-      <div className="container mt-4">
+      <div className="container mt-5 pt-5">
         <div className="row">
           {/* Feed Section */}          
             <div className="card">

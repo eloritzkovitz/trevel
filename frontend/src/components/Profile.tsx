@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
       <Navbar />
 
       {/* Main Content */}
-      <div className="container mt-4">
+      <div className="container mt-5 pt-5">
         <div className="row justify-content-center">
           {/* Profile Section */}
           <div className="col-md-8">
