@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Navbar from "./Navbar";
-import EditProfile from "./EditProfile";
-import PostsList from "./PostsList";
-import userService, { User } from "../services/user-service";
-import { useAuth } from "../context/AuthContext";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import Navbar from "./Navbar";
+import EditProfile from "./EditProfile";
+import PostsList from "./PostsList";
+import ImageModal from "./ImageModal";
+import userService, { User } from "../services/user-service";
+import { useAuth } from "../context/AuthContext";
 
 const Profile: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: loggedInUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -27,6 +30,17 @@ const Profile: React.FC = () => {
 
   const isOwnProfile = loggedInUser?._id === userId;
 
+  // Image modal
+  const handleImageClick = () => {
+    setImageUrl(user.profilePicture || null);
+    setIsImageModalOpen(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setIsImageModalOpen(false);
+    setImageUrl(null);
+  };
+
   return (
     <div className="container-fluid bg-light min-vh-100">
       {/* Navbar */}
@@ -39,11 +53,12 @@ const Profile: React.FC = () => {
           <div className="col-md-8">
             <div className="card mb-4">
               <div className="card-body text-center">
-                <img 
+              <img 
                   src={user.profilePicture} 
                   className="rounded-circle mb-3" 
                   alt="Profile" 
-                  style={{ width: '100px', height: '100px' }} 
+                  style={{ width: '100px', height: '100px', cursor: 'pointer' }} 
+                  onClick={handleImageClick}
                 />
                 <h4 className="card-title">{user.firstName} {user.lastName}</h4>
                 <p className="card-text">{user.bio || <em>No bio available</em>}</p>
@@ -96,6 +111,13 @@ const Profile: React.FC = () => {
           onUpdate={setUser}
         />
       )}
+
+      {/* Image Modal */}
+      <ImageModal 
+        show={isImageModalOpen} 
+        imageUrl={imageUrl} 
+        handleClose={handleCloseImageModal} 
+      />
     </div>
   );
 };
