@@ -11,7 +11,7 @@ const register = async (req: Request, res: Response) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const profilePicture = req.file ? `/uploads/${req.file.filename}` : undefined;
+        const profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; 
         const user = await userModel.create({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -95,6 +95,51 @@ const login = async (req: Request, res: Response) => {
 
     } catch (err) {
         res.status(400).send(err);
+    }
+};
+
+// Get user data
+const getUserData = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.params.userId;
+        const user = await userModel.findById(userId).select('-password');
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user data', error });
+    }
+};
+
+// Update user data
+const updateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.params.userId;
+        const user = await userModel.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
+        // Update user details
+        user.firstName = req.body.firstName || user.firstName;
+        user.lastName = req.body.lastName || user.lastName;
+        if (req.body.password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(req.body.password, salt);
+        }
+        if (req.file) {
+            user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
+        } else if (req.body.profilePicture === "null") {
+            user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; // if cleared set default profile picture
+        }
+
+        await user.save();
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user data', error });
     }
 };
 
@@ -222,6 +267,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 export default {
     register,
     login,
+    getUserData,
+    updateUser,
     refresh,
     logout
 };
