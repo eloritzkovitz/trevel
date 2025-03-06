@@ -10,10 +10,14 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [headline, setHeadline] = useState(loggedInUser?.headline || "");
+  const [bio, setBio] = useState(loggedInUser?.bio || "");
+  const [location, setLocation] = useState(loggedInUser?.location || ""); 
+  const [website, setWebsite] = useState(loggedInUser?.website || ""); 
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate();  
 
   // Handle profile picture change
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,13 +40,17 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     const formData = new FormData();
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
+    formData.append("headline", headline.trim());
+    formData.append("bio", bio.trim());
+    formData.append("location", location.trim()); 
+    formData.append("website", website.trim());   
     if (password) {
       formData.append("password", password);
     }
     if (profilePicture !== null) {
       formData.append("profilePicture", profilePicture);
     } else {
-      formData.append("profilePicture", "null");
+      formData.append("profilePicture", "");
     }
 
     try {
@@ -87,6 +95,34 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Headline</Form.Label>
+            <Form.Control
+              type="text"
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Bio</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Location</Form.Label>
+            <Form.Control
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
             />
           </Form.Group>
 

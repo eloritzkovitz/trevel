@@ -1,55 +1,58 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Navbar, Nav, NavDropdown, Container } from "react-bootstrap";
 import logo from "../assets/logo.png";
 import { useAuth } from "../context/AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
-const Navbar: React.FC = () => {
+const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container">      
-        <Link className="navbar-brand" to="/">
-          <img src={logo} alt="Trevel Logo" style={{ height: '50px', marginRight: '10px'}} />
+    <Navbar bg="primary" variant="dark" expand="lg" fixed="top">
+      <Container>
+        <Navbar.Brand as={Link} to="/">
+          <img src={logo} alt="Trevel Logo" style={{ height: '50px', marginRight: '10px' }} />
           Trevel
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Home
-              </Link>
-            </li>
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarNav" />
+        <Navbar.Collapse id="navbarNav">
+          <Nav className="ms-auto">
+            <Nav.Link as={Link} to="/">
+              <FontAwesomeIcon icon={faHome} style={{ marginRight: '5px' }} />
+              Home
+            </Nav.Link>
             {user && (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to={`/profile/${user._id}`}>
+              <NavDropdown
+                title={
+                  <>
                     <img 
                       src={user.profilePicture} 
                       alt="Profile" 
                       style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} 
                     />
                     {user.firstName} {user.lastName}
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link" onClick={logout}>Logout</button>
-                </li>
-              </>
+                  </>
+                }
+                id="navbarDropdown"
+                align="end"
+              >
+                <NavDropdown.Item as={Link} to={`/profile/${user._id}`}>
+                  <FontAwesomeIcon icon={faUser} style={{ marginRight: '5px' }} />
+                  Profile
+                </NavDropdown.Item>
+                <NavDropdown.Item onClick={logout}>
+                  <FontAwesomeIcon icon={faSignOutAlt} style={{ marginRight: '5px' }} />
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
             )}
-          </ul>
-        </div>
-      </div>
-    </nav>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default NavigationBar;

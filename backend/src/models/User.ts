@@ -1,12 +1,17 @@
 import mongoose from "mongoose";
 
 export interface IUser {
+  _id?: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   profilePicture?: string;
-  _id?: string;
+  headline?: string;
+  bio?: string
+  location?: string;
+  website?: string;
+  joinDate?: string;  
   refreshToken?: string[];
 }
 
@@ -29,6 +34,21 @@ const userSchema = new mongoose.Schema<IUser>({
     required: true,
   },
   profilePicture: {
+    type: String,
+  },
+  headline: {
+    type: String,
+  },
+  bio: {
+    type: String,
+  },
+  location: {
+    type: String,
+  },
+  website: {
+    type: String,
+  },
+  joinDate: {
     type: String,
   },
   refreshToken: {

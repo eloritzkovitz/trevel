@@ -1,15 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import PostsList from "./PostsList";
 
 const MainPage: React.FC = () => {
+  // Page always loads from the top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   return (
     <div className="container-fluid bg-light min-vh-100">
       {/* Navbar */}
       <Navbar/>
 
       {/* Main Content */}
-      <div className="container mt-4">
+      <div className="container mt-5 pt-5">
         <div className="row">
           {/* Feed Section */}          
             <div className="card">
