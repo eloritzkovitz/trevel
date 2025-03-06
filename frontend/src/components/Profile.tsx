@@ -64,10 +64,10 @@ const Profile: React.FC = () => {
                 />
                 <div className="text-left">
                   <h1 className="card-title">{user.firstName} {user.lastName}</h1>
-                  <h5 className="card-text" style = {{marginBottom: '30px'}}>{user.headline || <em>No description available</em>}</h5>
+                  <h5 className="card-text" style={{ marginBottom: '30px' }}>{user.headline || <em>No description available</em>}</h5>
                   <div className="border-top border-primary"></div>
                   <h5 className="card-title mt-3">About Me</h5>
-                  <p className="card-text" style = {{marginBottom: '30px'}}>{user.bio || <em>No bio available</em>}</p> 
+                  <p className="card-text" style={{ marginBottom: '30px' }}>{user.bio || <em>No bio available</em>}</p> 
                   <div className="border-top border-primary"></div>
                   <h5 className="card-title mt-3">Contact Information</h5>
                   <p className="card-text">
@@ -84,7 +84,7 @@ const Profile: React.FC = () => {
                       <em>No website available</em>
                     )}
                   </p>
-                  <p className="card-text" style = {{marginBottom: '50px'}}>
+                  <p className="card-text" style={{ marginBottom: '50px' }}>
                     <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: '5px' }} /> {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : <em>Join date not available</em>}
                   </p>
                   {isOwnProfile && (
