@@ -131,7 +131,9 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             user.password = await bcrypt.hash(req.body.password, salt);
         }
         if (req.file) {
-            user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+            user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
+        } else if (req.body.profilePicture === "null") {
+            user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; // if cleared set default profile picture
         }
 
         await user.save();

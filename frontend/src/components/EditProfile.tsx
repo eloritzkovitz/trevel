@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import userService, { User } from "../services/user-service";
@@ -11,6 +11,7 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
   const navigate = useNavigate();
 
@@ -18,6 +19,14 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setProfilePicture(e.target.files[0]);
+    }
+  };
+
+  // Handle clear profile picture
+  const handleClearProfilePicture = () => {
+    setProfilePicture(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -30,8 +39,10 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     if (password) {
       formData.append("password", password);
     }
-    if (profilePicture) {
+    if (profilePicture !== null) {
       formData.append("profilePicture", profilePicture);
+    } else {
+      formData.append("profilePicture", "null");
     }
 
     try {
@@ -90,12 +101,15 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
 
           <Form.Group className="mb-3">
             <Form.Label>Profile Picture</Form.Label>
-            <Form.Control type="file" onChange={handleProfilePictureChange} />
+            <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />            
+            <Button variant="danger" onClick={handleClearProfilePicture} className="ms-2">
+            Clear
+            </Button>
           </Form.Group>
 
           <Button variant="primary" type="submit">
             Save Changes
-          </Button>
+          </Button>          
         </Form>
         {statusMessage && statusType && (
           <Alert variant={statusType} className="mt-3">
