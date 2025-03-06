@@ -10,7 +10,8 @@ export interface User {
     lastName: string,
     email: string,
     password: string,
-    profilePicture?: string    
+    profilePicture?: string 
+    headline?: string;   
     bio?: string; 
     location?: string;
     website?: string;

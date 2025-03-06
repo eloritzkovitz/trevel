@@ -7,6 +7,7 @@ export interface IUser {
   email: string;
   password: string;
   profilePicture?: string;
+  headline?: string;
   bio?: string
   location?: string;
   website?: string;
@@ -33,6 +34,9 @@ const userSchema = new mongoose.Schema<IUser>({
     required: true,
   },
   profilePicture: {
+    type: String,
+  },
+  headline: {
     type: String,
   },
   bio: {

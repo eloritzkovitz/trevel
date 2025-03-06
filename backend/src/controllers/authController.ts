@@ -126,6 +126,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
         // Update user details
         user.firstName = req.body.firstName || user.firstName;
         user.lastName = req.body.lastName || user.lastName;
+        user.headline = req.body.headline || user.headline;
         user.bio = req.body.bio || user.bio;
         user.location = req.body.location || user.location;
         user.website = req.body.website || user.website;

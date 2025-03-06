@@ -10,6 +10,7 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
   const [password, setPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [headline, setHeadline] = useState(loggedInUser?.headline || "");
   const [bio, setBio] = useState(loggedInUser?.bio || "");
   const [location, setLocation] = useState(loggedInUser?.location || "");  
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -38,6 +39,7 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     const formData = new FormData();
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
+    formData.append("headline", headline);
     formData.append("bio", bio);
     formData.append("location", location);    
     if (password) {
@@ -91,6 +93,15 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Headline</Form.Label>
+            <Form.Control
+              type="text"
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
             />
           </Form.Group>
 
