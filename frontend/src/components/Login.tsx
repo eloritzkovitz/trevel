@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import userService from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { handleGoogleResponse, handleGoogleError } from "../services/google-auth";
 
 interface FormData {  
   email: string;
@@ -30,12 +31,12 @@ const Login: FC = () => {
   };
 
   // Google OAuth response handlers
-  const googleResponseMessage = (credentialResponse: CredentialResponse) => {    
-    console.log(credentialResponse);
+  const googleResponseMessage = (credentialResponse: CredentialResponse) => {
+    handleGoogleResponse(credentialResponse, login, setErrorMessage, navigate);
   };
 
   const googleErrorMessage = () => {
-    console.log("Google Error");
+    handleGoogleError(setErrorMessage);
   };
   
   return (

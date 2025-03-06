@@ -1,8 +1,10 @@
 import { FC, useState } from "react";
 import { useForm } from 'react-hook-form'
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import userService, { User } from "../services/user-service";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { handleGoogleResponse, handleGoogleError } from "../services/google-auth";
 
 interface FormData {
   firstName: string;
@@ -14,7 +16,9 @@ interface FormData {
 const Signup: FC = () => {  
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();  
-  const navigate = useNavigate();  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);  
 
   // Submit form
   const onSubmit = (data: FormData) => {
@@ -35,12 +39,12 @@ const Signup: FC = () => {
   };
 
   // Google OAuth response handlers
-  const googleResponseMessage = (credentialResponse: CredentialResponse) => {    
-    console.log(credentialResponse);
+  const googleResponseMessage = (credentialResponse: CredentialResponse) => {
+    handleGoogleResponse(credentialResponse, login, setErrorMessage, navigate);
   };
-
+ 
   const googleErrorMessage = () => {
-    console.log("Google Error");
+    handleGoogleError(setErrorMessage);
   };  
 
   return (
