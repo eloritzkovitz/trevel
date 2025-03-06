@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import PostsList from "./PostsList";
 
 const MainPage: React.FC = () => {
+  // Page always loads from the top
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   return (
     <div className="container-fluid bg-light min-vh-100">
       {/* Navbar */}

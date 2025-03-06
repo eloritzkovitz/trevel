@@ -18,7 +18,9 @@ const Profile: React.FC = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  // Load page data
   useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top
     if (userId) {
       userService.getUserData(userId).then(setUser).catch(console.error);
     }
