@@ -172,7 +172,43 @@ describe("Auth Tests", () => {
       refreshToken: refreshTokenNew,
     });
     expect(response3.statusCode).not.toBe(200);
-  });  
+  }); 
+
+  // Test get user
+  test("Test get user", async () => {
+    const response = await request(app).get(baseUrl + "/user/" + testUser._id)
+      .set("Authorization", `Bearer ${testUser.accessToken}`);    
+    expect(response.statusCode).toBe(200);
+    expect(response.body._id).toBe(testUser._id);
+  });
+  
+  // Test update user
+  test("Test update user", async () => {
+    const response = await request(app).put(baseUrl + "/user/" + testUser._id)
+      .set("Authorization", `Bearer ${testUser.accessToken}`)
+      .send({
+        firstName: "User1",
+        lastName: "Test",        
+        password: "newpassword",
+        headline: "New Headline",
+        bio: "New Bio",
+        location: "New Location",
+        website: "website.com",
+      });
+
+    expect(response.statusCode).toBe(200);
+
+    // // Refresh token after update to ensure logout uses a valid token
+    // const refreshResponse = await request(app).post(baseUrl + "/refresh").send({
+    //   refreshToken: testUser.refreshToken,
+    // });
+    
+    // expect(refreshResponse.statusCode).toBe(200);
+
+    // // Update tokens
+    // testUser.accessToken = refreshResponse.body.accessToken;
+    // testUser.refreshToken = refreshResponse.body.refreshToken;
+  });
 
   // Test logout
   test("Test logout", async () => {
