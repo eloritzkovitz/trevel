@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import postModel from "../models/Post";
 import { Express } from "express";
 import userModel, { IUser } from "../models/User";
+import path from "path";
+import { OAuth2Client } from 'google-auth-library';
 
 var app: Express;
 
@@ -181,33 +183,80 @@ describe("Auth Tests", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body._id).toBe(testUser._id);
   });
+
+  // Test get user fail
+  test("Test get user fail", async () => {
+    const response = await request(app).get(baseUrl + "/user/" + testUser._id)
+      .set("Authorization", `Bearer invalidtoken`);
+    expect(response.statusCode).not.toBe(200);
+  });
   
   // Test update user
   test("Test update user", async () => {
-    const response = await request(app).put(baseUrl + "/user/" + testUser._id)
+    const imagePath = path.join(__dirname, "test-image.png");
+
+    const response = await request(app)
+      .put(baseUrl + "/user/" + testUser._id)
       .set("Authorization", `Bearer ${testUser.accessToken}`)
-      .send({
-        firstName: "User1",
-        lastName: "Test",        
-        password: "newpassword",
-        headline: "New Headline",
-        bio: "New Bio",
-        location: "New Location",
-        website: "website.com",
-      });
+      .field("firstName", "User1")
+      .field("lastName", "Test")
+      .field("password", "newpassword")
+      .field("headline", "New Headline")
+      .field("bio", "New Bio")
+      .field("location", "New Location")
+      .field("website", "website.com")
+      .attach("profilePicture", imagePath);
 
     expect(response.statusCode).toBe(200);
+    expect(response.body.profilePicture).toBeDefined();
+  });
 
-    // // Refresh token after update to ensure logout uses a valid token
-    // const refreshResponse = await request(app).post(baseUrl + "/refresh").send({
-    //   refreshToken: testUser.refreshToken,
-    // });
-    
-    // expect(refreshResponse.statusCode).toBe(200);
+  // Test update user with removed image
+  test("Test update user 2", async () => {    
 
-    // // Update tokens
-    // testUser.accessToken = refreshResponse.body.accessToken;
-    // testUser.refreshToken = refreshResponse.body.refreshToken;
+    const response = await request(app)
+      .put(baseUrl + "/user/" + testUser._id)
+      .set("Authorization", `Bearer ${testUser.accessToken}`)
+      .field("firstName", "User1")
+      .field("lastName", "Test")
+      .field("password", "newpassword")
+      .field("headline", "New Headline")
+      .field("bio", "New Bio")
+      .field("location", "New Location")
+      .field("website", "website.com")   
+      .field("profilePicture", "null");  
+
+    expect(response.statusCode).toBe(200);    
+    if (response.body.profilePicture === "null") {
+       expect(response.body.profilePicture).toBe(`${process.env.BASE_URL}/uploads/default-profile.png`);
+    }   
+  });
+
+  // Test update user fail with invalid token
+  test("Test update user fail", async () => {    
+    const response = await request(app)
+      .put(baseUrl + "/user/" + testUser._id)
+      .set("Authorization", `Bearer invalidtoken`)
+      .field("firstName", "User1")
+      .field("lastName", "Test")
+      .field("password", "newpassword")
+      .field("headline", "New Headline")
+      .field("bio", "New Bio")
+      .field("location", "New Location")
+      .field("website", "website.com");
+    expect(response.statusCode).not.toBe(200);    
+  });
+
+  // Test update user fail with non-existent user ID
+  test("Test update user fail with non-existent user ID", async () => {
+    const nonExistentUserId = new mongoose.Types.ObjectId().toHexString();
+
+    const response = await request(app)
+      .put(baseUrl + "/user/" + nonExistentUserId)
+      .set("Authorization", `Bearer ${testUser.accessToken}`)
+      .field("firstName", "User1")
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe('User not found');
   });
 
   // Test logout
@@ -331,3 +380,25 @@ describe("Auth Tests", () => {
     expect(response4.statusCode).toBe(201);
   });
 });
+
+//const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Test Google sign-in
+// test("Auth test Google sign-in", async () => {
+
+//   const testGoogleToken = process.env.TEST_GOOGLE_TOKEN;
+//   const googleSignInResponse = await request(app)
+//     .post(baseUrl + "/auth/google")
+//     .send({ tokenId: testGoogleToken });
+
+//   expect(googleSignInResponse.statusCode).toBe(200);
+//   const accessToken = googleSignInResponse.body.accessToken;
+//   const refreshToken = googleSignInResponse.body.refreshToken;
+//   expect(accessToken).toBeDefined();
+//   expect(refreshToken).toBeDefined();
+//   expect(googleSignInResponse.body._id).toBeDefined();
+  
+//   testUser.accessToken = accessToken;
+//   testUser.refreshToken = refreshToken;
+//   testUser._id = googleSignInResponse.body._id;
+// });
