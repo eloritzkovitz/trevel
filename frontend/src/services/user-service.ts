@@ -30,7 +30,7 @@ const register = (user: User) => {
     return { request, abort: () => abortController.abort() };
 }
 
-// Log in
+// Login
 const login = (email: string, password: string) => {
     const abortController = new AbortController();
     const request = apiClient.post<{ accessToken: string, refreshToken: string }>('/auth/login',
@@ -67,4 +67,13 @@ const updateUser = async (userId: string, formData: FormData): Promise<User> => 
     return response.data;
 };
 
-export default { register, login, getUserData, updateUser };
+// Google sign in
+const signInWithGoogle = (idToken: string) => {
+    const abortController = new AbortController();
+    const request = apiClient.post<{ accessToken: string, refreshToken: string }>('/auth/google', { idToken }, {
+        signal: abortController.signal
+    });
+    return { request, abort: () => abortController.abort() };
+}
+
+export default { register, login, signInWithGoogle, getUserData, updateUser };

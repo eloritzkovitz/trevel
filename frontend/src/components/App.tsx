@@ -9,15 +9,15 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<RequireAuth><MainPage /></RequireAuth>} />
-          <Route path="/profile/:userId" element={<RequireAuth><Profile /></RequireAuth>} />       
-        </Routes>
-      </Router>
-    </AuthProvider>    
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<RequireAuth><MainPage /></RequireAuth>} />
+            <Route path="/profile/:userId" element={<RequireAuth><Profile /></RequireAuth>} />       
+          </Routes>
+        </Router>
+      </AuthProvider>        
   );
 };
 

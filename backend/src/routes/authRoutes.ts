@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
-import authController, { authMiddleware } from "../controllers/authController";
+import authController from "../controllers/authController";
+import { authMiddleware } from "../middleware/auth";
 import upload from "../middleware/upload";
 
 /**
@@ -20,6 +21,46 @@ import upload from "../middleware/upload";
 *       bearerFormat: JWT
 */
 
+
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Google sign-in
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: The Google ID token
+ *     responses:
+ *       200:
+ *         description: Successful sign-in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 refreshToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 _id:
+ *                   type: string
+ *                   example: 60d0fe4f5311236168a109ca
+ *       400:
+ *         description: Invalid ID token
+ *       500:
+ *         description: Server error
+ */
+router.post("/google", authController.googleSignIn);
 
 /**
 * @swagger
