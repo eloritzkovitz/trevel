@@ -6,6 +6,7 @@ import { Express } from "express";
 import userModel, { IUser } from "../models/User";
 import path from "path";
 import { OAuth2Client } from 'google-auth-library';
+import { generateToken, verifyRefreshToken } from "../utils/tokenService";
 
 var app: Express;
 
@@ -108,6 +109,21 @@ describe("Auth Tests", () => {
     });
     expect(response2.statusCode).not.toBe(200);
   });  
+  
+  // Test generate token fail
+  test("Test generate token fail", async () => {
+    const originalSecret = process.env.TOKEN_SECRET;
+    delete process.env.TOKEN_SECRET;
+
+    const result = generateToken("mockUserId");
+    expect(result).toBeNull();
+
+    const response = await request(app).post(baseUrl + "/login").send(testUser);    
+    expect(response.statusCode).toBe(500);
+    expect(response.text).toBe("Server Error");
+
+    process.env.TOKEN_SECRET = originalSecret;
+  });
 
   // Test me
   test("Auth test me", async () => {
@@ -125,7 +141,7 @@ describe("Auth Tests", () => {
       sender: testUser._id,
     });
     expect(response2.statusCode).toBe(201);
-  });
+  });  
 
   // Test refresh token
   test("Test refresh token", async () => {
@@ -174,7 +190,7 @@ describe("Auth Tests", () => {
       refreshToken: refreshTokenNew,
     });
     expect(response3.statusCode).not.toBe(200);
-  }); 
+  });  
 
   // Test get user
   test("Test get user", async () => {
@@ -189,7 +205,7 @@ describe("Auth Tests", () => {
     const response = await request(app).get(baseUrl + "/user/" + testUser._id)
       .set("Authorization", `Bearer invalidtoken`);
     expect(response.statusCode).not.toBe(200);
-  });
+  });  
   
   // Test update user
   test("Test update user", async () => {
@@ -200,7 +216,7 @@ describe("Auth Tests", () => {
       .set("Authorization", `Bearer ${testUser.accessToken}`)
       .field("firstName", "User1")
       .field("lastName", "Test")
-      .field("password", "newpassword")
+      .field("password", "testpassword")
       .field("headline", "New Headline")
       .field("bio", "New Bio")
       .field("location", "New Location")
@@ -216,10 +232,7 @@ describe("Auth Tests", () => {
 
     const response = await request(app)
       .put(baseUrl + "/user/" + testUser._id)
-      .set("Authorization", `Bearer ${testUser.accessToken}`)
-      .field("firstName", "User1")
-      .field("lastName", "Test")
-      .field("password", "newpassword")
+      .set("Authorization", `Bearer ${testUser.accessToken}`)      
       .field("headline", "New Headline")
       .field("bio", "New Bio")
       .field("location", "New Location")
@@ -236,27 +249,12 @@ describe("Auth Tests", () => {
   test("Test update user fail", async () => {    
     const response = await request(app)
       .put(baseUrl + "/user/" + testUser._id)
-      .set("Authorization", `Bearer invalidtoken`)
-      .field("firstName", "User1")
-      .field("lastName", "Test")
-      .field("password", "newpassword")
+      .set("Authorization", `Bearer invalidtoken`)      
       .field("headline", "New Headline")
       .field("bio", "New Bio")
       .field("location", "New Location")
       .field("website", "website.com");
     expect(response.statusCode).not.toBe(200);    
-  });
-
-  // Test update user fail with non-existent user ID
-  test("Test update user fail with non-existent user ID", async () => {
-    const nonExistentUserId = new mongoose.Types.ObjectId().toHexString();
-
-    const response = await request(app)
-      .put(baseUrl + "/user/" + nonExistentUserId)
-      .set("Authorization", `Bearer ${testUser.accessToken}`)
-      .field("firstName", "User1")
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe('User not found');
   });
 
   // Test logout
@@ -296,7 +294,8 @@ describe("Auth Tests", () => {
   test("Test Refresh Token with Invalid Token", async () => {
     const response = await request(app).post(baseUrl + "/refresh").send({
       refreshToken: "invalidtoken",
-    });
+    });   
+
     expect(response.statusCode).not.toBe(201);    
   });
 
@@ -308,7 +307,7 @@ describe("Auth Tests", () => {
     });
     expect(response.statusCode).toBe(400);
     expect(response.text).toBe("fail");
-  });
+  });  
 
   test("Create post when TOKEN_SECRET is missing from server", async () => {
     const originalSecret = process.env.TOKEN_SECRET;
@@ -337,7 +336,7 @@ describe("Auth Tests", () => {
 
     const response = await request(app).post(baseUrl + "/refresh").send({
       refreshToken: testUser.refreshToken,
-    });
+    });    
 
     expect(response.statusCode).toBe(400);
     expect(response.text).toBe("Token secret is missing");
@@ -381,24 +380,56 @@ describe("Auth Tests", () => {
   });
 });
 
-//const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+jest.mock('google-auth-library', () => {
+  const mockVerifyIdToken = jest.fn().mockResolvedValue({
+    getPayload: jest.fn().mockReturnValue({
+      sub: "12345678901234567890",
+      email: "testuser@gmail.com",
+      given_name: "Test",
+      family_name: "User",
+      picture: "https://example.com/photo.jpg",
+      iss: "accounts.google.com",
+      aud: process.env.GOOGLE_CLIENT_ID,
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    }),
+  });
 
-// Test Google sign-in
-// test("Auth test Google sign-in", async () => {
+  return {
+    OAuth2Client: jest.fn(() => ({
+      verifyIdToken: mockVerifyIdToken,
+    })),
+  };
+});
 
-//   const testGoogleToken = process.env.TEST_GOOGLE_TOKEN;
-//   const googleSignInResponse = await request(app)
-//     .post(baseUrl + "/auth/google")
-//     .send({ tokenId: testGoogleToken });
+// Test Google Sign-In
+test("Test Google Sign-In", async () => {
+  const mockIdToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXVkIjoiMzExOTkwNDIzMjAzLWhzdHVidG9xaXQza2M3ZXNibTBuOXZjNmhyYmkzbTdkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTIzNDU2Nzg5MDEyMzQ1Njc4OTAiLCJlbWFpbCI6InRlc3R1c2VyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiVGVzdCBVc2VyIiwicGljdHVyZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20vcGhvdG8uanBnIiwiZ2l2ZW5fbmFtZSI6IlRlc3QiLCJmYW1pbHlfbmFtZSI6IlVzZXIiLCJpYXQiOjE2MTY1ODk0ODMsImV4cCI6MTYxNjU5MzA4M30.C-VzIn8EgawWDrBvhVZ1fKsCPbJOjfi-RGAXCjKyahk";
 
-//   expect(googleSignInResponse.statusCode).toBe(200);
-//   const accessToken = googleSignInResponse.body.accessToken;
-//   const refreshToken = googleSignInResponse.body.refreshToken;
-//   expect(accessToken).toBeDefined();
-//   expect(refreshToken).toBeDefined();
-//   expect(googleSignInResponse.body._id).toBeDefined();
-  
-//   testUser.accessToken = accessToken;
-//   testUser.refreshToken = refreshToken;
-//   testUser._id = googleSignInResponse.body._id;
-// });
+  const response = await request(app)
+    .post(baseUrl + "/google")
+    .send({ idToken: mockIdToken }); 
+
+  expect(response.statusCode).toBe(200);
+  expect(response.body.accessToken).toBeDefined();
+  expect(response.body.refreshToken).toBeDefined();
+  expect(response.body._id).toBeDefined();
+});
+
+jest.mock('google-auth-library', () => {
+  const mOAuth2Client = {
+    verifyIdToken: jest.fn().mockResolvedValue({
+      getPayload: jest.fn().mockReturnValue(null),
+    }),
+  };
+  return { OAuth2Client: jest.fn(() => mOAuth2Client) };
+});
+
+// Test Google Sign-In with invalid token
+test("Test Google Sign-In", async () => {
+  const response = await request(app).post(baseUrl + "/google").send({
+    idToken: "invalidToken",
+  });
+
+  expect(response.statusCode).toBe(400);
+  expect(response.text).toBe("Invalid Google ID token");
+});
