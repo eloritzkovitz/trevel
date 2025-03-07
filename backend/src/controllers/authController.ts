@@ -134,38 +134,49 @@ const getUserData = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+interface UpdateUserRequestBody {
+    firstName?: string;
+    lastName?: string;
+    headline?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+    password?: string;
+    profilePicture?: string;
+}
+  
 // Update user data
-const updateUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const userId = req.params.userId;
-        const user = await userModel.findById(userId);
-        if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-
-        // Update user details
-        user.firstName = req.body.firstName || user.firstName;
-        user.lastName = req.body.lastName || user.lastName;
-        if (user.headline !== undefined) user.headline = req.body.headline;
-        if (user.bio !== undefined) user.bio = req.body.bio;
-        if (user.location !== undefined) user.location = req.body.location;
-        if (user.website !== undefined) user.website = req.body.website;
-        if (req.body.password) {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(req.body.password, salt);
-        }
-        if (req.file) {
-            user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
-        } else if (req.body.profilePicture === "null") {
-            user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; // if cleared set default profile picture
-        }
-
-        await user.save();
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating user data', error });
+const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequestBody>, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.userId;
+    const user = await userModel.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
     }
+
+    // Update user details
+    if (req.body.firstName !== undefined) user.firstName = req.body.firstName;
+    if (req.body.lastName !== undefined) user.lastName = req.body.lastName;
+    if (req.body.headline !== undefined) user.headline = req.body.headline;
+    if (req.body.bio !== undefined) user.bio = req.body.bio;
+    if (req.body.location !== undefined) user.location = req.body.location;
+    if (req.body.website !== undefined) user.website = req.body.website;
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(req.body.password, salt);
+    }
+    if (req.file) {
+      user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
+    } else if (req.body.profilePicture === "null") {
+      user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; // if cleared set default profile picture
+    }
+ 
+    await user.save();
+    res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating user data', error });
+   }
 };
 
 // Logout function
