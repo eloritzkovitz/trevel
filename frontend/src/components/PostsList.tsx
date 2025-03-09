@@ -100,15 +100,15 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
   return (
     <div className="d-flex flex-column gap-3">
       {posts.map((post, index) => {        
-        const isOwner = loggedInUser?._id === post.sender._id;
-
+        const isOwner = loggedInUser?._id === post.sender;        
         if (posts.length === index + 1) {
           return (
             <div ref={lastPostElementRef} key={post._id}>
               <Post
                 title={post.title}
                 content={post.content}
-                sender={post.sender}
+                senderName={post.senderName || "Unknown"}
+                senderImage={post.senderImage || ""}
                 isOwner={isOwner}
                 onEdit={() => handleEditPost(post)}
               />
@@ -120,7 +120,8 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
               key={post._id}
               title={post.title}
               content={post.content}
-              sender={post.sender}
+              senderName={post.senderName || "Unknown"}
+              senderImage={post.senderImage || ""}
               isOwner={isOwner}
               onEdit={() => handleEditPost(post)}
             />

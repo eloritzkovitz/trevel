@@ -5,25 +5,23 @@ import CommentsList from "./CommentsList";
 interface PostProps {
   title: string;
   content: string;
-  sender: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
+  senderName: string;
+  senderImage: string;    
   isOwner: boolean;
   onEdit: () => void;  
 }
 
-const Post: React.FC<PostProps> = ({ title, content, sender, isOwner, onEdit }) => { 
-  
-  const senderName = `${sender.firstName} ${sender.lastName}`;
+const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, isOwner, onEdit }) => { 
 
   return (
     <div className="card mb-3">
       <div className="card-body">
+        <div className="d-flex align-items-center mb-2">
+          <img src={senderImage} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} />
+          <h5 className="card-text mb-0"><small className="text-muted">{senderName}</small></h5>
+        </div>
         <h6 className="card-title">{title}</h6>
-        <p className="card-text">{content}</p>        
-        <p className="card-text"><small className="text-muted">Posted by {senderName}</small></p>
+        <p className="card-text">{content}</p>
         {isOwner && (
           <Button variant="primary" onClick={onEdit}>
             Edit

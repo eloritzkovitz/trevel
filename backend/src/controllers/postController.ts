@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import postModel, { IPost } from "../models/Post";
+import userModel from "../models/User";
 import commentsModel from "../models/Comment";
 import BaseController from "./baseController";
 import fs from "fs";
@@ -14,18 +15,21 @@ class PostsController extends BaseController<IPost> {
   // Create a new post
   async createItem(req: Request, res: Response) {
     try {
-      const userId = req.params.userId;
-      const images = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
+      const userId = req.params.userId;      
+      const user = await userModel.findById(userId);
+      const images = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];      
       const post: IPost = {
         ...req.body,
         sender: new mongoose.Types.ObjectId(userId),
+        senderName: user ? `${user.firstName} ${user.lastName}` : "Unknown",
+        senderImage: user?.profilePicture,
         likes: [],
         likesCount: 0,  
         images,      
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
-      req.body = post;
+      req.body = post;      
       await super.createItem(req, res);
     } catch (error) {
       if (error instanceof Error) {

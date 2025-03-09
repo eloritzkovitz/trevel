@@ -3,6 +3,8 @@ import { ILikeable } from "./ILikeable";
 
 export interface IPost extends ILikeable {
   sender: mongoose.Schema.Types.ObjectId;
+  senderName?: string;
+  senderImage?: string;
   title: string;
   content: string;
   images?: string[];    
@@ -15,6 +17,12 @@ const postSchema = new mongoose.Schema<IPost>({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', 
     required: true,
+  },
+  senderName: {
+    type: String,
+  },
+  senderImage: {
+    type: String,
   },
   title: {
     type: String,

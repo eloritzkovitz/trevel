@@ -6,11 +6,9 @@ export interface Post {
   _id?: string;
   title: string;
   content: string;
-  sender: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
+  sender: string;
+  senderName?: string;
+  senderImage?: string;
   images?: string[];
   likes?: string[];
   likesCount?: number;
