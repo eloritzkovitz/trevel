@@ -3,6 +3,8 @@ import userModel from '../models/User';
 import { generateToken, verifyRefreshToken } from '../utils/tokenService';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
+import fs from 'fs';
+import path from 'path';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -166,12 +168,22 @@ const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequest
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(req.body.password, salt);
     }
-    if (req.file) {
-      user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
-    } else if (req.body.profilePicture === "null") {
-      user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; // if cleared set default profile picture
-    }
- 
+
+    // Handle profile picture update
+    if (req.file) { 
+        // Delete the old profile picture if it's not the default one
+        if (user.profilePicture && !user.profilePicture.includes('default-profile.png')) {
+            const oldImagePath = path.join(__dirname, '../../', user.profilePicture);
+            if (fs.existsSync(oldImagePath)) {
+                fs.unlinkSync(oldImagePath);
+            }
+        }
+        user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
+      } else if (req.body.profilePicture === "null") {
+        // if cleared, set default profile picture
+        user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`;
+      }
+       
     await user.save();
     res.json(user);
     } catch (error) {

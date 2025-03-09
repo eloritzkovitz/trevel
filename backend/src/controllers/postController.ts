@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import postModel, { IPost } from "../models/Post";
 import commentsModel from "../models/Comment";
 import BaseController from "./baseController";
+import fs from "fs";
+import path from "path";
 
 class PostsController extends BaseController<IPost> {
   constructor() {
@@ -13,11 +15,13 @@ class PostsController extends BaseController<IPost> {
   async createItem(req: Request, res: Response) {
     try {
       const userId = req.params.userId;
+      const images = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
       const post: IPost = {
         ...req.body,
         sender: new mongoose.Types.ObjectId(userId),
         likes: [],
-        likesCount: 0,        
+        likesCount: 0,  
+        images,      
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -41,7 +45,20 @@ class PostsController extends BaseController<IPost> {
         res.status(404).json({ error: "Post not found" });
         return;
       }
-      req.body = { ...req.body, updatedAt: new Date().toISOString() };
+      
+      // Handle new images
+      const newImages = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
+      const existingImages = req.body.existingImages ? req.body.existingImages : post.images;
+
+      // Remove images that are not in the existingImages array
+      const imagesToRemove = (post.images || []).filter(image => !existingImages.includes(image));
+      imagesToRemove.forEach(image => {
+        fs.unlinkSync(`${process.env.BASE_URL}/uploads/${image}`);
+      });
+
+      const updatedImages = [...existingImages, ...newImages];
+
+      req.body = { ...req.body, images: updatedImages, updatedAt: new Date().toISOString() };
       await super.updateItem(req, res);
     } catch (error) {
       if (error instanceof Error) {
@@ -56,6 +73,13 @@ class PostsController extends BaseController<IPost> {
   async deleteItem(req: Request, res: Response) {
     try {
       const postId = req.params.id;
+      const post = await postModel.findById(postId);
+      if (post) {
+        // Remove all images associated with the post
+        post.images?.forEach(image => {
+            fs.unlinkSync(`${process.env.BASE_URL}/uploads/${image}`);
+        });
+      }  
       await commentsModel.deleteMany({ postId });
       await super.deleteItem(req, res);
     } catch (error) {        
