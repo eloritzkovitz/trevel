@@ -1,83 +1,142 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import postService, { Post as PostType } from "../services/post-service";
 import Post from "./Post";
+import { useAuth } from "../context/AuthContext";
+import EditPost from "./EditPost";
 
 interface PostsListProps {
   userId?: string;
 }
 
 const PostsList: React.FC<PostsListProps> = ({ userId }) => {
+  const { user: loggedInUser } = useAuth();
   const [posts, setPosts] = useState<PostType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentPost, setCurrentPost] = useState<PostType | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const fetchedPosts = await postService.getPosts(userId, page);
-        setPosts((prevPosts) => {
-          // Avoid appending the same posts multiple times
-          const newPosts = fetchedPosts.filter(post => !prevPosts.some(p => p._id === post._id));
-          return [...prevPosts, ...newPosts];
-        });
-        setHasMore(fetchedPosts.length > 0);
-      } catch (error) {
-        console.error("Failed to fetch posts", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch posts (memoized to prevent unnecessary re-renders)
+  const fetchPosts = useCallback(async () => {
+    if (!hasMore || isLoading) return; // Prevent redundant calls
 
+    try {
+      setIsLoading(true);
+      const fetchedPosts = await postService.getPosts(userId, page);
+      
+      setPosts((prevPosts) => {
+        // Prevent duplicates
+        const newPosts = fetchedPosts.filter(post => !prevPosts.some(p => p._id === post._id));
+        return [...prevPosts, ...newPosts].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+      });
+
+      setHasMore(fetchedPosts.length > 0);
+    } catch (error) {
+      console.error("Failed to fetch posts", error);
+      setError("Error fetching posts...");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, page, hasMore, isLoading]);
+
+  // Load posts when `page` or `userId` changes
+  useEffect(() => {
     fetchPosts();
-  }, [userId, page]);
+  }, [fetchPosts]);
 
+  // Reset posts when `userId` changes
   useEffect(() => {
-    // Reset posts and page when userId changes
     setPosts([]);
     setPage(1);
+    setHasMore(true);
   }, [userId]);
 
+  // Intersection observer for infinite scrolling
   const lastPostElementRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
+      if (isLoading) return;
       if (observer.current) observer.current.disconnect();
+
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
           setPage((prevPage) => prevPage + 1);
         }
       });
+
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [isLoading, hasMore]
   );
 
-  if (loading) {
+  // Handle edit post actions
+  const handleEditPost = (post: PostType) => {
+    setCurrentPost(post);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setCurrentPost(null);
+  };
+
+  const handlePostUpdated = () => {
+    setShowEditModal(false);
+    setCurrentPost(null);
+    setPosts([]); // Refresh posts after an update
+    setPage(1);
+  };
+
+  if (isLoading && posts.length === 0) {
     return <div>Loading posts...</div>;
   }
 
-  if (posts.length === 0) {
+  if (!isLoading && posts.length === 0) {
     return <div>No posts available</div>;
   }
 
   return (
     <div className="d-flex flex-column gap-3">
-      {posts.map((post, index) => {
+      {posts.map((post, index) => {        
+        const isOwner = loggedInUser?._id === post.sender._id;
+
         if (posts.length === index + 1) {
           return (
             <div ref={lastPostElementRef} key={post._id}>
-              <Post title={post.title} content={post.content} sender={post.sender} />
+              <Post
+                title={post.title}
+                content={post.content}
+                sender={post.sender}
+                isOwner={isOwner}
+                onEdit={() => handleEditPost(post)}
+              />
             </div>
           );
         } else {
           return (
-            <Post key={post._id} title={post.title} content={post.content} sender={post.sender} />
+            <Post
+              key={post._id}
+              title={post.title}
+              content={post.content}
+              sender={post.sender}
+              isOwner={isOwner}
+              onEdit={() => handleEditPost(post)}
+            />
           );
         }
       })}
-      {loading && <div>Loading...</div>}
+      {/* {isLoading && hasMore && <div>Loading more posts...</div>} */}
+      {error && <div className="alert alert-danger">{error}</div>}
+      {currentPost && (
+        <EditPost
+          show={showEditModal}
+          handleClose={handleCloseEditModal}
+          post={currentPost}
+          onPostUpdated={handlePostUpdated}
+        />
+      )}
     </div>
   );
 };

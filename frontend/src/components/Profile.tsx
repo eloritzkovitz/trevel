@@ -6,6 +6,7 @@ import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faEdit, faPlus } fr
 import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
 import PostsList from "./PostsList";
+import PostModal from "./PostModal";
 import ImageModal from "./ImageModal";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
@@ -17,6 +18,7 @@ const Profile: React.FC = () => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   // Load page data
   useEffect(() => {
@@ -41,6 +43,17 @@ const Profile: React.FC = () => {
   const handleCloseImageModal = () => {
     setIsImageModalOpen(false);
     setImageUrl(null);
+  };
+
+  const handleShowPostModal = () => setShowPostModal(true);
+  const handleClosePostModal = () => setShowPostModal(false);
+  const handlePostCreated = () => {
+    setShowPostModal(false);
+    // Refresh the posts list
+    const postsListComponent = document.querySelector('.posts-list');
+    if (postsListComponent) {
+      postsListComponent.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -89,7 +102,7 @@ const Profile: React.FC = () => {
                   </p>
                   {isOwnProfile && (
                     <>
-                      <Button variant="primary" style={{ marginRight: '10px' }}>
+                      <Button variant="primary" style={{ marginRight: '10px' }} onClick={handleShowPostModal}>
                         <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} />
                         New Post
                       </Button>
@@ -129,6 +142,13 @@ const Profile: React.FC = () => {
         title="Profile Picture"
         imageUrl={imageUrl} 
         handleClose={handleCloseImageModal} 
+      />
+
+      {/* Post Modal */}
+      <PostModal 
+        show={showPostModal} 
+        handleClose={handleClosePostModal} 
+        onPostCreated={handlePostCreated}
       />
     </div>
   );
