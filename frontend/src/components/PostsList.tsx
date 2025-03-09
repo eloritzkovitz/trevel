@@ -1,20 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-//import postService, { Post } from "../services/post-service";
+import postService, { Post as PostType } from "../services/post-service";
 import Post from "./Post";
-
-interface Post {
-  _id: string;
-  title: string;
-  content: string;
-  sender: string;
-}
 
 interface PostsListProps {
   userId?: string;
 }
 
 const PostsList: React.FC<PostsListProps> = ({ userId }) => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -24,14 +17,13 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        let fetchedPosts;
-        if (userId) {
-          //fetchedPosts = await postService.getUserPosts(userId, page);
-        } else {
-          //fetchedPosts = await postService.getAllPosts(page);
-        }
-        //setPosts((prevPosts) => [...prevPosts, ...fetchedPosts]);
-        //setHasMore(fetchedPosts.length > 0);
+        const fetchedPosts = await postService.getPosts(userId, page);
+        setPosts((prevPosts) => {
+          // Avoid appending the same posts multiple times
+          const newPosts = fetchedPosts.filter(post => !prevPosts.some(p => p._id === post._id));
+          return [...prevPosts, ...newPosts];
+        });
+        setHasMore(fetchedPosts.length > 0);
       } catch (error) {
         console.error("Failed to fetch posts", error);
       } finally {
@@ -40,6 +32,12 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     };
 
     fetchPosts();
+  }, [userId, page]);
+
+  useEffect(() => {
+    // Reset posts and page when userId changes
+    setPosts([]);
+    setPage(1);
   }, [userId]);
 
   const lastPostElementRef = useCallback(

@@ -158,7 +158,7 @@ router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsContr
  * @swagger
  * /posts/{id}/like:
  *   post:
- *     summary: Like a post
+ *     summary: Like/unlike a post
  *     tags: [Posts]
  *     security:
  *       - bearerAuth: []
