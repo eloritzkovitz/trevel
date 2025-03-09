@@ -153,4 +153,36 @@ router.put("/:id", authMiddleware, postsController.updateItem.bind(postsControll
  */
 router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
 
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Like a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Post liked successfully
+ *       404:
+ *         description: Post not found
+ */
+router.post("/:id/like", authMiddleware, postsController.handleLike.bind(postsController));
+
 export default router;

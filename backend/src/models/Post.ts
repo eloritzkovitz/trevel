@@ -1,13 +1,11 @@
 import mongoose from "mongoose";
+import { ILikeable } from "./ILikeable";
 
-export interface IPost {
+export interface IPost extends ILikeable {
   sender: mongoose.Schema.Types.ObjectId;
   title: string;
   content: string;
-  images?: string[];
-  likes: mongoose.Schema.Types.ObjectId[];
-  likesCount: number;
-  comments: mongoose.Schema.Types.ObjectId[];
+  images?: string[];    
   createdAt: string; 
   updatedAt: string; 
 }
@@ -32,12 +30,7 @@ const postSchema = new mongoose.Schema<IPost>({
   likesCount: {
     type: Number,
     default: 0,
-  },
-  comments: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Comment',
-    default: [],
-  }], 
+  },  
   createdAt: {
     type: String,
   },

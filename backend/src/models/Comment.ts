@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
+import { ILikeable } from "./ILikeable";
 
-export interface IComment {
+export interface IComment extends ILikeable {
   sender: String;
   postId: string;
-  content: string;
-  likes: mongoose.Schema.Types.ObjectId[];
-  likesCount: number;
+  content: string;  
   createdAt: string;
   updatedAt: string;   
 }
