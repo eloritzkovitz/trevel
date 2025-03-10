@@ -17,7 +17,8 @@ const Profile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
   const [showPostModal, setShowPostModal] = useState(false);
 
   // Load page data
@@ -34,15 +35,23 @@ const Profile: React.FC = () => {
 
   const isOwnProfile = loggedInUser?._id === userId;
 
-  // Image modal
-  const handleImageClick = () => {
-    setImageUrl(user.profilePicture || null);
+  // Image modal for profile picture
+  const handleProfileImageClick = () => {
+    setImages([user.profilePicture || ""]);
+    setCurrentIndex(0);
     setIsImageModalOpen(true);
   };
 
   const handleCloseImageModal = () => {
     setIsImageModalOpen(false);
-    setImageUrl(null);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
+  const handleNextImage = () => {
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
   };
 
   const handleShowPostModal = () => setShowPostModal(true);
@@ -73,7 +82,7 @@ const Profile: React.FC = () => {
                   className="rounded-circle mb-3" 
                   alt="Profile" 
                   style={{ width: '180px', height: '180px', cursor: 'pointer' }} 
-                  onClick={handleImageClick}
+                  onClick={handleProfileImageClick}
                 />
                 <div className="text-left">
                   <h1 className="card-title">{user.firstName} {user.lastName}</h1>
@@ -140,8 +149,11 @@ const Profile: React.FC = () => {
       <ImageModal 
         show={isImageModalOpen}
         title="Profile Picture"
-        imageUrl={imageUrl} 
-        handleClose={handleCloseImageModal} 
+        images={images}
+        currentIndex={currentIndex}
+        handleClose={handleCloseImageModal}
+        handlePrev={handlePrevImage}
+        handleNext={handleNextImage}
       />
 
       {/* Post Modal */}

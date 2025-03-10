@@ -19,7 +19,7 @@ interface PostProps {
 const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, images, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Toggle options dropdown
@@ -42,15 +42,26 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, im
   }, [dropdownRef]);
 
   // Handle image click
-  const handleImageClick = (image: string) => {
-    setSelectedImage(image);
+  const handleImageClick = (index: number) => {
+    setCurrentIndex(index);
     setShowImageModal(true);
   };
 
   // Handle close image modal
   const handleCloseImageModal = () => {
     setShowImageModal(false);
-    setSelectedImage(null);
+  };
+
+  // Handle previous image
+  const handlePrevImage = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
+  // Handle next image
+  const handleNextImage = () => {
+    if (images) {
+      setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
+    }
   };
 
   return (
@@ -91,7 +102,7 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, im
                 src={image}
                 alt={`Post image ${index + 1}`}
                 style={{ width: '120px', height: '120px', objectFit: 'cover', marginRight: '10px', cursor: 'pointer' }}
-                onClick={() => handleImageClick(image)}
+                onClick={() => handleImageClick(index)}
               />
             ))}
           </div>
@@ -102,8 +113,11 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, im
       <ImageModal 
         show={showImageModal}
         title="Image"
-        imageUrl={selectedImage} 
-        handleClose={handleCloseImageModal} 
+        images={images || []}
+        currentIndex={currentIndex}
+        handleClose={handleCloseImageModal}
+        handlePrev={handlePrevImage}
+        handleNext={handleNextImage}
       />
     </div>
   );
