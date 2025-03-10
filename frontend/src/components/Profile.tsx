@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
 import PostsList from "./PostsList";
@@ -107,7 +107,7 @@ const Profile: React.FC = () => {
                         New Post
                       </Button>
                       <Button variant="primary" onClick={() => setIsEditProfileOpen(true)}>
-                        <FontAwesomeIcon icon={faEdit} style={{ marginRight: '5px' }} />
+                        <FontAwesomeIcon icon={faPencil} style={{ marginRight: '5px' }} />
                         Edit Profile
                       </Button>
                     </>

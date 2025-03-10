@@ -77,16 +77,30 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     setShowEditModal(true);
   };
 
+  // Handle close edit modal
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setCurrentPost(null);
   };
 
+  // Handle post updated action
   const handlePostUpdated = () => {
     setShowEditModal(false);
     setCurrentPost(null);
     setPosts([]); // Refresh posts after an update
     setPage(1);
+  };
+
+  // Handle delete post action
+  const handleDeletePost = async (post: PostType) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        await postService.deletePost(post._id!);
+        setPosts((prevPosts) => prevPosts.filter((p) => p._id !== post._id));
+      } catch (error) {
+        console.error("Failed to delete post", error);
+      }
+    }
   };
 
   if (isLoading && posts.length === 0) {
@@ -111,6 +125,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
                 senderImage={post.senderImage || ""}
                 isOwner={isOwner}
                 onEdit={() => handleEditPost(post)}
+                onDelete={() => handleDeletePost(post)}
               />
             </div>
           );
@@ -124,6 +139,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
               senderImage={post.senderImage || ""}
               isOwner={isOwner}
               onEdit={() => handleEditPost(post)}
+              onDelete={() => handleDeletePost(post)}
             />
           );
         }
