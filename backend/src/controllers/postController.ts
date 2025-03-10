@@ -17,7 +17,7 @@ class PostsController extends BaseController<IPost> {
     try {
       const userId = req.params.userId;      
       const user = await userModel.findById(userId);
-      const images = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];      
+      const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];      
       const post: IPost = {
         ...req.body,
         sender: new mongoose.Types.ObjectId(userId),
@@ -81,9 +81,12 @@ class PostsController extends BaseController<IPost> {
       if (post) {
         // Remove all images associated with the post
         post.images?.forEach(image => {
-            fs.unlinkSync(`${process.env.BASE_URL}/uploads/${image}`);
+          const imagePath = path.join(__dirname, "../../uploads", path.basename(image));
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
         });
-      }  
+      } 
       await commentsModel.deleteMany({ postId });
       await super.deleteItem(req, res);
     } catch (error) {        

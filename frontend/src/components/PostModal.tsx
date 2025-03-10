@@ -11,6 +11,7 @@ interface PostModalProps {
 const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [images, setImages] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,6 +24,11 @@ const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated 
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
+      if (images) {
+        Array.from(images).forEach((image) => {
+          formData.append("images", image);
+        });
+      }
 
       await postService.createPost(formData);
       onPostCreated();
@@ -61,6 +67,14 @@ const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated 
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
+            />
+          </Form.Group>
+          <Form.Group controlId="formImages" className="mt-3">
+            <Form.Label>Images</Form.Label>
+            <Form.Control
+              type="file"
+              multiple
+              onChange={(e) => setImages((e.target as HTMLInputElement).files)}
             />
           </Form.Group>
           {error && <div className="alert alert-danger mt-3">{error}</div>}

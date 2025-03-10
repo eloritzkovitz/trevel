@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Button, Dropdown, DropdownButton } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import ImageModal from "./ImageModal";
 import CommentsList from "./CommentsList";
 
 interface PostProps {
@@ -9,13 +10,16 @@ interface PostProps {
   content: string;
   senderName: string;
   senderImage: string;    
+  images?: string[];
   isOwner: boolean;
   onEdit: () => void;
   onDelete: () => void; 
 }
 
-const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, isOwner, onEdit, onDelete }) => {  
+const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, images, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Toggle options dropdown
@@ -36,6 +40,18 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, is
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
+
+  // Handle image click
+  const handleImageClick = (image: string) => {
+    setSelectedImage(image);
+    setShowImageModal(true);
+  };
+
+  // Handle close image modal
+  const handleCloseImageModal = () => {
+    setShowImageModal(false);
+    setSelectedImage(null);
+  };
 
   return (
     <div className="card mb-3">
@@ -67,12 +83,28 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, is
         </div>
         <h6 className="card-title">{title}</h6>
         <p className="card-text">{content}</p>
-        <button className="btn btn-outline-primary btn-sm">Like ❤️</button>
-        <button className="btn btn-outline-secondary btn-sm ms-2">Comment 💬</button>
+        {images && images.length > 0 && (
+          <div className="d-flex flex-wrap">
+            {images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`Post image ${index + 1}`}
+                style={{ width: '120px', height: '120px', objectFit: 'cover', marginRight: '10px', cursor: 'pointer' }}
+                onClick={() => handleImageClick(image)}
+              />
+            ))}
+          </div>
+        )}
+        <button className="btn btn-outline-primary btn-sm mt-2">Like ❤️</button>
+        <button className="btn btn-outline-secondary btn-sm ms-2 mt-2">Comment 💬</button>
       </div>
-      {/* <div className="card-body">
-        <CommentsList comments={comments} />
-      </div> */}
+      <ImageModal 
+        show={showImageModal}
+        title="Image"
+        imageUrl={selectedImage} 
+        handleClose={handleCloseImageModal} 
+      />
     </div>
   );
 };

@@ -17,9 +17,9 @@ export interface Post {
 }
 
 // Get all posts
-const getPosts = async (userId?: string, page: number = 1): Promise<Post[]> => {    
+const getPosts = async (sender?: string, page: number = 1): Promise<Post[]> => {    
     const response = await apiClient.get<Post[]>('/posts', {
-        params: { userId, page }
+        params: { sender, page }
     });
     return response.data;
 };

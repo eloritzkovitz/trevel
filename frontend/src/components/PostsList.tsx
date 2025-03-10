@@ -123,6 +123,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
                 content={post.content}
                 senderName={post.senderName || "Unknown"}
                 senderImage={post.senderImage || ""}
+                images={post.images}
                 isOwner={isOwner}
                 onEdit={() => handleEditPost(post)}
                 onDelete={() => handleDeletePost(post)}
@@ -137,6 +138,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
               content={post.content}
               senderName={post.senderName || "Unknown"}
               senderImage={post.senderImage || ""}
+              images={post.images}
               isOwner={isOwner}
               onEdit={() => handleEditPost(post)}
               onDelete={() => handleDeletePost(post)}
