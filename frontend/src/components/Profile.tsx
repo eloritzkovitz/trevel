@@ -20,6 +20,7 @@ const Profile: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [images, setImages] = useState<string[]>([]);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [refreshPosts, setRefreshPosts] = useState(false);
 
   // Load page data
   useEffect(() => {
@@ -43,6 +44,7 @@ const Profile: React.FC = () => {
     setIsImageModalOpen(true);
   };
 
+  // Image modal handlers
   const handleCloseImageModal = () => {
     setIsImageModalOpen(false);
   };
@@ -55,15 +57,12 @@ const Profile: React.FC = () => {
     setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
   };
 
+  // Post modal handlers
   const handleShowPostModal = () => setShowPostModal(true);
   const handleClosePostModal = () => setShowPostModal(false);
   const handlePostCreated = () => {
     setShowPostModal(false);
-    // Refresh the posts list
-    const postsListComponent = document.querySelector('.posts-list');
-    if (postsListComponent) {
-      postsListComponent.scrollIntoView({ behavior: 'smooth' });
-    }
+    setRefreshPosts((prev) => !prev);
   };
 
   return (
@@ -129,8 +128,8 @@ const Profile: React.FC = () => {
             {/* Posts Section */}
             <div className="card">
               <div className="card-body">
-                <h5 className="card-title">Recent Posts</h5>
-                <PostsList userId={userId} />
+                <h5 className="card-title">Posts</h5>
+                <PostsList userId={userId} refresh={refreshPosts} />
               </div>
             </div>
           </div>

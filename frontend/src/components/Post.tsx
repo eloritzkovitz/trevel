@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faPencil, faTrash, faThumbsUp, faComment } from "@fortawesome/free-solid-svg-icons";
 import postService from "../services/post-service";
 import { useAuth } from "../context/AuthContext";
+import { formatElapsedTime } from "../utils/date";
 import ImageModal from "./ImageModal";
 import CommentsList from "./CommentsList";
 
@@ -20,12 +21,13 @@ interface PostProps {
   likesCount: number;
   comments?: Comment[];
   commentsCount: number;
-  isOwner: boolean;
-  onEdit: () => void;
+  createdAt: string;
+  isOwner: boolean;  
+  onEdit: () => void;  
   onDelete: () => void;   
 }
 
-const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, isOwner, onEdit, onDelete }) => {  
+const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,12 +97,15 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="d-flex align-items-center">
-            <img src={senderImage} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} />
-            <h5 className="card-text mb-0">
-              <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">
-                <small>{senderName}</small>
-              </Link>
-            </h5>
+            <img src={senderImage} alt="Profile" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }} />
+            <div>
+              <h5 className="card-text mb-0">
+                <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">
+                  <small>{senderName}</small>
+                </Link>
+              </h5>
+              <small className="text-muted">{formatElapsedTime(createdAt)}</small>
+            </div>
           </div>
           {isOwner && (
             <DropdownButton

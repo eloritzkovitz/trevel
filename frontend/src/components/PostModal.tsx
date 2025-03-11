@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import postService from "../services/post-service";
 
@@ -15,6 +15,17 @@ const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset form state when modal is shown
+  useEffect(() => {
+    if (show) {
+      setTitle("");
+      setContent("");
+      setImages(null);
+      setError(null);
+    }
+  }, [show]);
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

@@ -6,9 +6,10 @@ import EditPost from "./EditPost";
 
 interface PostsListProps {
   userId?: string;
+  refresh: boolean;
 }
 
-const PostsList: React.FC<PostsListProps> = ({ userId }) => {
+const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
   const { user: loggedInUser } = useAuth();
   const [posts, setPosts] = useState<PostType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,14 +49,14 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     };
 
     fetchPosts();
-  }, [page, userId]);
+  }, [page, userId, refresh]);
 
   // Reset when userId changes
   useEffect(() => {
     setPosts([]);
     setPage(1);
     setHasMore(true);
-  }, [userId]);
+  }, [userId, refresh]);
 
   // Infinite scrolling observer
   const lastPostRef = useCallback(
@@ -77,7 +78,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
   // Edit post handlers
   const handleEditPost = (post: PostType) => {
     setCurrentPost(post);
-    setShowEditModal(true);
+    setShowEditModal(true);    
   };
 
   const handleCloseEditModal = () => {
@@ -85,11 +86,17 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     setCurrentPost(null);
   };
 
-  const handlePostUpdated = () => {
+  const handlePostUpdated = (updatedPost: PostType) => {
     setShowEditModal(false);
     setCurrentPost(null);
-    setPosts([]);
-    setPage(1);
+    //setPosts([]);    
+    //setPage(1);  
+    //setHasMore(true);
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === updatedPost._id ? updatedPost : post
+      )
+    );
   };
 
   // Delete post handler
@@ -131,8 +138,9 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
               likesCount={post.likesCount || 0}
               comments={post.comments || []}
               commentsCount={post.commentsCount || 0}
+              createdAt={post.createdAt || ""}
               isOwner={isOwner}
-              onEdit={() => handleEditPost(post)}
+              onEdit={() => handleEditPost(post)}              
               onDelete={() => handleDeletePost(post)}
             />
           </div>
