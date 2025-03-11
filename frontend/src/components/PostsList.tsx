@@ -11,7 +11,7 @@ interface PostsListProps {
 const PostsList: React.FC<PostsListProps> = ({ userId }) => {
   const { user: loggedInUser } = useAuth();
   const [posts, setPosts] = useState<PostType[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,49 +19,52 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
   const [currentPost, setCurrentPost] = useState<PostType | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  // Fetch posts (memoized to prevent unnecessary re-renders)
-  const fetchPosts = useCallback(async () => {
-    if (!hasMore || isLoading) return; // Prevent redundant calls
-
-    try {
-      setIsLoading(true);
-      const fetchedPosts = await postService.getPosts(userId, page);
-      
-      setPosts((prevPosts) => {
-        // Prevent duplicates
-        const newPosts = fetchedPosts.filter(post => !prevPosts.some(p => p._id === post._id));
-        return [...prevPosts, ...newPosts].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
-      });
-
-      setHasMore(fetchedPosts.length > 0);
-    } catch (error) {
-      console.error("Failed to fetch posts", error);
-      setError("Error fetching posts...");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, page, hasMore, isLoading]);
-
-  // Load posts when `page` or `userId` changes
+  // Fetch posts when page changes
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    const fetchPosts = async () => {
+      if (!hasMore || isLoading) return;
 
-  // Reset posts when `userId` changes
+      try {
+        setIsLoading(true);
+        const fetchedPosts = await postService.getPosts(userId, page);
+
+        setPosts((prevPosts) => {
+          const newPosts = fetchedPosts.filter(
+            (post) => !prevPosts.some((p) => p._id === post._id)
+          );
+          return [...prevPosts, ...newPosts].sort(
+            (a, b) =>
+              new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+          );
+        });
+
+        setHasMore(fetchedPosts.length > 0);
+      } catch (error) {
+        console.error("Failed to fetch posts", error);
+        setError("Error fetching posts...");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [page, userId]);
+
+  // Reset when userId changes
   useEffect(() => {
     setPosts([]);
     setPage(1);
     setHasMore(true);
   }, [userId]);
 
-  // Intersection observer for infinite scrolling
-  const lastPostElementRef = useCallback(
+  // Infinite scrolling observer
+  const lastPostRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (isLoading) return;
+      if (isLoading || !hasMore) return;
       if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+      observer.current = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
           setPage((prevPage) => prevPage + 1);
         }
       });
@@ -71,27 +74,25 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
     [isLoading, hasMore]
   );
 
-  // Handle edit post actions
+  // Edit post handlers
   const handleEditPost = (post: PostType) => {
     setCurrentPost(post);
     setShowEditModal(true);
   };
 
-  // Handle close edit modal
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setCurrentPost(null);
   };
 
-  // Handle post updated action
   const handlePostUpdated = () => {
     setShowEditModal(false);
     setCurrentPost(null);
-    setPosts([]); // Refresh posts after an update
+    setPosts([]);
     setPage(1);
   };
 
-  // Handle delete post action
+  // Delete post handler
   const handleDeletePost = async (post: PostType) => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
@@ -113,40 +114,30 @@ const PostsList: React.FC<PostsListProps> = ({ userId }) => {
 
   return (
     <div className="d-flex flex-column gap-3">
-      {posts.map((post, index) => {        
-        const isOwner = loggedInUser?._id === post.sender;        
-        if (posts.length === index + 1) {
-          return (
-            <div ref={lastPostElementRef} key={post._id}>
-              <Post
-                title={post.title}
-                content={post.content}
-                senderName={post.senderName || "Unknown"}
-                senderImage={post.senderImage || ""}
-                images={post.images}
-                isOwner={isOwner}
-                onEdit={() => handleEditPost(post)}
-                onDelete={() => handleDeletePost(post)}
-              />
-            </div>
-          );
-        } else {
-          return (
+      {posts.map((post, index) => {
+        const isOwner = loggedInUser?._id === post.sender;
+
+        return (
+          <div ref={index === posts.length - 1 ? lastPostRef : null} key={post._id}>
             <Post
-              key={post._id}
+              _id={post._id}
               title={post.title}
               content={post.content}
+              sender={post.sender}
               senderName={post.senderName || "Unknown"}
               senderImage={post.senderImage || ""}
               images={post.images}
+              likes={post.likes || []}
+              likesCount={post.likesCount || 0}
+              comments={post.comments || []}
+              commentsCount={post.commentsCount || 0}
               isOwner={isOwner}
               onEdit={() => handleEditPost(post)}
               onDelete={() => handleDeletePost(post)}
             />
-          );
-        }
+          </div>
+        );
       })}
-      {/* {isLoading && hasMore && <div>Loading more posts...</div>} */}
       {error && <div className="alert alert-danger">{error}</div>}
       {currentPost && (
         <EditPost

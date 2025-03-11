@@ -12,6 +12,8 @@ export interface Post {
   images?: string[];
   likes?: string[];
   likesCount?: number;
+  comments?: Comment[];
+  commentsCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }

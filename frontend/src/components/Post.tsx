@@ -1,25 +1,37 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, Dropdown, DropdownButton } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { Dropdown, DropdownButton } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisH, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisH, faPencil, faTrash, faThumbsUp, faComment } from "@fortawesome/free-solid-svg-icons";
+import postService from "../services/post-service";
+import { useAuth } from "../context/AuthContext";
 import ImageModal from "./ImageModal";
 import CommentsList from "./CommentsList";
 
 interface PostProps {
+  _id?: string;
   title: string;
   content: string;
+  sender: string;
   senderName: string;
-  senderImage: string;    
+  senderImage: string;
   images?: string[];
+  likes: string[];
+  likesCount: number;
+  comments?: Comment[];
+  commentsCount: number;
   isOwner: boolean;
   onEdit: () => void;
-  onDelete: () => void; 
+  onDelete: () => void;   
 }
 
-const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, images, isOwner, onEdit, onDelete }) => {  
+const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const viewer = { _id: useAuth().user?._id };
+  const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
+  const [likeCount, setLikeCount] = useState(likesCount);  
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Toggle options dropdown
@@ -64,13 +76,31 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, im
     }
   };
 
+  // Handle like button click
+  const handleLikeClick = async () => {
+    try {
+      if (!_id) {
+        throw new Error("Post ID is required");
+      }
+      const updatedPost = await postService.likePost(_id, viewer?._id || "");
+      setIsLiked(updatedPost.likes?.includes(viewer?._id || "") || false);
+      setLikeCount(updatedPost.likesCount || 0);
+    } catch (error) {
+      console.error("Failed to update like status", error);
+    }
+  };
+
   return (
     <div className="card mb-3">
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="d-flex align-items-center">
             <img src={senderImage} alt="Profile" style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '10px' }} />
-            <h5 className="card-text mb-0"><small className="text-muted">{senderName}</small></h5>
+            <h5 className="card-text mb-0">
+              <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">
+                <small>{senderName}</small>
+              </Link>
+            </h5>
           </div>
           {isOwner && (
             <DropdownButton
@@ -105,10 +135,21 @@ const Post: React.FC<PostProps> = ({ title, content, senderName, senderImage, im
                 onClick={() => handleImageClick(index)}
               />
             ))}
-          </div>
+          </div>          
         )}
-        <button className="btn btn-outline-primary btn-sm mt-2">Like ❤️</button>
-        <button className="btn btn-outline-secondary btn-sm ms-2 mt-2">Comment 💬</button>
+        <div className="d-flex justify-content-between mt-2">
+          <div>
+            <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
+          </div>
+          <div>
+            <span>{commentsCount}</span> <FontAwesomeIcon icon={faComment}/>
+          </div>
+        </div>
+        <hr />
+        <button className={`btn btn-sm ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
+          <FontAwesomeIcon icon={faThumbsUp} className="me-2"/> {isLiked ? "Liked" : "Like"}        
+        </button>
+        <button className="btn btn-outline-secondary btn-sm ms-2"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
       </div>
       <ImageModal 
         show={showImageModal}

@@ -23,9 +23,10 @@ const Profile: React.FC = () => {
 
   // Load page data
   useEffect(() => {
+    setUser(null);
     window.scrollTo(0, 0); // Scroll to top
     if (userId) {
-      userService.getUserData(userId).then(setUser).catch(console.error);
+      userService.getUserData(userId).then(setUser).catch(console.error);      
     }
   }, [userId]);
 
