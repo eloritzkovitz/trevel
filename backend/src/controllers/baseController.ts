@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
-import { Model } from "mongoose";
+import mongoose from "mongoose";
+import { ILikeable } from "../models/ILikeable";
 
-class BaseController<T> {
-    model: Model<T>;
-    constructor(model: any) {
-        this.model = model;
+class BaseController<T extends ILikeable> {
+    protected model: mongoose.Model<T>;
+  
+    constructor(model: mongoose.Model<T>) {
+      this.model = model;
     }
 
     // Get all items
@@ -63,6 +65,33 @@ class BaseController<T> {
           }
         }        
     };
+
+    // Like an item    
+    async handleLike(req: Request, res: Response) : Promise<void> {
+      try {
+        const itemId = req.params.id;
+        const userId = req.body.userId;
+        const item = await this.model.findById(itemId);
+        if (!item) {
+          res.status(404).json({ error: "Item not found" });
+          return;
+        }
+        const index = item.likes.indexOf(userId);
+        if (index === -1) {
+          // Like the item
+          item.likes.push(userId);
+        } else {
+          // Unlike the item
+          item.likes.splice(index, 1);
+        }
+        item.likesCount = item.likes.length;
+        await item.save();
+        res.status(200).json(item);
+      } catch (error) {
+        const errorMessage = (error as Error).message;
+        res.status(500).json({ error: errorMessage });
+      }
+    }
 
     // Delete an item by id
     async deleteItem(req: Request, res: Response) {

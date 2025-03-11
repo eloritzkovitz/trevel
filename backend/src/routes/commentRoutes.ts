@@ -147,4 +147,34 @@ router.put("/:id", authMiddleware, commentsController.updateItem.bind(commentsCo
  */
 router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(commentsController));
 
+/**
+ * @swagger
+ * /comments/{id}/like:
+ *   put:
+ *     summary: Like a comment
+ *     tags: [Comments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Comment ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Comment liked successfully
+ */
+router.put("/:id/like", authMiddleware, commentsController.handleLike.bind(commentsController));
+
 export default router;

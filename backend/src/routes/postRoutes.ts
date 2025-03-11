@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import postsController from "../controllers/postController";
 import { authMiddleware } from "../middleware/auth";
+import upload from "../middleware/upload";
 
 /**
  * @swagger
@@ -94,7 +95,7 @@ router.get("/:id", postsController.getById.bind(postsController));
  *       201:
  *         description: Post created successfully
  */
-router.post("/", authMiddleware, postsController.createItem.bind(postsController));
+router.post("/", authMiddleware, upload.array("images", 6), postsController.createItem.bind(postsController));
 
 /**
  * @swagger
@@ -128,7 +129,7 @@ router.post("/", authMiddleware, postsController.createItem.bind(postsController
  *       404:
  *         description: Post not found
  */
-router.put("/:id", authMiddleware, postsController.updateItem.bind(postsController));
+router.put("/:id", authMiddleware, upload.array("images", 6), postsController.updateItem.bind(postsController));
 
 /**
  * @swagger
@@ -152,5 +153,37 @@ router.put("/:id", authMiddleware, postsController.updateItem.bind(postsControll
  *         description: Post not found
  */
 router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
+
+/**
+ * @swagger
+ * /posts/{id}/like:
+ *   post:
+ *     summary: Like/unlike a post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Post ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Post liked successfully
+ *       404:
+ *         description: Post not found
+ */
+router.post("/:id/like", authMiddleware, postsController.handleLike.bind(postsController));
 
 export default router;

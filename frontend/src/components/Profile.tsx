@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
 import PostsList from "./PostsList";
+import PostModal from "./PostModal";
 import ImageModal from "./ImageModal";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
@@ -16,13 +17,16 @@ const Profile: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   // Load page data
   useEffect(() => {
+    setUser(null);
     window.scrollTo(0, 0); // Scroll to top
     if (userId) {
-      userService.getUserData(userId).then(setUser).catch(console.error);
+      userService.getUserData(userId).then(setUser).catch(console.error);      
     }
   }, [userId]);
 
@@ -32,15 +36,34 @@ const Profile: React.FC = () => {
 
   const isOwnProfile = loggedInUser?._id === userId;
 
-  // Image modal
-  const handleImageClick = () => {
-    setImageUrl(user.profilePicture || null);
+  // Image modal for profile picture
+  const handleProfileImageClick = () => {
+    setImages([user.profilePicture || ""]);
+    setCurrentIndex(0);
     setIsImageModalOpen(true);
   };
 
   const handleCloseImageModal = () => {
     setIsImageModalOpen(false);
-    setImageUrl(null);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  };
+
+  const handleNextImage = () => {
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
+  };
+
+  const handleShowPostModal = () => setShowPostModal(true);
+  const handleClosePostModal = () => setShowPostModal(false);
+  const handlePostCreated = () => {
+    setShowPostModal(false);
+    // Refresh the posts list
+    const postsListComponent = document.querySelector('.posts-list');
+    if (postsListComponent) {
+      postsListComponent.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -60,7 +83,7 @@ const Profile: React.FC = () => {
                   className="rounded-circle mb-3" 
                   alt="Profile" 
                   style={{ width: '180px', height: '180px', cursor: 'pointer' }} 
-                  onClick={handleImageClick}
+                  onClick={handleProfileImageClick}
                 />
                 <div className="text-left">
                   <h1 className="card-title">{user.firstName} {user.lastName}</h1>
@@ -89,12 +112,12 @@ const Profile: React.FC = () => {
                   </p>
                   {isOwnProfile && (
                     <>
-                      <Button variant="primary" style={{ marginRight: '10px' }}>
+                      <Button variant="primary" style={{ marginRight: '10px' }} onClick={handleShowPostModal}>
                         <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} />
                         New Post
                       </Button>
                       <Button variant="primary" onClick={() => setIsEditProfileOpen(true)}>
-                        <FontAwesomeIcon icon={faEdit} style={{ marginRight: '5px' }} />
+                        <FontAwesomeIcon icon={faPencil} style={{ marginRight: '5px' }} />
                         Edit Profile
                       </Button>
                     </>
@@ -127,8 +150,18 @@ const Profile: React.FC = () => {
       <ImageModal 
         show={isImageModalOpen}
         title="Profile Picture"
-        imageUrl={imageUrl} 
-        handleClose={handleCloseImageModal} 
+        images={images}
+        currentIndex={currentIndex}
+        handleClose={handleCloseImageModal}
+        handlePrev={handlePrevImage}
+        handleNext={handleNextImage}
+      />
+
+      {/* Post Modal */}
+      <PostModal 
+        show={showPostModal} 
+        handleClose={handleClosePostModal} 
+        onPostCreated={handlePostCreated}
       />
     </div>
   );
