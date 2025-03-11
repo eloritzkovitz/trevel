@@ -6,7 +6,7 @@ interface EditPostProps {
   show: boolean;
   handleClose: () => void;
   post: PostType;
-  onPostUpdated: () => void;
+  onPostUpdated: (post: PostType) => void;
 }
 
 const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpdated }) => {
@@ -30,8 +30,9 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
       formData.append("title", title);
       formData.append("content", content);
 
-      await postService.updatePost(post._id!, formData);
-      onPostUpdated();
+      await postService.updatePost(post._id!, formData); // Update post in database
+      const updatedPost = { ...post, title, content }; // Update post in parent component
+      onPostUpdated(updatedPost);
       handleClose();
     } catch (error) {
       console.error("Failed to update post", error);
