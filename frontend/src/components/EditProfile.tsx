@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 
@@ -9,15 +11,17 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
   const [password, setPassword] = useState("");
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [headline, setHeadline] = useState(loggedInUser?.headline || "");
   const [bio, setBio] = useState(loggedInUser?.bio || "");
   const [location, setLocation] = useState(loggedInUser?.location || ""); 
   const [website, setWebsite] = useState(loggedInUser?.website || ""); 
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
-  const navigate = useNavigate();  
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  const currentProfilePicture = loggedInUser?.profilePicture || ""; 
 
   // Handle profile picture change
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,8 +30,8 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     }
   };
 
-  // Handle clear profile picture
-  const handleClearProfilePicture = () => {
+  // Handle remove profile picture
+  const handleRemoveProfilePicture = () => {
     setProfilePicture(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -44,13 +48,13 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     formData.append("bio", bio.trim());
     formData.append("location", location.trim()); 
     formData.append("website", website.trim());   
+
     if (password) {
       formData.append("password", password);
     }
+
     if (profilePicture !== null) {
       formData.append("profilePicture", profilePicture);
-    } else {
-      formData.append("profilePicture", "");
     }
 
     try {
@@ -80,73 +84,60 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>First Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
+            <Form.Control type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
+            <Form.Control type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Headline</Form.Label>
-            <Form.Control
-              type="text"
-              value={headline}
-              onChange={(e) => setHeadline(e.target.value)}
-            />
+            <Form.Control type="text" value={headline} onChange={(e) => setHeadline(e.target.value)} />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Bio</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
+            <Form.Control as="textarea" rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+            <Form.Control type="text" value={location} onChange={(e) => setLocation(e.target.value)} />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </Form.Group>
 
+          {/* Profile Picture */}
+          {!currentProfilePicture && (
+            <Form.Group className="mb-3">
+              <Form.Label>Current Profile Picture</Form.Label>
+              <div className="position-relative">
+                <img src={currentProfilePicture} alt="Profile" className="img-thumbnail" style={{ width: 100, height: 100 }} />
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  className="text-danger position-absolute top-0 end-0"
+                  style={{ cursor: "pointer", background: "white", borderRadius: "50%" }}
+                  onClick={handleRemoveProfilePicture}
+                />
+              </div>
+            </Form.Group>
+          )}
+          
           <Form.Group className="mb-3">
             <Form.Label>Profile Picture</Form.Label>
-            <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />            
-            <Button variant="danger" onClick={handleClearProfilePicture} className="ms-2">
-            Clear
-            </Button>
+            <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />
           </Form.Group>
 
           <Button variant="primary" type="submit">
             Save Changes
-          </Button>          
+          </Button>
         </Form>
+
         {statusMessage && statusType && (
           <Alert variant={statusType} className="mt-3">
             {statusMessage}
