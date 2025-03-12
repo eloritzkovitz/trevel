@@ -93,7 +93,7 @@ const NavigationBar: React.FC = () => {
                   <img
                     src={user.profilePicture}
                     alt="Profile"
-                    style={{ height: "50px", width: "50px",  borderRadius: "50%" }}
+                    style={{ height: "50px", width: "50px",  borderRadius: "50%", marginRight: "10px" }}
                   />
                 </>
                 <span className="fw-semibold">
