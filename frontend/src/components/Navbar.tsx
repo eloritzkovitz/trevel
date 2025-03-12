@@ -26,19 +26,13 @@ const NavigationBar: React.FC = () => {
         {/* Search */}
         <Form
           className="d-flex ms-auto position-relative"
-          style={{ height: "60px", width: "300px" }}
+          style={{ height: "60px", width: "450px" }}
         >
           <InputGroup>
             <FontAwesomeIcon
               icon={faSearch}
               className="position-absolute text-muted"
-              style={{
-                height: "20px",
-                left: "15px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 1,
-              }}
+              style={{ height: "20px", left: "15px", top: "50%", transform: "translateY(-50%)", zIndex: 1 }}
             />
             <FormControl
               type="search"
