@@ -1,0 +1,17 @@
+.post-btn {
+    background-color: transparent !important;
+    border: none !important;
+    color: black !important;
+    transition: color 0.3s ease-in-out;
+    height: 50px;
+}
+
+.post-btn:hover {
+    color: black !important;
+    background-color: lightGray !important;
+}
+
+.btn-primary {
+    background-color: #007bff !important;
+    color: white !important;
+}

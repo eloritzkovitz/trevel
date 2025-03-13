@@ -4,14 +4,13 @@ import postModel, { IPost } from "../models/Post";
 import userModel from "../models/User";
 import commentsModel from "../models/Comment";
 import BaseController from "./baseController";
-import fs from "fs";
-import path from "path";
+import { deleteFile } from "../utils/fileService";
 
 class PostsController extends BaseController<IPost> {
   constructor() {
       super(postModel);
   }
-
+  
   // Create a new post
   async createItem(req: Request, res: Response) {
     try {
@@ -49,27 +48,26 @@ class PostsController extends BaseController<IPost> {
         res.status(404).json({ error: "Post not found" });
         return;
       }
-      
+  
+      // Parse deleted images from request
+      const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
+  
       // Handle new images
       const newImages = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
-      const existingImages = req.body.existingImages ? req.body.existingImages : post.images;
-
-      // Remove images that are not in the existingImages array
-      const imagesToRemove = (post.images || []).filter(image => !existingImages.includes(image));
-      imagesToRemove.forEach(image => {
-        fs.unlinkSync(`${process.env.BASE_URL}/uploads/${image}`);
+      const existingImages = req.body.existingImages || [];  
+  
+      // Remove deleted images
+      deletedImages.forEach((image: string) => {
+        deleteFile(image);
       });
-
+  
+      // Update post images
       const updatedImages = [...existingImages, ...newImages];
-
+  
       req.body = { ...req.body, images: updatedImages, updatedAt: new Date().toISOString() };
       await super.updateItem(req, res);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: "An unknown error occurred" });
-      }
+      res.status(500).json({ error: error instanceof Error ? error.message : "An unknown error occurred" });
     }
   }
 
@@ -81,10 +79,7 @@ class PostsController extends BaseController<IPost> {
       if (post) {
         // Remove all images associated with the post
         post.images?.forEach(image => {
-          const imagePath = path.join(__dirname, "../../uploads", path.basename(image));
-          if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
-          }
+          deleteFile(image);
         });
       } 
       await commentsModel.deleteMany({ postId });

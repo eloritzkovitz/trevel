@@ -1,73 +1,84 @@
 import React, { useState, useRef } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 
-const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void }> = ({ show, handleClose, onUpdate }) => {
-  const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
-  const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
-  const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
-  const [password, setPassword] = useState("");
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [headline, setHeadline] = useState(loggedInUser?.headline || "");
-  const [bio, setBio] = useState(loggedInUser?.bio || "");
-  const [location, setLocation] = useState(loggedInUser?.location || ""); 
-  const [website, setWebsite] = useState(loggedInUser?.website || ""); 
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [statusType, setStatusType] = useState<"success" | "danger" | null>(null);
-  const navigate = useNavigate();  
+const DEFAULT_IMAGE = "/images/default-profile.png";
 
-  // Handle profile picture change
+const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onProfileUpdated: (user: User) => void }> = ({ show, handleClose, onProfileUpdated }) => {
+  const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // State for form data
+  const [formData, setFormData] = useState({
+    firstName: loggedInUser?.firstName || "",
+    lastName: loggedInUser?.lastName || "",
+    password: "",
+    headline: loggedInUser?.headline || "",
+    bio: loggedInUser?.bio || "",
+    location: loggedInUser?.location || "",
+    website: loggedInUser?.website || ""
+  });
+  
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [currentProfilePicture, setCurrentProfilePicture] = useState(loggedInUser?.profilePicture || DEFAULT_IMAGE);
+  const [status, setStatus] = useState<{ message: string; type: "success" | "danger" } | null>(null);
+
+  // Derived Profile Picture URL
+  const displayProfilePicture = profilePicture
+  ? URL.createObjectURL(profilePicture)
+  : currentProfilePicture;
+
+  // Handle Input Change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  // Handle Profile Picture Change
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setProfilePicture(e.target.files[0]);
     }
   };
 
-  // Handle clear profile picture
-  const handleClearProfilePicture = () => {
+  // Remove Profile Picture
+  const handleRemoveProfilePicture = () => {
     setProfilePicture(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    setCurrentProfilePicture(DEFAULT_IMAGE); // Reset to default image
   };
 
-  // Handle form submission
+  // Handle Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("firstName", firstName);
-    formData.append("lastName", lastName);
-    formData.append("headline", headline.trim());
-    formData.append("bio", bio.trim());
-    formData.append("location", location.trim()); 
-    formData.append("website", website.trim());   
-    if (password) {
-      formData.append("password", password);
-    }
-    if (profilePicture !== null) {
-      formData.append("profilePicture", profilePicture);
-    } else {
-      formData.append("profilePicture", "");
+    const submissionData = new FormData();
+
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value.trim()) submissionData.append(key, value.trim());
+    });
+
+    if (profilePicture) {
+      submissionData.append("profilePicture", profilePicture); // Append new profile picture
+    } else if (currentProfilePicture === DEFAULT_IMAGE) {
+      submissionData.append("profilePicture", ""); // Indicate removal
     }
 
     try {
-      const updatedUser = await userService.updateUser(loggedInUser!._id!, formData);
+      const updatedUser = await userService.updateUser(loggedInUser!._id!, submissionData);
       setLoggedInUser(updatedUser);
-      onUpdate(updatedUser);
-      setStatusMessage("Profile updated successfully!");
-      setStatusType("success");
+      onProfileUpdated(updatedUser);
+      setStatus({ message: "Profile updated successfully!", type: "success" });
       setTimeout(() => {
-        setStatusMessage(null);
+        setStatus(null);
         handleClose();
-        navigate(`/profile/${loggedInUser!._id}`);
+        navigate(`/profile/${updatedUser._id}`);
       }, 2000);
     } catch (error) {
-      setStatusMessage("Failed to update profile.");
-      setStatusType("danger");
-      console.error("Failed to update profile", error);
+      setStatus({ message: "Failed to update profile.", type: "danger" });
+      console.error("Profile update error:", error);
     }
   };
 
@@ -78,78 +89,60 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>First Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </Form.Group>
+          {Object.entries(formData).map(([key, value]) => (
+            <Form.Group className="mb-3" key={key}>
+              <Form.Label>{key.charAt(0).toUpperCase() + key.slice(1)}</Form.Label>
+              {key === "bio" ? (
+                <Form.Control
+                  as="textarea"
+                  name={key}
+                  value={value}
+                  onChange={handleChange}
+                  rows={3}
+                />
+              ) : (
+                <Form.Control
+                  type={key === "password" ? "password" : "text"}
+                  name={key}
+                  value={value}
+                  onChange={handleChange}
+                />
+              )}
+            </Form.Group>
+          ))}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Headline</Form.Label>
-            <Form.Control
-              type="text"
-              value={headline}
-              onChange={(e) => setHeadline(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Bio</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-
+          {/* Profile Picture */}
           <Form.Group className="mb-3">
             <Form.Label>Profile Picture</Form.Label>
-            <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />            
-            <Button variant="danger" onClick={handleClearProfilePicture} className="ms-2">
-            Clear
-            </Button>
+            {(profilePicture || loggedInUser?.profilePicture !== DEFAULT_IMAGE) && (
+              <div className="mb-2">
+                <div className="position-relative d-inline-block">
+                <img
+                  src={displayProfilePicture}
+                  alt="Profile"
+                  className="img-thumbnail d-block"
+                  style={{ width: 100, height: 100 }}
+                />
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  className="text-danger position-absolute"
+                  style={{ top: "0px", right: "0px", cursor: "pointer", background: "white", borderRadius: "50%" }}
+                  onClick={handleRemoveProfilePicture}
+                />
+                </div>
+              </div>
+            )}
+            <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />
           </Form.Group>
 
           <Button variant="primary" type="submit">
             Save Changes
-          </Button>          
+          </Button>
         </Form>
-        {statusMessage && statusType && (
-          <Alert variant={statusType} className="mt-3">
-            {statusMessage}
+
+        {status && (
+          <Alert variant={status.type} className="mt-3">
+            {status.message}
           </Alert>
         )}
       </Modal.Body>

@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { formatElapsedTime } from "../utils/date";
 import ImageModal from "./ImageModal";
 import CommentsList from "./CommentsList";
+import "../styles/Post.css";
 
 interface PostProps {
   _id?: string;
@@ -93,7 +94,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   };
 
   return (
-    <div className="card mb-3">
+    <div className="card mb-2" style={{ boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)' }}>
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="d-flex align-items-center">
@@ -151,10 +152,10 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
           </div>
         </div>
         <hr />
-        <button className={`btn btn-sm ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
+        <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
           <FontAwesomeIcon icon={faThumbsUp} className="me-2"/> {isLiked ? "Liked" : "Like"}        
         </button>
-        <button className="btn btn-outline-secondary btn-sm ms-2"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
+        <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
       </div>
       <ImageModal 
         show={showImageModal}

@@ -88,10 +88,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
 
   const handlePostUpdated = (updatedPost: PostType) => {
     setShowEditModal(false);
-    setCurrentPost(null);
-    //setPosts([]);    
-    //setPage(1);  
-    //setHasMore(true);
+    setCurrentPost(null);    
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post._id === updatedPost._id ? updatedPost : post

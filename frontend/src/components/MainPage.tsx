@@ -37,14 +37,14 @@ const MainPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="container mt-5 pt-5">
-        <div className="row">
+        <div className="row justify-content-center">       
           {/* Feed Section */}
-          <div className="card">
+          <div className="col-md-8">
             <div className="card-body">             
               <PostsList refresh={refreshPosts} />
             </div>
-          </div>
-        </div>
+          </div>        
+        </div>        
       </div>
 
       {/* Post Modal */}

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import userModel from '../models/User';
-import { generateToken, verifyRefreshToken } from '../utils/tokenService';
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
-import fs from 'fs';
-import path from 'path';
+import userModel from '../models/User';
+import { deleteFile } from '../utils/fileService';
+import { generateToken, verifyRefreshToken } from '../utils/tokenService';
+import postModel from '../models/Post';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -65,7 +65,7 @@ const register = async (req: Request, res: Response) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; 
+        const profilePicture = '/images/default-profile.png'; 
         const user = await userModel.create({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -149,46 +149,66 @@ interface UpdateUserRequestBody {
   
 // Update user data
 const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequestBody>, res: Response): Promise<void> => {
-  try {
-    const userId = req.params.userId;
-    const user = await userModel.findById(userId);
-    if (!user) {
-      res.status(404).json({ message: 'User not found' });
-      return;
-    }
-
-    // Update user details
-    if (req.body.firstName !== undefined) user.firstName = req.body.firstName;
-    if (req.body.lastName !== undefined) user.lastName = req.body.lastName;
-    if (req.body.headline !== undefined) user.headline = req.body.headline;
-    if (req.body.bio !== undefined) user.bio = req.body.bio;
-    if (req.body.location !== undefined) user.location = req.body.location;
-    if (req.body.website !== undefined) user.website = req.body.website;
-    if (req.body.password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(req.body.password, salt);
-    }
-
-    // Handle profile picture update
-    if (req.file) { 
-        // Delete the old profile picture if it's not the default one
-        if (user.profilePicture && !user.profilePicture.includes('default-profile.png')) {
-            const oldImagePath = path.join(__dirname, '../../', user.profilePicture);
-            if (fs.existsSync(oldImagePath)) {
-                fs.unlinkSync(oldImagePath);
-            }
-        }
-        user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`; // Update profile picture
-      } else if (req.body.profilePicture === "null") {
-        // if cleared, set default profile picture
-        user.profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`;
+    try {
+      const userId = req.params.userId;
+      const user = await userModel.findById(userId);
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
       }
-       
-    await user.save();
-    res.json(user);
+  
+      // Update user details
+      if (req.body.firstName !== undefined) user.firstName = req.body.firstName;
+      if (req.body.lastName !== undefined) user.lastName = req.body.lastName;
+      if (req.body.headline !== undefined) user.headline = req.body.headline;
+      if (req.body.bio !== undefined) user.bio = req.body.bio;
+      if (req.body.location !== undefined) user.location = req.body.location;
+      if (req.body.website !== undefined) user.website = req.body.website;
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(req.body.password, salt);
+      }
+      
+      /// Update profile picture
+      if (req.file || req.body.profilePicture === "") {
+        // Check if the old profile picture needs to be deleted
+        if (user.profilePicture && user.profilePicture !== '/images/default-profile.png') { 
+            deleteFile(user.profilePicture); // Delete the old image
+        }
+      
+        // Update the profile picture based on the input
+        if (req.file) {
+          user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+        } else {
+          user.profilePicture = '/images/default-profile.png'; // Set to default image
+        }
+      }
+      
+      // Save the updated user data
+      await user.save();
+
+      // Find all posts related to this user
+      const posts = await postModel.find({ sender: userId });
+      if (posts.length === 0) {
+        res.json(user);
+        return;
+      }   
+
+      // Batch update senderName and senderImage for all posts associated with user
+      const result = await postModel.updateMany(
+        { sender: userId },
+        { 
+          $set: {
+            senderName: `${user.firstName} ${user.lastName}`,
+            senderImage: user.profilePicture
+          }
+        }
+      );
+
+      res.json(user);
     } catch (error) {
       res.status(500).json({ message: 'Error updating user data', error });
-   }
+    }
 };
 
 // Logout function

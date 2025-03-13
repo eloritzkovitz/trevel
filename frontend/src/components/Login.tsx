@@ -43,7 +43,7 @@ const Login: FC = () => {
     <div className="container-fluid bg-light min-vh-100">
       <div style={{ textAlign: 'center' }}>
         <h1>Trevel</h1>
-        <div className="card" style={{ height: 'auto', width: '300px', margin: 'auto', padding: '20px', marginTop: '20px', boxShadow: '0px 0px 0px 2px rgba(136, 136, 136, 0.1)' }}>
+        <div className="card" style={{ height: 'auto', width: '300px', margin: 'auto', padding: '20px', marginTop: '20px', boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)' }}>
           <form onSubmit={handleSubmit(onSubmit)}>            
             <div className="form-group" style={{ marginTop: '20px' }}>
               <input type="email" className="form-control" id="inputEmail" placeholder="Email" {...register("email", { required: true })} />
