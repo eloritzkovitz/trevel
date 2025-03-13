@@ -93,7 +93,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   };
 
   return (
-    <div className="card mb-3">
+    <div className="card mb-2" style={{ boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)' }}>
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="d-flex align-items-center">

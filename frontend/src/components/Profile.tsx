@@ -81,7 +81,7 @@ const Profile: React.FC = () => {
         <div className="row justify-content-center">
           {/* Profile Section */}
           <div className="col-md-8">
-            <div className="card mb-4">
+            <div className="card mb-4" style= {{boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)'}}>
               <div className="card-body text-center">
                 <img 
                   src={user.profilePicture} 
@@ -132,9 +132,11 @@ const Profile: React.FC = () => {
             </div>
 
             {/* Posts Section */}
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">Posts</h5>
+            <div>
+              <div className="card mb-2" style={{ height: '70px', boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)' }}>
+                <h4 style={{ marginTop: '15px', marginLeft: '15px' }}>Posts</h4>
+              </div>
+              <div>                
                 <PostsList userId={userId} refresh={refreshPosts} />
               </div>
             </div>
