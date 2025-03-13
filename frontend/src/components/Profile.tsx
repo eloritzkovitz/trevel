@@ -66,7 +66,8 @@ const Profile: React.FC = () => {
     setRefreshPosts((prev) => !prev);
   };
 
-  const handleProfileUpdated = () => {
+  const handleProfileUpdated = (updatedUser: User) => {
+    setUser(updatedUser);
     setRefreshPosts((prev) => !prev);
   };
 
@@ -145,8 +146,7 @@ const Profile: React.FC = () => {
       {isEditProfileOpen && (
         <EditProfile
           show={isEditProfileOpen}
-          handleClose={() => setIsEditProfileOpen(false)}
-          onUpdate={setUser}
+          handleClose={() => setIsEditProfileOpen(false)}          
           onProfileUpdated={handleProfileUpdated}
         />
       )}

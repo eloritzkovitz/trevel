@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext";
 
 const DEFAULT_IMAGE = "/images/default-profile.png";
 
-const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void; onProfileUpdated: () => void }> = ({ show, handleClose, onUpdate, onProfileUpdated }) => {
+const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onProfileUpdated: (user: User) => void }> = ({ show, handleClose, onProfileUpdated }) => {
   const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
   const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
@@ -68,10 +68,9 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     try {
       const updatedUser = await userService.updateUser(loggedInUser!._id!, formData);
       setLoggedInUser(updatedUser);
-      onUpdate(updatedUser);      
+      onProfileUpdated(updatedUser);      
       setStatusMessage("Profile updated successfully!");
-      setStatusType("success");
-      onProfileUpdated();
+      setStatusType("success");      
       setTimeout(() => {
         setStatusMessage(null);
         handleClose();
