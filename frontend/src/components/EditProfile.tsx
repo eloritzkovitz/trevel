@@ -6,6 +6,8 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 
+const DEFAULT_IMAGE = "/images/default-profile.png";
+
 const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void }> = ({ show, handleClose, onUpdate }) => {
   const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
   const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
@@ -27,12 +29,16 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setProfilePicture(e.target.files[0]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = e.target.files[0].name;
+      }
     }
   };
 
   // Handle remove profile picture
   const handleRemoveProfilePicture = () => {
     setProfilePicture(null);
+    setLoggedInUser((prev) => prev ? { ...prev, profilePicture: undefined } : null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -52,9 +58,11 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     if (password) {
       formData.append("password", password);
     }
-
-    if (profilePicture !== null) {
-      formData.append("profilePicture", profilePicture);
+    
+    if (!fileInputRef.current?.files?.length) {
+      formData.append("profilePicture", ""); // Revert to default picture
+    } else if (profilePicture !== null) {
+      formData.append("profilePicture", profilePicture); // Replace with new picture
     }
 
     try {
@@ -108,28 +116,36 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
           </Form.Group>
 
           <Form.Group className="mb-3">
+            <Form.Label>Website</Form.Label>
+            <Form.Control type="text" value={website} onChange={(e) => setWebsite(e.target.value)} />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
             <Form.Label>Password</Form.Label>
             <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </Form.Group>
 
           {/* Profile Picture */}
-          {!currentProfilePicture && (
-            <Form.Group className="mb-3">
-              <Form.Label>Current Profile Picture</Form.Label>
-              <div className="position-relative">
-                <img src={currentProfilePicture} alt="Profile" className="img-thumbnail" style={{ width: 100, height: 100 }} />
-                <FontAwesomeIcon
-                  icon={faTrash}
-                  className="text-danger position-absolute top-0 end-0"
-                  style={{ cursor: "pointer", background: "white", borderRadius: "50%" }}
-                  onClick={handleRemoveProfilePicture}
-                />
-              </div>
-            </Form.Group>
-          )}
-          
           <Form.Group className="mb-3">
             <Form.Label>Profile Picture</Form.Label>
+            {(profilePicture || (currentProfilePicture && currentProfilePicture !== DEFAULT_IMAGE)) && (
+              <div className="mb-2">
+                <div className="position-relative d-inline-block">
+                  <img 
+                    src={profilePicture ? URL.createObjectURL(profilePicture) : currentProfilePicture} 
+                    alt="Profile" 
+                    className="img-thumbnail d-block" 
+                    style={{ width: 100, height: 100 }} 
+                  />
+                  <FontAwesomeIcon
+                  icon={faTrash}
+                  className="text-danger position-absolute"
+                  style={{ top: '0px', right: '0px', cursor: "pointer", background: "white", borderRadius: "50%" }}
+                  onClick={handleRemoveProfilePicture}
+                  />
+                </div>
+              </div>
+            )}            
             <Form.Control type="file" onChange={handleProfilePictureChange} ref={fileInputRef} />
           </Form.Group>
 
