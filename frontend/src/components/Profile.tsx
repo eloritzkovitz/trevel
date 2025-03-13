@@ -60,8 +60,13 @@ const Profile: React.FC = () => {
   // Post modal handlers
   const handleShowPostModal = () => setShowPostModal(true);
   const handleClosePostModal = () => setShowPostModal(false);
+  
   const handlePostCreated = () => {
     setShowPostModal(false);
+    setRefreshPosts((prev) => !prev);
+  };
+
+  const handleProfileUpdated = () => {
     setRefreshPosts((prev) => !prev);
   };
 
@@ -142,6 +147,7 @@ const Profile: React.FC = () => {
           show={isEditProfileOpen}
           handleClose={() => setIsEditProfileOpen(false)}
           onUpdate={setUser}
+          onProfileUpdated={handleProfileUpdated}
         />
       )}
 

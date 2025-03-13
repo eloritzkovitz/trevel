@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import userModel from '../models/User';
 import { deleteFile } from '../utils/fileService';
 import { generateToken, verifyRefreshToken } from '../utils/tokenService';
+import postModel from '../models/Post';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -185,6 +186,21 @@ const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequest
       
       // Save the updated user data
       await user.save();
+
+      // Find all posts related to this user
+      const posts = await postModel.find({ sender: userId }); 
+      if (posts.length === 0) {
+        res.status(404).json({ message: 'No posts found for this user' });
+        return;
+      }
+
+      // Update the senderName and senderImage for each post associated with user
+      for (const post of posts) {
+        post.senderName = `${user.firstName} ${user.lastName}`;  // Update sender name
+        post.senderImage = user.profilePicture;  // Update sender profile image
+        await post.save();  // Save each updated post
+      }
+
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: 'Error updating user data', error });

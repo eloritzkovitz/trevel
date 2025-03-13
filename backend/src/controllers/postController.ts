@@ -5,14 +5,12 @@ import userModel from "../models/User";
 import commentsModel from "../models/Comment";
 import BaseController from "./baseController";
 import { deleteFile } from "../utils/fileService";
-import fs from "fs";
-import path from "path";
 
 class PostsController extends BaseController<IPost> {
   constructor() {
       super(postModel);
   }
-
+  
   // Create a new post
   async createItem(req: Request, res: Response) {
     try {

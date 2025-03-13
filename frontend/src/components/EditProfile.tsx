@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext";
 
 const DEFAULT_IMAGE = "/images/default-profile.png";
 
-const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void }> = ({ show, handleClose, onUpdate }) => {
+const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: (user: User) => void; onProfileUpdated: () => void }> = ({ show, handleClose, onUpdate, onProfileUpdated }) => {
   const { user: loggedInUser, setUser: setLoggedInUser } = useAuth();
   const [firstName, setFirstName] = useState(loggedInUser?.firstName || "");
   const [lastName, setLastName] = useState(loggedInUser?.lastName || "");
@@ -60,7 +60,7 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     }
     
     if (!fileInputRef.current?.files?.length) {
-      formData.append("profilePicture", ""); // Revert to default picture
+      if (!currentProfilePicture) formData.append("profilePicture", ""); // Revert to default picture
     } else if (profilePicture !== null) {
       formData.append("profilePicture", profilePicture); // Replace with new picture
     }
@@ -68,9 +68,10 @@ const EditProfile: React.FC<{ show: boolean; handleClose: () => void; onUpdate: 
     try {
       const updatedUser = await userService.updateUser(loggedInUser!._id!, formData);
       setLoggedInUser(updatedUser);
-      onUpdate(updatedUser);
+      onUpdate(updatedUser);      
       setStatusMessage("Profile updated successfully!");
       setStatusType("success");
+      onProfileUpdated();
       setTimeout(() => {
         setStatusMessage(null);
         handleClose();
