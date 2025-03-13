@@ -65,7 +65,7 @@ const register = async (req: Request, res: Response) => {
         const password = req.body.password;
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const profilePicture = `${process.env.BASE_URL}/uploads/default-profile.png`; 
+        const profilePicture = '/images/default-profile.png'; 
         const user = await userModel.create({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -188,18 +188,22 @@ const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequest
       await user.save();
 
       // Find all posts related to this user
-      const posts = await postModel.find({ sender: userId }); 
+      const posts = await postModel.find({ sender: userId });
       if (posts.length === 0) {
-        res.status(404).json({ message: 'No posts found for this user' });
+        res.json(user);
         return;
-      }
+      }   
 
-      // Update the senderName and senderImage for each post associated with user
-      for (const post of posts) {
-        post.senderName = `${user.firstName} ${user.lastName}`;  // Update sender name
-        post.senderImage = user.profilePicture;  // Update sender profile image
-        await post.save();  // Save each updated post
-      }
+      // Batch update senderName and senderImage for all posts associated with user
+      const result = await postModel.updateMany(
+        { sender: userId },
+        { 
+          $set: {
+            senderName: `${user.firstName} ${user.lastName}`,
+            senderImage: user.profilePicture
+          }
+        }
+      );
 
       res.json(user);
     } catch (error) {
