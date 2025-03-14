@@ -6,7 +6,7 @@ import { faEllipsisH, faPencil, faTrash, faThumbsUp, faComment } from "@fortawes
 import postService from "../services/post-service";
 import { useAuth } from "../context/AuthContext";
 import { formatElapsedTime } from "../utils/date";
-import ImageModal from "./ImageModal";
+import ImageViewer from "./ImageViewer";
 import CommentsList from "./CommentsList";
 import "../styles/Post.css";
 
@@ -30,7 +30,7 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
+  const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewer = { _id: useAuth().user?._id };
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
@@ -59,25 +59,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   // Handle image click
   const handleImageClick = (index: number) => {
     setCurrentIndex(index);
-    setShowImageModal(true);
-  };
-
-  // Handle close image modal
-  const handleCloseImageModal = () => {
-    setShowImageModal(false);
-  };
-
-  // Handle previous image
-  const handlePrevImage = () => {
-    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  // Handle next image
-  const handleNextImage = () => {
-    if (images) {
-      setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
-    }
-  };
+    setImageViewer(true);
+  };  
 
   // Handle like button click
   const handleLikeClick = async () => {
@@ -157,14 +140,12 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         </button>
         <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
       </div>
-      <ImageModal 
-        show={showImageModal}
+      <ImageViewer 
+        show={showImageViewer}
         title="Image"
         images={images || []}
         currentIndex={currentIndex}
-        handleClose={handleCloseImageModal}
-        handlePrev={handlePrevImage}
-        handleNext={handleNextImage}
+        onClose={() => setImageViewer(false)}        
       />
     </div>
   );
