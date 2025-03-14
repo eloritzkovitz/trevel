@@ -30,14 +30,20 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Web Applications Assignment 2 REST API",
+      title: "Trevel API",
       version: "1.0.0",
-      description: "REST API for web applications assignment",
+      description: "API documentation for Trevel",
     },
-    servers: [{ url: "http://localhost:3000", },],
+    servers: [
+      { 
+        url: "http://localhost:3000",
+        description: 'Local server',      
+     },
+    ],
   },
   apis: ["./src/routes/*.ts"],
 };
+
 const specs = swaggerJsDoc(options);
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 

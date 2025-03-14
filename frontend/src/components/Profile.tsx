@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import EditProfile from "./EditProfile";
 import PostsList from "./PostsList";
 import PostModal from "./PostModal";
-import ImageModal from "./ImageModal";
+import ImageViewer from "./ImageViewer";
 import userService, { User } from "../services/user-service";
 import { useAuth } from "../context/AuthContext";
 
@@ -15,8 +15,8 @@ const Profile: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const { user: loggedInUser } = useAuth();
   const [user, setUser] = useState<User | null>(null);
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [showEditProfile, setEditProfile] = useState(false);
+  const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [images, setImages] = useState<string[]>([]);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -41,21 +41,8 @@ const Profile: React.FC = () => {
   const handleProfileImageClick = () => {
     setImages([user.profilePicture || ""]);
     setCurrentIndex(0);
-    setIsImageModalOpen(true);
-  };
-
-  // Image modal handlers
-  const handleCloseImageModal = () => {
-    setIsImageModalOpen(false);
-  };
-
-  const handlePrevImage = () => {
-    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  };
-
-  const handleNextImage = () => {
-    setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, images.length - 1));
-  };
+    setImageViewer(true);
+  };  
 
   // Post modal handlers
   const handleShowPostModal = () => setShowPostModal(true);
@@ -121,7 +108,7 @@ const Profile: React.FC = () => {
                         <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} />
                         New Post
                       </Button>
-                      <Button variant="primary" onClick={() => setIsEditProfileOpen(true)}>
+                      <Button variant="primary" onClick={() => setEditProfile(true)}>
                         <FontAwesomeIcon icon={faPencil} style={{ marginRight: '5px' }} />
                         Edit Profile
                       </Button>
@@ -145,23 +132,20 @@ const Profile: React.FC = () => {
       </div>
       
       {/* Edit Profile Modal */}
-      {isEditProfileOpen && (
+      {showEditProfile && (
         <EditProfile
-          show={isEditProfileOpen}
-          handleClose={() => setIsEditProfileOpen(false)}          
+          show={showEditProfile}
+          handleClose={() => setEditProfile(false)}          
           onProfileUpdated={handleProfileUpdated}
         />
       )}
 
       {/* Image Modal */}
-      <ImageModal 
-        show={isImageModalOpen}
-        title="Profile Picture"
+      <ImageViewer 
+        show={showImageViewer}        
         images={images}
         currentIndex={currentIndex}
-        handleClose={handleCloseImageModal}
-        handlePrev={handlePrevImage}
-        handleNext={handleNextImage}
+        onClose={() => setImageViewer(false)}        
       />
 
       {/* Post Modal */}
