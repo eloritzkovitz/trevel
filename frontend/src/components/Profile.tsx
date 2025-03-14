@@ -142,8 +142,7 @@ const Profile: React.FC = () => {
 
       {/* Image Modal */}
       <ImageViewer 
-        show={showImageViewer}
-        title="Profile Picture"
+        show={showImageViewer}        
         images={images}
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}        

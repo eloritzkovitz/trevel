@@ -141,8 +141,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
       </div>
       <ImageViewer 
-        show={showImageViewer}
-        title="Image"
+        show={showImageViewer}        
         images={images || []}
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}        

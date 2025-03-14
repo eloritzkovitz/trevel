@@ -1,0 +1,63 @@
+.modal-header {
+    border-bottom: none;
+}
+    
+.modal-header .btn-close {
+    color: black;
+    font-size: 1.5rem; 
+}
+
+.modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    position: relative;
+}
+
+.modal-dialog {
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+}
+  
+.modal-content {
+  background: transparent;
+  border: none;
+}
+  
+.modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  overflow: hidden;
+}
+  
+.modal-body img {
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain; 
+}
+
+.chevron-button {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 4rem;
+    color: black;
+    text-decoration: none;
+    z-index: 1050;
+    cursor: pointer;
+}
+
+.chevron-button:hover {
+  color: darkgray;
+}
+
+.chevron-left {
+  left: 20px;
+}
+
+.chevron-right {
+  right: 20px;
+}

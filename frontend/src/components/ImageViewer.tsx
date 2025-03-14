@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import "../styles/ImageViewer.css";
 
-interface ImageModalProps {
-  show: boolean;
-  title: string;
+interface ImageViewerProps {
+  show: boolean;  
   images: string[];
   currentIndex: number;
   onClose: () => void;
 }
 
-const ImageModal: React.FC<ImageModalProps> = ({ show, title, images, currentIndex, onClose }) => {  
+const ImageViewer: React.FC<ImageViewerProps> = ({ show, images, currentIndex, onClose }) => {  
   const [currentImageIndex, setCurrentImageIndex] = useState(currentIndex);
 
   useEffect(() => {
@@ -32,20 +32,17 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, title, images, currentInd
   };
 
   return (
-    <Modal show={show} onHide={handleModalClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="text-center position-relative">
-        <img src={images[currentImageIndex] || ''} alt="Post" className="img-fluid" />
+    <Modal show={show} onHide={handleModalClose} centered>  
+      <Modal.Header closeButton /> 
+      <Modal.Body className="text-center d-flex justify-content-center align-items-center">        
+        <img src={images[currentImageIndex] || ''} alt="Post" className="img-fluid full-size-image" />
         {images.length > 1 && (
           <>
             <Button 
               variant="link" 
               onClick={handlePrevImage} 
               disabled={currentImageIndex === 0} 
-              className="position-fixed top-50 start-0 translate-middle-y"
-              style={{ fontSize: '4rem', color: 'black', textDecoration: 'none', left: '20px', zIndex: 1050 }}
+              className="chevron-button chevron-left"              
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </Button>
@@ -53,8 +50,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, title, images, currentInd
               variant="link" 
               onClick={handleNextImage} 
               disabled={currentImageIndex === images.length - 1} 
-              className="position-fixed top-50 end-0 translate-middle-y"
-              style={{ fontSize: '4rem', color: 'black', textDecoration: 'none', right: '20px', zIndex: 1050 }}
+              className="chevron-button chevron-right"              
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </Button>
@@ -65,4 +61,4 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, title, images, currentInd
   );
 };
 
-export default ImageModal;
+export default ImageViewer;
