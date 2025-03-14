@@ -91,6 +91,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
               <small className="text-muted">{formatElapsedTime(createdAt)}</small>
             </div>
           </div>
+          
+          {/* Dropdown menu */}
           {isOwner && (
             <DropdownButton
               align="end"
@@ -111,21 +113,28 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
             </DropdownButton>
           )}
         </div>
+
+        {/* Post content */}
         <h6 className="card-title">{title}</h6>
         <p className="card-text">{content}</p>
         {images && images.length > 0 && (
-          <div className="d-flex flex-wrap">
-            {images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Post image ${index + 1}`}
-                style={{ width: '120px', height: '120px', objectFit: 'cover', marginRight: '10px', cursor: 'pointer' }}
-                onClick={() => handleImageClick(index)}
-              />
+          <div className="image-grid">
+            {images.slice(0, 3).map((image, index) => (
+              <div key={index} className="image-grid-item" onClick={() => handleImageClick(index)}>
+                <img
+                  src={image}
+                  alt={`Post image ${index + 1}`}
+                  className="image-grid-img"
+                />
+                {index === 2 && images.length > 3 && (
+                  <div className="image-grid-more" onClick={() => handleImageClick(index)}>
+                    +{images.length - 3} more
+                  </div>
+                )}
+              </div>
             ))}
-          </div>          
-        )}
+          </div>
+        )}       
         <div className="d-flex justify-content-between mt-2">
           <div>
             <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
@@ -135,11 +144,15 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
           </div>
         </div>
         <hr />
+
+         {/* Lower buttons */}
         <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
           <FontAwesomeIcon icon={faThumbsUp} className="me-2"/> {isLiked ? "Liked" : "Like"}        
         </button>
         <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
       </div>
+
+       {/* Image viewer */}
       <ImageViewer 
         show={showImageViewer}        
         images={images || []}
