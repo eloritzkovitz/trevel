@@ -70,11 +70,10 @@ const Profile: React.FC = () => {
           <div className="col-md-8">
             <div className="card mb-4" style= {{boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)'}}>
               <div className="card-body text-center">
-                <img 
+                <img
                   src={user.profilePicture} 
-                  className="rounded-circle mb-3" 
-                  alt="Profile" 
-                  style={{ width: '180px', height: '180px', cursor: 'pointer' }} 
+                  className="profile-picture-1 rounded-circle mb-3" 
+                  alt="Profile"                  
                   onClick={handleProfileImageClick}
                 />
                 <div className="text-left">
