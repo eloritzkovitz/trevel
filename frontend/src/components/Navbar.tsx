@@ -5,42 +5,38 @@ import logo from "../assets/logo.png";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faHome, faPlane, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import "../styles/Navbar.css";
 
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
     <Navbar
-      bg="white"
+      className="navbar"      
       variant="light"
       expand="lg"
-      fixed="top"
-      style={{ boxShadow: "1px 1px 5px rgba(0, 0, 0, 0.1)" }}
+      fixed="top"      
     >
       <Container fluid>
         {/* Brand */}
-        <Navbar.Brand as={Link} to="/" className="ms-3">
-          <img src={logo} alt="Trevel Logo" style={{ height: "50px" }} />
+        <Navbar.Brand as={Link} to="/" className="ms-3 brand">
+          <img src={logo} alt="Trevel Logo" />
         </Navbar.Brand>
 
         {/* Search */}
         <Form
-          className="d-flex ms-auto position-relative"
-          style={{ height: "60px", width: "450px" }}
+          className="d-flex ms-auto position-relative search-bar-form"          
         >
           <InputGroup>
             <FontAwesomeIcon
               icon={faSearch}
-              className="position-absolute text-muted"
-              style={{ height: "20px", left: "15px", top: "50%", transform: "translateY(-50%)", zIndex: 1 }}
+              className="position-absolute text-muted search-bar-icon"
             />
             <FormControl
               type="search"
               placeholder="Search"
-              className="me-2 rounded-pill ps-5"
-              aria-label="Search"
-              style={{ fontSize: "24px", backgroundColor: "#f8f9fa", borderColor: "#f8f9fa", boxShadow: "inset 1px 1px 1px rgba(0, 0, 0, 0.03)",
-              }}
+              className="me-2 rounded-pill ps-5 search-bar"
+              aria-label="Search"              
             />
           </InputGroup>
         </Form>
@@ -54,20 +50,18 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/"
-              className={`nav-link d-flex flex-column align-items-center ${location.pathname === "/" ? "active text-primary" : ""}`}
-              style={{ marginRight: "15px" }}
+              className={`nav-link d-flex flex-column align-items-center mr-15 ${location.pathname === "/" ? "active text-primary" : ""}`}              
             >
-              <FontAwesomeIcon icon={faHome} style={{ height: "25px" }} />
+              <FontAwesomeIcon className="navbar-icon" icon={faHome} />
               <span>Home</span>
             </Nav.Link>
 
             <Nav.Link
               as={Link}
               to="/trips"
-              className={`nav-link d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}
-              style={{ marginRight: "15px" }}
+              className={`nav-link d-flex flex-column align-items-center mr-15 ${location.pathname === "/trips" ? "active text-primary" : ""}`}              
             >
-              <FontAwesomeIcon icon={faPlane} style={{ height: "25px" }} />
+              <FontAwesomeIcon className="navbar-icon" icon={faPlane} />
               <span>Trips</span>
             </Nav.Link>
           </Nav>
@@ -78,9 +72,9 @@ const NavigationBar: React.FC = () => {
               title={
                 <>
                   <img
+                    className="profile-picture-3 rounded-circle"
                     src={user.profilePicture}
-                    alt="Profile"
-                    style={{ height: "50px", width: "50px",  borderRadius: "50%" }}
+                    alt="Profile"                    
                   />
                 </>
               }
@@ -91,9 +85,9 @@ const NavigationBar: React.FC = () => {
               <NavDropdown.Item>
                 <>
                   <img
+                    className="profile-picture-3 rounded-circle mr-10"
                     src={user.profilePicture}
-                    alt="Profile"
-                    style={{ height: "50px", width: "50px",  borderRadius: "50%", marginRight: "10px" }}
+                    alt="Profile"                    
                   />
                 </>
                 <span className="fw-semibold">
@@ -102,13 +96,12 @@ const NavigationBar: React.FC = () => {
               </NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item as={Link} to={`/profile/${user._id}`}>
-                <FontAwesomeIcon icon={faUser} style={{ marginRight: "5px" }} />
+                <FontAwesomeIcon className="mr-10" icon={faUser} />
                 Profile
               </NavDropdown.Item>
               <NavDropdown.Item onClick={logout}>
-                <FontAwesomeIcon
-                  icon={faSignOutAlt}
-                  style={{ marginRight: "5px" }}
+                <FontAwesomeIcon className="mr-10"
+                  icon={faSignOutAlt}                  
                 />
                 Logout
               </NavDropdown.Item>

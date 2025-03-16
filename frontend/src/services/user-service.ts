@@ -40,12 +40,16 @@ const login = (email: string, password: string) => {
 }
 
 // Get user data
-const getUserData = async (userId: string): Promise<User> => {
+const getUserData = async (id?: string): Promise<User> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    const response = await apiClient.get<User>(`/auth/user/${userId}`, {
+
+    // Determine the endpoint: if `id` is given, fetch that user; otherwise, fetch the authenticated user
+    const endpoint = id ? `/auth/user/${id}` : "/auth/user";
+
+    const response = await apiClient.get<User>(endpoint, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -54,12 +58,12 @@ const getUserData = async (userId: string): Promise<User> => {
 };
 
 // Update user data
-const updateUser = async (userId: string, formData: FormData): Promise<User> => {
+const updateUser = async (id: string, formData: FormData): Promise<User> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    const response = await apiClient.put<User>(`/auth/user/${userId}`, formData, {
+    const response = await apiClient.put<User>(`/auth/user/${id}`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

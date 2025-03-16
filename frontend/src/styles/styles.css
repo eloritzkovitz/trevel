@@ -1,13 +1,62 @@
+/* Global styles */
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.mr-15 {
+  margin-right: 15px;
+}
+
 .fab {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-  }
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.panel{
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+}
+
+.panel-form {
+  height: auto;
+  width: 300px;
+  margin: auto;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Profile picture styles */
+
+.profile-picture-1 {
+  height: 200px;
+  width: 200px;
+  cursor: pointer;
+}
+
+.profile-picture-2 {  
+  height: 100px;
+  width: 100px;
+  cursor: pointer;
+}
+
+.profile-picture-3 {
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+}
+
+.profile-picture-4 {
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+}

@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'strict' });
     Cookies.set("refreshToken", refreshToken, { secure: true, sameSite: 'strict' });
     setIsAuthenticated(true);
-    userService.getUserData(accessToken).then(setUser);
+    userService.getUserData().then(setUser);
   };
 
   // Remove authentication on logout

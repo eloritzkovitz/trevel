@@ -77,11 +77,11 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   };
 
   return (
-    <div className="card mb-2" style={{ boxShadow: '0 5px 5px -5px rgba(0, 0, 0, 0.2)' }}>
+    <div className="card mb-2 panel">
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <div className="d-flex align-items-center">
-            <img src={senderImage} alt="Profile" style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '10px' }} />
+            <img className="profile-picture-4 rounded-circle mr-10" src={senderImage} alt="Profile" />
             <div>
               <h5 className="card-text mb-0">
                 <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">

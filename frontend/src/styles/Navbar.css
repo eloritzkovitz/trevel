@@ -1,0 +1,37 @@
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.brand img {
+    height: 50px;
+}
+
+.search-bar-form {
+    height: 60px;
+    width: 450px;
+}
+
+.search-bar {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.03);
+    font-size: 24px;
+}
+
+.search-bar-icon {
+    height: 20px;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.navbar-icon {
+    height: 25px;
+}
+
+.dropdown-menu {
+    width: 350px;
+    font-size: 20px;
+}

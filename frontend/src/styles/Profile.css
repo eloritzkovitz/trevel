@@ -1,0 +1,62 @@
+/* Custom styles for tabs */
+
+.tab-content .nav-tabs {
+    border-bottom: 2px solid #dee2e6;    
+}
+
+.tab-content .nav-link {
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    color: black;
+    padding: 0.5rem 1rem;   
+}
+
+.tab-content .nav-link.active {
+    color: blue;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.tab-content .nav-link:hover {
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.fixed-height-tab-content {
+    height: 220px;
+    overflow-y: auto;    
+}
+
+/* Profile page styles */
+
+.about-me, .contact-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left; 
+    margin-top: 30px;
+    margin-left: 20px;
+}
+
+.about-me h4, .contact-info h4 {
+    margin-bottom: 20px;
+}
+
+.contact-info p {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 180px; 
+    gap: 10px;
+}
+
+/* Profile posts styles */
+
+.panel-posts {
+    height: 70px;
+}
+
+.panel-posts h4 {
+    margin-top: 15px;
+    margin-left: 15px;
+}

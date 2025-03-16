@@ -204,7 +204,7 @@ router.post("/refresh", authController.refresh);
  *       500:
  *         description: Server error
  */
-router.get("/user/:userId", authMiddleware, authController.getUserData);
+router.get("/user/:id?", authMiddleware, authController.getUserData);
 
 /**
  * @swagger
@@ -255,7 +255,7 @@ router.get("/user/:userId", authMiddleware, authController.getUserData);
  *       500:
  *         description: Server error
  */
-router.put("/user/:userId", authMiddleware, upload.single("profilePicture"), authController.updateUser);
+router.put("/user/:id", authMiddleware, upload.single("profilePicture"), authController.updateUser);
 
 /**
  * @swagger
