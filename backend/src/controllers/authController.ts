@@ -124,12 +124,18 @@ const login = async (req: Request, res: Response) => {
 // Get user data
 const getUserData = async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = req.params.userId;
+        const requestedUserId = req.params.id;
+        const authenticatedUserId = req.params.userId;
+
+        // Use the requested ID if available, otherwise fallback to the authenticated user
+        const userId = requestedUserId || authenticatedUserId;
+
         const user = await userModel.findById(userId).select('-password');
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
+
         res.json(user);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching user data', error });
@@ -148,9 +154,9 @@ interface UpdateUserRequestBody {
 }
   
 // Update user data
-const updateUser = async (req: Request<{ userId: string }, {}, UpdateUserRequestBody>, res: Response): Promise<void> => {
+const updateUser = async (req: Request<{ id: string }, {}, UpdateUserRequestBody>, res: Response): Promise<void> => {
     try {
-      const userId = req.params.userId;
+      const userId = req.params.id;
       const user = await userModel.findById(userId);
       if (!user) {
         res.status(404).json({ message: 'User not found' });
