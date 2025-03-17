@@ -1,7 +1,11 @@
 /* Custom styles for tabs */
 
+.tab-content {    
+    border-color: var(--panel-border-color);    
+}
+
 .tab-content .nav-tabs {
-    border-bottom: 2px solid #dee2e6;    
+    border-bottom: 2px solid transparent;      
 }
 
 .tab-content .profile-nav-link {
@@ -12,18 +16,21 @@
     padding: 0.5rem 1rem;    
 }
 
-.tab-content .nav-link.active {
-    color: var(--primary-color);
+.tab-content .nav-link.active {    
     background-color: var(--panel-color);  
-    border-color: #dee2e6 #dee2e6 transparent;  
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;
+    color: var(--text-color); 
 }
 
 .tab-content .nav-link.active:hover {
-    background-color: var(--panel-color);
+    background-color: var(--panel-color);    
+    color: var(--primary-color);
 }
 
 .tab-content .nav-link:hover {
     background-color: var(--secondary-color);
+    border-color: var(--panel-border-color);
+    color: var(--text-hover-color);
 }
 
 .fixed-height-tab-content {

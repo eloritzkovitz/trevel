@@ -50,11 +50,13 @@
 
 .nav-link:hover {
     background-color: var(--secondary-color);    
+    color: var(--text-hover-color);  
 }
 
 .nav-link.active, .nav-link.active:hover {    
     background-color: transparent;
-    color: var(--primary-hover-color);    
+    border-bottom: 3px solid var(--primary-color);
+    color: var(--primary-hover-color) !important;    
 }
 
 .navbar-icon {
