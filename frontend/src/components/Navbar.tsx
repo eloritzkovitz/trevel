@@ -4,6 +4,7 @@ import { Navbar, Nav, NavDropdown, Container, Form, FormControl, InputGroup} fro
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faHome, faPlane, faChevronDown, faUser, faSignOutAlt, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/logo.png";
+import logoWhite from "../assets/logo-white.png";
 import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
 
@@ -27,8 +28,8 @@ const NavigationBar: React.FC = () => {
     >
       <Container fluid>
         {/* Brand */}
-        <Navbar.Brand as={Link} to="/" className="ms-3 brand">
-          <img src={logo} alt="Trevel Logo" />
+        <Navbar.Brand as={Link} to="/" className="ms-3 brand">        
+          <img src={theme === "light" ? logo : logoWhite} alt="Trevel Logo" />
         </Navbar.Brand>
 
         {/* Search */}
