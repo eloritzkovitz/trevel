@@ -1,6 +1,6 @@
 .navbar {
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    background-color: var(--navbar-color);
+    box-shadow: var(--panel-shadow);
 }
 
 .brand img {
@@ -13,10 +13,14 @@
 }
 
 .search-bar {
-    background-color: #f8f9fa;
-    border-color: #f8f9fa;
+    background-color: var(--search-bar-color);
+    border-color: var(--search-bar-color);    
     box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.03);
     font-size: 24px;
+}
+
+.search-bar-form {
+    color: var(--text-color) !important;
 }
 
 .search-bar-icon {
@@ -25,6 +29,27 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 1;
+}
+
+.nav-link {
+    color: var(--text-color);    
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.nav-link-btn {
+    height: 60px;
+    width: 90px;
+}
+
+.nav-link:hover {
+    background-color: var(--secondary-color);    
+}
+
+.nav-link.active, .nav-link.active:hover {    
+    background-color: transparent;
+    color: var(--primary-hover-color);    
 }
 
 .navbar-icon {

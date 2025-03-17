@@ -1,5 +1,43 @@
 /* Global styles */
 
+/* Light theme (default) */
+:root {
+  --background-color: #f8f9fa;
+  --navbar-color: white;
+  --search-bar-color: #f8f9fa;
+  --panel-color: #ffffff;
+  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  --primary-color: #007bff;
+  --primary-hover-color: #0056b3;
+  --primary-text-color: white;
+  --secondary-color: #f2f2f2;
+  --text-color: black;
+  --text-hover-color: white;
+}
+
+/* Dark theme */
+body.dark {
+  --background-color: #6c757d;
+  --navbar-color: #343a40;
+  --search-bar-color: #495057;
+  --panel-color: #343a40;
+  --primary-color: #007bff;
+  --primary-hover-color: #0056b3;
+  --primary-text-color: white;
+  --secondary-color: #f2f2f2;
+  --text-color: white;
+  --text-hover-color: black;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6, p, small, .text-muted {
+  color: var(--text-color) !important;
+}
+
 .mr-10 {
   margin-right: 10px;
 }
@@ -23,7 +61,8 @@
 }
 
 .panel{
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  background-color: var(--panel-color);
+  box-shadow: var(--panel-shadow);
 }
 
 .panel-form {
@@ -32,7 +71,7 @@
   margin: auto;
   padding: 20px;
   margin-top: 20px;
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--panel-shadow);
 }
 
 /* Profile picture styles */

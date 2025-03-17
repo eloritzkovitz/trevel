@@ -4,12 +4,12 @@
     border-bottom: 2px solid #dee2e6;    
 }
 
-.tab-content .nav-link {
+.tab-content .profile-nav-link {
     border: 1px solid transparent;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
     color: black;
-    padding: 0.5rem 1rem;   
+    padding: 0.5rem 1rem;    
 }
 
 .tab-content .nav-link.active {
@@ -18,8 +18,12 @@
     border-color: #dee2e6 #dee2e6 #fff;
 }
 
+.tab-content .nav-link.active:hover {
+    background-color: #fff;
+}
+
 .tab-content .nav-link:hover {
-    border-color: #e9ecef #e9ecef #dee2e6;
+    background-color: #f2f2f2;
 }
 
 .fixed-height-tab-content {
@@ -50,9 +54,15 @@
     gap: 10px;
 }
 
+.profile-button:hover {
+    background-color: #0056b3 !important;             
+}
+
 /* Profile posts styles */
 
-.panel-posts {
+.panel-posts {    
+    background-color: var(--panel-color);
+    box-shadow: var(--panel-shadow);
     height: 70px;
 }
 

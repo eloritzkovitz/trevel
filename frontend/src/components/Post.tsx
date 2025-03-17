@@ -135,7 +135,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
             ))}
           </div>
         )}       
-        <div className="d-flex justify-content-between mt-2">
+        <div className="d-flex justify-content-between mt-2 post-counter">
           <div>
             <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
           </div>

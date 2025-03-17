@@ -1,21 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container, Form, FormControl, InputGroup} from "react-bootstrap";
-import logo from "../assets/logo.png";
-import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faHome, faPlane, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faHome, faPlane, faUser, faSignOutAlt, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+import logo from "../assets/logo.png";
 import "../styles/Navbar.css";
+import { useAuth } from "../context/AuthContext";
 
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  useEffect(() => {
+    // Apply the theme class to the body
+    document.body.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme); // Store theme preference
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
 
   return (
     <Navbar
-      className="navbar"      
-      variant="light"
-      expand="lg"
-      fixed="top"      
+      className="navbar" variant="{theme}" expand="lg" fixed="top"      
     >
       <Container fluid>
         {/* Brand */}
@@ -50,7 +58,7 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/"
-              className={`nav-link d-flex flex-column align-items-center mr-15 ${location.pathname === "/" ? "active text-primary" : ""}`}              
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/" ? "active text-primary" : ""}`}              
             >
               <FontAwesomeIcon className="navbar-icon" icon={faHome} />
               <span>Home</span>
@@ -59,7 +67,7 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/trips"
-              className={`nav-link d-flex flex-column align-items-center mr-15 ${location.pathname === "/trips" ? "active text-primary" : ""}`}              
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}              
             >
               <FontAwesomeIcon className="navbar-icon" icon={faPlane} />
               <span>Trips</span>
@@ -104,6 +112,11 @@ const NavigationBar: React.FC = () => {
                   icon={faSignOutAlt}                  
                 />
                 Logout
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={toggleTheme}>
+                <FontAwesomeIcon className="mr-10" icon={theme === "light" ? faMoon : faSun} />
+                {theme === "light" ? "Dark Mode" : "Light Mode"}
               </NavDropdown.Item>
             </NavDropdown>
           )}
