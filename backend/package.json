@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "cp .env .env run build && node ./dist/app.js",
-    "test": "cp .env_test .env && npx jest --coverage --runInBand"
+    "start": "node -e \"require('fs').copyFileSync('.env', '.env')\" && npm run build && node ./dist/app.js",
+    "test": "node -e \"require('fs').copyFileSync('.env_test', '.env')\" && npx jest --coverage --runInBand"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",

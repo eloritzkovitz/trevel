@@ -1,12 +1,12 @@
+import { Express } from "express";
 import request from "supertest";
+import path from "path";
 import initApp from "../server";
 import mongoose from "mongoose";
-import postModel from "../models/Post";
-import { Express } from "express";
 import userModel, { IUser } from "../models/User";
-import path from "path";
-import { OAuth2Client } from 'google-auth-library';
+import postModel from "../models/Post";
 import { generateToken, verifyRefreshToken } from "../utils/tokenService";
+import { OAuth2Client } from 'google-auth-library';
 
 var app: Express;
 
