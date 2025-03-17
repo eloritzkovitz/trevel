@@ -99,9 +99,9 @@ const Profile: React.FC = () => {
                   
                   {/* Bio and Contact Information */}
                   <Tabs defaultActiveKey="about" className="mb-3 tab-content">
-                    <Tab eventKey="about" title="About Me">
+                    <Tab eventKey="about" title="About">
                       <div className="fixed-height-tab-content about-me">
-                        <h4>About Me</h4>
+                        <h4>About</h4>                        
                         <p className="card-text">{user.bio || <em>No bio available</em>}</p>
                       </div>
                     </Tab>

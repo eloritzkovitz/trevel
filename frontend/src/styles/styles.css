@@ -41,7 +41,7 @@ body {
   color: var(--text-color);
 }
 
-h1, h2, h3, h4, h5, h6, p, small, hr {
+h1, h2, h3, h4, h5, h6, p, a, small, hr {
   color: var(--text-color) !important;
 }
 
@@ -91,9 +91,13 @@ h1, h2, h3, h4, h5, h6, p, small, hr {
   box-shadow: var(--panel-shadow);
 }
 
-.form-control {
+.form-control, .form-control:focus {
   background-color: var(--search-bar-color);
   border-color: var(--panel-border-color);
+  color: var(--text-color);
+}
+
+.form-control::placeholder {
   color: var(--text-color);
 }
 
@@ -108,6 +112,7 @@ h1, h2, h3, h4, h5, h6, p, small, hr {
   margin: auto;
   padding: 20px;
   margin-top: 20px;
+  background-color: var(--panel-color);
   box-shadow: var(--panel-shadow);
 }
 

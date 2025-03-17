@@ -1,36 +1,45 @@
 /* Custom styles for tabs */
 
 .tab-content {    
-    border-color: var(--panel-border-color);    
+    border-color: var(--panel-border-color);       
 }
 
 .tab-content .nav-tabs {
-    border-bottom: 2px solid transparent;      
+    border-bottom: 2px solid transparent;    
 }
 
 .tab-content .profile-nav-link {
     border: 1px solid transparent;
     border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;    
     color: black;
     padding: 0.5rem 1rem;    
 }
 
+.tab-content .nav-link {    
+    background-color: var(--search-bar-color);  
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;        
+    font-weight: 600;
+}
+
 .tab-content .nav-link.active {    
     background-color: var(--panel-color);  
-    border-color: var(--panel-border-color) var(--panel-border-color) transparent;
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;    
     color: var(--text-color); 
+    font-weight: 600;
 }
 
 .tab-content .nav-link.active:hover {
     background-color: var(--panel-color);    
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;  
     color: var(--primary-color);
+    font-weight: 600;
 }
 
 .tab-content .nav-link:hover {
     background-color: var(--secondary-color);
     border-color: var(--panel-border-color);
-    color: var(--text-hover-color);
+    color: var(--text-color);
 }
 
 .fixed-height-tab-content {

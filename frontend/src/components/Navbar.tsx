@@ -91,7 +91,7 @@ const NavigationBar: React.FC = () => {
               align="end"
               className="ms-5 profile-dropdown"
             >
-              <NavDropdown.Item>
+              <NavDropdown.Item as={Link} to={`/profile/${user._id}`}>
                 <>
                   <img
                     className="profile-picture-3 rounded-circle mr-10"
