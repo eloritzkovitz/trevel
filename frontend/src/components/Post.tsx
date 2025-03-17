@@ -94,9 +94,10 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
           
           {/* Dropdown menu */}
           {isOwner && (
-            <DropdownButton
+            <DropdownButton 
+              className="post-options"             
               align="end"
-              title={<FontAwesomeIcon icon={faEllipsisH} />}
+              title={<FontAwesomeIcon className="post-options-btn" icon={faEllipsisH} />}
               id="dropdown-menu-align-end"
               variant="link"
               onToggle={handleToggleDropdown}              

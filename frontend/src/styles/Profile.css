@@ -13,17 +13,17 @@
 }
 
 .tab-content .nav-link.active {
-    color: blue;
-    background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff;
+    color: var(--primary-color);
+    background-color: var(--panel-color);  
+    border-color: #dee2e6 #dee2e6 transparent;  
 }
 
 .tab-content .nav-link.active:hover {
-    background-color: #fff;
+    background-color: var(--panel-color);
 }
 
 .tab-content .nav-link:hover {
-    background-color: #f2f2f2;
+    background-color: var(--secondary-color);
 }
 
 .fixed-height-tab-content {
@@ -54,8 +54,12 @@
     gap: 10px;
 }
 
+.profile-button {
+    border-color: transparent !important;
+}
+
 .profile-button:hover {
-    background-color: #0056b3 !important;             
+    background-color: var(--primary-hover-color) !important;               
 }
 
 /* Profile posts styles */

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar, Nav, NavDropdown, Container, Form, FormControl, InputGroup} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faHome, faPlane, faUser, faSignOutAlt, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faHome, faPlane, faChevronDown, faUser, faSignOutAlt, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/logo.png";
 import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
@@ -76,17 +76,18 @@ const NavigationBar: React.FC = () => {
 
           {/* Profile Dropdown */}
           {user && (
-            <NavDropdown
+              <NavDropdown            
               title={
-                <>
+                <div className="profile-dropdown-wrapper">
                   <img
                     className="profile-picture-3 rounded-circle"
                     src={user.profilePicture}
-                    alt="Profile"                    
+                    alt="Profile"
                   />
-                </>
+                  <FontAwesomeIcon icon={faChevronDown} className="custom-caret" />
+                </div>
               }
-              id="navbarDropdown"
+             id="navbarDropdown"
               align="end"
               className="ms-5"
             >
