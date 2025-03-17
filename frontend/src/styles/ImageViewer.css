@@ -12,11 +12,6 @@
 .image-viewer-header {
   border-bottom: none;
 }
-    
-.image-viewer-header .btn-close {
-  color: black;
-  font-size: 1.5rem; 
-}
 
 .image-viewer-body {
   display: flex;
@@ -42,7 +37,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 4rem;
-  color: black;
+  color: var(--invert-color);  
   text-decoration: none;
   z-index: 1050;
   cursor: pointer;

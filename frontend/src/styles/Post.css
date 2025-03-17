@@ -1,21 +1,49 @@
 /* Post button styles */
 
+.post-options-btn {
+    color: var(--text-color) !important;
+}
+
+.post-options-btn:hover {
+    color: var(--secondary-color) !important;
+}
+
+.post-options::after {
+    display: none;
+}
+
+.post-options {
+    position: absolute;
+    top: 10px;
+    right: 10px;    
+    cursor: pointer;
+}
+
 .post-btn {
     background-color: transparent !important;
     border: none !important;
-    color: black !important;
+    color: var(--text-color) !important;
     transition: color 0.3s ease-in-out;
     height: 50px;
 }
 
 .post-btn:hover {
-    color: black !important;
-    background-color: lightGray !important;
+    color: var(--text-color) !important;
+    background-color: var(--secondary-color) !important;
 }
 
 .btn-primary {
-    background-color: #007bff !important;
-    color: white !important;
+    background-color: var(--primary-color) !important;
+    color: var(--primary-text-color) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover-color) !important;
+    color: var(--primary-text-color) !important; 
+}
+
+.post-counter {
+    color: var(--text-color);
 }
 
 /* Image grid styles */

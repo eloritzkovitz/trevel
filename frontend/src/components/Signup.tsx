@@ -48,7 +48,7 @@ const Signup: FC = () => {
   };  
 
   return (
-    <div className="container-fluid bg-light min-vh-100">
+    <div className="container-fluid min-vh-100">
       <div style={{ textAlign: 'center' }}>
         <h1>Trevel</h1>
         <div className="card panel-form" >

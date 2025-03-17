@@ -1,11 +1,72 @@
 /* Global styles */
 
-.mr-10 {
-  margin-right: 10px;
+/* Light theme (default) */
+:root {
+  --background-color: #f8f9fa;
+  --navbar-color: white;
+  --search-bar-color: #f8f9fa;
+  --search-text-color: #6c757d;
+  --panel-color: #ffffff;
+  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);  
+  --panel-border-color: #dee2e6;
+  --primary-color: #007bff;
+  --primary-hover-color: #0056b3;
+  --primary-text-color: white;
+  --secondary-color: #f2f2f2;
+  --text-color: black;
+  --text-hover-color: #1d1d1d;  
+  --invert-color: invert(0); 
 }
 
-.mr-15 {
-  margin-right: 15px;
+/* Dark theme */
+body.dark {
+  --background-color: #5b6268;
+  --navbar-color: #343a40;
+  --search-bar-color: #495057;
+  --search-text-color: #f8f9fa;
+  --panel-color: #343a40;
+  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.8);  
+  --panel-border-color: #6c757d;
+  --primary-color: #b0bec5;
+  --primary-hover-color: #90a4ae;
+  --primary-text-color: black;
+  --secondary-color: #495057;
+  --text-color: #f2f2f2;
+  --text-hover-color: #f3f3f3;
+  --invert-color: invert(1);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6, p, a, small, hr {
+  color: var(--text-color) !important;
+}
+
+.text-muted {
+  color: var(--search-text-color) !important;
+}
+
+.icon, .modal-header .btn-close {
+  filter: var(--invert-color);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--primary-text-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover-color);
+  border-color: var(--primary-hover-color);
+  color: var(--primary-text-color);
+}
+
+.mr-10 {
+  margin-right: 10px;
 }
 
 .fab {
@@ -15,6 +76,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
+  border-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,8 +84,26 @@
   z-index: 1000;
 }
 
-.panel{
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+/* Form, panel and modal styles */
+
+.modal-content {
+  background-color: var(--panel-color);
+  box-shadow: var(--panel-shadow);
+}
+
+.form-control, .form-control:focus {
+  background-color: var(--search-bar-color);
+  border-color: var(--panel-border-color);
+  color: var(--text-color);
+}
+
+.form-control::placeholder {
+  color: var(--text-color);
+}
+
+.panel {
+  background-color: var(--panel-color);
+  box-shadow: var(--panel-shadow);
 }
 
 .panel-form {
@@ -32,7 +112,27 @@
   margin: auto;
   padding: 20px;
   margin-top: 20px;
-  box-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  background-color: var(--panel-color);
+  box-shadow: var(--panel-shadow);
+}
+
+/* Custom styles for dropdown menu */
+.dropdown-menu {
+  background-color: var(--panel-color) !important;
+  color: var(--text-color) !important;
+}
+
+.dropdown-divider {
+  background-color: var(--text-color) !important;
+}
+
+.dropdown-item {
+  color: var(--text-color) !important;
+}
+
+.dropdown-item:hover {
+  background-color: var(--secondary-color) !important;
+  color: var(--text-hover-color) !important;
 }
 
 /* Profile picture styles */

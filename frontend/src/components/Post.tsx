@@ -94,9 +94,10 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
           
           {/* Dropdown menu */}
           {isOwner && (
-            <DropdownButton
+            <DropdownButton 
+              className="post-options"             
               align="end"
-              title={<FontAwesomeIcon icon={faEllipsisH} />}
+              title={<FontAwesomeIcon className="post-options-btn" icon={faEllipsisH} />}
               id="dropdown-menu-align-end"
               variant="link"
               onToggle={handleToggleDropdown}              
@@ -135,7 +136,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
             ))}
           </div>
         )}       
-        <div className="d-flex justify-content-between mt-2">
+        <div className="d-flex justify-content-between mt-2 post-counter">
           <div>
             <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
           </div>

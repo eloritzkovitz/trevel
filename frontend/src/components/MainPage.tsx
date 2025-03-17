@@ -22,7 +22,7 @@ const MainPage: React.FC = () => {
   };
   
   return (
-    <div className="container-fluid bg-light min-vh-100">
+    <div className="container-fluid min-vh-100">
       {/* Navbar */}
       <Navbar/>
 

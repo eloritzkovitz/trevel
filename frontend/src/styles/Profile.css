@@ -1,25 +1,45 @@
 /* Custom styles for tabs */
 
-.tab-content .nav-tabs {
-    border-bottom: 2px solid #dee2e6;    
+.tab-content {    
+    border-color: var(--panel-border-color);       
 }
 
-.tab-content .nav-link {
+.tab-content .nav-tabs {
+    border-bottom: 2px solid transparent;    
+}
+
+.tab-content .profile-nav-link {
     border: 1px solid transparent;
     border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;    
     color: black;
-    padding: 0.5rem 1rem;   
+    padding: 0.5rem 1rem;    
 }
 
-.tab-content .nav-link.active {
-    color: blue;
-    background-color: #fff;
-    border-color: #dee2e6 #dee2e6 #fff;
+.tab-content .nav-link {    
+    background-color: var(--search-bar-color);  
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;        
+    font-weight: 600;
+}
+
+.tab-content .nav-link.active {    
+    background-color: var(--panel-color);  
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;    
+    color: var(--text-color); 
+    font-weight: 600;
+}
+
+.tab-content .nav-link.active:hover {
+    background-color: var(--panel-color);    
+    border-color: var(--panel-border-color) var(--panel-border-color) transparent;  
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .tab-content .nav-link:hover {
-    border-color: #e9ecef #e9ecef #dee2e6;
+    background-color: var(--secondary-color);
+    border-color: var(--panel-border-color);
+    color: var(--text-color);
 }
 
 .fixed-height-tab-content {
@@ -50,9 +70,19 @@
     gap: 10px;
 }
 
+.profile-button {
+    border-color: transparent !important;
+}
+
+.profile-button:hover {
+    background-color: var(--primary-hover-color) !important;               
+}
+
 /* Profile posts styles */
 
-.panel-posts {
+.panel-posts {    
+    background-color: var(--panel-color);
+    box-shadow: var(--panel-shadow);
     height: 70px;
 }
 

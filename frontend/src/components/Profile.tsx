@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="container-fluid bg-light min-vh-100">
+    <div className="container-fluid min-vh-100">
       {/* Navbar */}
       <Navbar />
 
@@ -85,11 +85,11 @@ const Profile: React.FC = () => {
                   {/* Edit Profile and New Post buttons */}
                   {isOwnProfile && (
                     <>
-                      <Button variant="primary" style={{ marginRight: '10px' }} onClick={handleShowPostModal}>
+                      <Button className="profile-button" variant="primary" style={{ marginRight: '10px' }} onClick={handleShowPostModal}>
                         <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} />
                         New Post
                       </Button>
-                      <Button variant="primary" onClick={() => setEditProfile(true)}>
+                      <Button className="profile-button" variant="primary" onClick={() => setEditProfile(true)}>
                         <FontAwesomeIcon icon={faPencil} style={{ marginRight: '5px' }} />
                         Edit Profile
                       </Button>
@@ -99,9 +99,9 @@ const Profile: React.FC = () => {
                   
                   {/* Bio and Contact Information */}
                   <Tabs defaultActiveKey="about" className="mb-3 tab-content">
-                    <Tab eventKey="about" title="About Me">
+                    <Tab eventKey="about" title="About">
                       <div className="fixed-height-tab-content about-me">
-                        <h4>About Me</h4>
+                        <h4>About</h4>                        
                         <p className="card-text">{user.bio || <em>No bio available</em>}</p>
                       </div>
                     </Tab>

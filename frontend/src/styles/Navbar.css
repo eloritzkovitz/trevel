@@ -1,6 +1,6 @@
 .navbar {
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    background-color: var(--navbar-color);
+    box-shadow: var(--panel-shadow);
 }
 
 .brand img {
@@ -13,25 +13,89 @@
 }
 
 .search-bar {
-    background-color: #f8f9fa;
-    border-color: #f8f9fa;
+    background-color: var(--search-bar-color);
+    border-color: transparent !important;   
+    color: var(--search-text-color) !important; 
     box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.03);
     font-size: 24px;
 }
 
-.search-bar-icon {
+.search-bar::placeholder {
+    color: var(--search-text-color);
+}
+
+.search-bar:focus {
+    background-color: var(--secondary-color);        
+}
+
+.search-bar-icon {   
     height: 20px;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1;
+    z-index: 1;    
+}
+
+.nav-link {
+    color: var(--text-color);    
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.nav-link-btn {
+    height: 60px;
+    width: 90px;
+}
+
+.nav-link:hover {
+    background-color: var(--secondary-color);    
+    color: var(--text-hover-color);  
+}
+
+.nav-link.active, .nav-link.active:hover {    
+    background-color: transparent;
+    border-bottom: 3px solid var(--primary-color);
+    color: var(--primary-hover-color) !important;    
 }
 
 .navbar-icon {
     height: 25px;
 }
 
+/* Dropdown menu */
+
 .dropdown-menu {
     width: 350px;
     font-size: 20px;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.profile-dropdown-wrapper {
+    position: relative;
+    display: inline-block;    
+}
+
+.profile-dropdown .dropdown-toggle {
+    background-color: transparent !important;
+}
+  
+.profile-dropdown .dropdown-toggle:hover {
+    background-color: transparent !important;
+}
+
+.custom-caret {    
+    background-color: var(--secondary-color) !important;
+    border-radius: 50% !important;
+    color: var(--text-color); 
+    transition: transform 0.2s ease-in-out;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    padding: 5px;
+    transform: translate(30%, 30%);
+    font-size: 12px;
 }
