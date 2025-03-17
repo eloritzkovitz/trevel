@@ -76,7 +76,7 @@ const NavigationBar: React.FC = () => {
 
           {/* Profile Dropdown */}
           {user && (
-              <NavDropdown            
+              <NavDropdown           
               title={
                 <div className="profile-dropdown-wrapper">
                   <img
@@ -89,7 +89,7 @@ const NavigationBar: React.FC = () => {
               }
              id="navbarDropdown"
               align="end"
-              className="ms-5"
+              className="ms-5 profile-dropdown"
             >
               <NavDropdown.Item>
                 <>
@@ -117,7 +117,7 @@ const NavigationBar: React.FC = () => {
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={toggleTheme}>
                 <FontAwesomeIcon className="mr-10" icon={theme === "light" ? faMoon : faSun} />
-                {theme === "light" ? "Dark Mode" : "Light Mode"}
+                {theme === "light" ? "Dark mode" : "Light mode"}
               </NavDropdown.Item>
             </NavDropdown>
           )}

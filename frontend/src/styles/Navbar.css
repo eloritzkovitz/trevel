@@ -74,7 +74,15 @@
 
 .profile-dropdown-wrapper {
     position: relative;
-    display: inline-block; /* Ensures the div wraps the image properly */
+    display: inline-block;    
+}
+
+.profile-dropdown .dropdown-toggle {
+    background-color: transparent !important;
+}
+  
+.profile-dropdown .dropdown-toggle:hover {
+    background-color: transparent !important;
 }
 
 .custom-caret {    

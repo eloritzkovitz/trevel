@@ -7,13 +7,14 @@
   --search-bar-color: #f8f9fa;
   --search-text-color: #6c757d;
   --panel-color: #ffffff;
-  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);
+  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.2);  
+  --form-control-border-color: #dee2e6;
   --primary-color: #007bff;
   --primary-hover-color: #0056b3;
   --primary-text-color: white;
   --secondary-color: #f2f2f2;
   --text-color: black;
-  --text-hover-color: #1d1d1d;
+  --text-hover-color: #1d1d1d;   
 }
 
 /* Dark theme */
@@ -23,7 +24,8 @@ body.dark {
   --search-bar-color: #495057;
   --search-text-color: #f8f9fa;
   --panel-color: #343a40;
-  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.8);
+  --panel-shadow: 0 5px 5px -5px rgba(0, 0, 0, 0.8);  
+  --form-control-border-color: transparent;
   --primary-color: #b0bec5;
   --primary-hover-color: #90a4ae;
   --primary-text-color: black;
@@ -64,7 +66,20 @@ h1, h2, h3, h4, h5, h6, p, small, .text-muted {
   z-index: 1000;
 }
 
-.panel{
+/* Form, panel and modal styles */
+
+.modal-content {
+  background-color: var(--panel-color);
+  box-shadow: var(--panel-shadow);
+}
+
+.form-control {
+  background-color: var(--search-bar-color);
+  border-color: var(--form-control-border-color);
+  color: var(--text-color);
+}
+
+.panel {
   background-color: var(--panel-color);
   box-shadow: var(--panel-shadow);
 }
