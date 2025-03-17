@@ -14,8 +14,8 @@
 
 .search-bar {
     background-color: var(--search-bar-color);
-    border-color: var(--search-bar-color);   
-    color: var(--text-color) !important; 
+    border-color: transparent !important;   
+    color: var(--search-text-color) !important; 
     box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.03);
     font-size: 24px;
 }
@@ -28,12 +28,12 @@
     background-color: var(--secondary-color);        
 }
 
-.search-bar-icon {
+.search-bar-icon {   
     height: 20px;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1;
+    z-index: 1;    
 }
 
 .nav-link {

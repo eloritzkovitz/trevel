@@ -39,8 +39,12 @@ body {
   color: var(--text-color);
 }
 
-h1, h2, h3, h4, h5, h6, p, small, .text-muted {
+h1, h2, h3, h4, h5, h6, p, small {
   color: var(--text-color) !important;
+}
+
+.text-muted {
+  color: var(--search-text-color) !important;
 }
 
 .mr-10 {
