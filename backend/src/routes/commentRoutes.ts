@@ -95,7 +95,7 @@ router.get("/post/:postId", commentsController.getCommentsByPostId.bind(comments
  *       201:
  *         description: Comment created successfully
  */
-router.post("/", authMiddleware, commentsController.createItem.bind(commentsController));
+router.post("/", authMiddleware, upload.array("images", 2), commentsController.createItem.bind(commentsController));
 
 /**
  * @swagger
@@ -125,7 +125,7 @@ router.post("/", authMiddleware, commentsController.createItem.bind(commentsCont
  *       200:
  *         description: Comment updated successfully
  */
-router.put("/:id", authMiddleware, commentsController.updateItem.bind(commentsController));
+router.put("/:id", authMiddleware, upload.array("images",2), commentsController.updateItem.bind(commentsController));
 
 /**
  * @swagger
