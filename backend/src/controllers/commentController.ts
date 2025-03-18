@@ -1,14 +1,17 @@
-import commentModel, { IComment } from "../models/Comment";
-import postModel from "../models/Post";
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+import postModel from "../models/Post";
+import userModel from "../models/User";
+import commentModel, { IComment } from "../models/Comment";
 import BaseController from "./baseController";
+import { deleteFile } from "../utils/fileService";
 
 class CommentController extends BaseController<IComment> {
   constructor() {
       super(commentModel);
   }
   
-  // Create comment
+  // Create new comment
   async createItem(req: Request, res: Response) {
     const postId = req.body.postId;
 
@@ -21,9 +24,18 @@ class CommentController extends BaseController<IComment> {
       const post = await postModel.findById(postId);
       if (post) {
         const userId = req.body.sender;
-        const comment = {
+        const user = await userModel.findById(userId);
+        const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];
+        const comment : IComment =  {
           ...req.body,
-          sender: userId,
+          sender: new mongoose.Types.ObjectId(userId),
+          senderName: user ? `${user.firstName} ${user.lastName}` : "Unknown",
+          senderImage: user?.profilePicture,
+          likes: [],
+          likesCount: 0,  
+          images,      
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
         req.body = comment;
         super.createItem(req, res);
@@ -45,6 +57,60 @@ class CommentController extends BaseController<IComment> {
       res.status(500).send("Server Error");
     }
   }
+
+  // Update comment
+  async updateItem(req: Request, res: Response): Promise<void> {
+    try {
+    const commentId = req.params.id;
+    const comment = await commentModel.findById(commentId);
+    if (!comment) {
+      res.status(404).json({ error: "Comment not found" });
+      return;
+      }
+     
+    // Parse deleted images from request  
+    const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
+    
+    // Handle new images
+    const newImages = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
+    const existingImages = req.body.existingImages || [];
+
+    // Remove deleted images
+    deletedImages.forEach((image: string) => {
+      deleteFile(image);
+    });
+
+  //update comment images
+  const updatedImages = [...existingImages, ...newImages];
+
+  req.body = { ...req.body, images: updatedImages, updatedAt: new Date().toISOString() };
+  await super.updateItem(req, res);
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : "An unknown error occurred" });
+  }
 }
 
+  // Delete comment
+  async deleteItem(req: Request, res: Response) {
+    try {
+      const commentId = req.params.id;
+      const comment = await commentModel.findById(commentId);
+      if (comment) {
+       // remove all images associated with the comment
+       comment.images?.forEach(image => {
+          deleteFile(image);
+      });
+    }
+    await commentModel.deleteMany({commentId});
+    await super.deleteItem(req, res);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    }
+    else {  
+      res.status(500).json({ error: "An unknown error occurred" });
+    }
+    }
+  }
+}
 export default new CommentController();

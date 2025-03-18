@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import commentsController from "../controllers/commentController";
 import { authMiddleware } from "../middleware/auth";
+import upload from "../middleware/upload";
 
 /**
  * @swagger
