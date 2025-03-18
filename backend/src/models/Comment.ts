@@ -2,25 +2,37 @@ import mongoose from "mongoose";
 import { ILikeable } from "./ILikeable";
 
 export interface IComment extends ILikeable {
-  sender: String;
+  sender: mongoose.Schema.Types.ObjectId;
+  senderName?: string;
+  senderImage?: string;
   postId: string;
   content: string;  
+  images?: string[];   
   createdAt: string;
   updatedAt: string;   
 }
 
 const commentSchema = new mongoose.Schema<IComment>({
   sender: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
+  },
+  senderName: {
+    type: String,
+  },
+  senderImage: {
+    type: String,
   },
   postId: {
     type: String,
     required: true 
   },
   content: {
-    type: String, 
-    required: true 
+    type: String,
+  },
+  images: {
+    type:[String],
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
