@@ -34,7 +34,10 @@ const testUser2: User = {
 describe("Auth Tests", () => {
   
   beforeAll(async () => {
-    console.log("beforeAll");
+    process.env.NODE_ENV = "test";
+    process.env.PORT = "4000";
+    console.log(`beforeAll - NODE_ENV: ${process.env.NODE_ENV}, PORT: ${process.env.PORT}`);
+
     app = await initApp();
     await userModel.deleteMany();
     await postModel.deleteMany();
@@ -197,19 +200,31 @@ describe("Auth Tests", () => {
     const response = await request(app).get(baseUrl + "/user/" + testUser._id)
       .set("Authorization", `Bearer ${testUser.accessToken}`);    
     expect(response.statusCode).toBe(200);
-    expect(response.body._id).toBe(testUser._id);
+    expect(response.body._id).toBe(testUser._id);    
   });
 
   // Test get user fail
   test("Test get user fail", async () => {
+    // Test get user with invalid token
     const response = await request(app).get(baseUrl + "/user/" + testUser._id)
       .set("Authorization", `Bearer invalidtoken`);
     expect(response.statusCode).not.toBe(200);
-  });  
+
+    // Test user does not exist
+    const nonExistentUserId = "60d21b4667d0d8992e610c85";
+    const response2 = await request(app).get(baseUrl + "/user/" + nonExistentUserId)
+      .set("Authorization", `Bearer ${testUser.accessToken}`);
+    expect(response2.statusCode).toBe(404);
+
+    // Test cannot fetch user 
+    const response3 = await request(app).get(baseUrl + "/user/" + 'invalidId')
+      .set("Authorization", `Bearer ${testUser.accessToken}`);
+    expect(response3.statusCode).toBe(500);    
+  });
   
   // Test update user
   test("Test update user", async () => {
-    const imagePath = path.join(__dirname, "test-image.png");
+    const imagePath = path.join(__dirname, "img", "test-image.png");
 
     const response = await request(app)
       .put(baseUrl + "/user/" + testUser._id)
@@ -241,7 +256,7 @@ describe("Auth Tests", () => {
 
     expect(response.statusCode).toBe(200);    
     if (response.body.profilePicture === "null") {
-       expect(response.body.profilePicture).toBe(`${process.env.BASE_URL}/uploads/default-profile.png`);
+       expect(response.body.profilePicture).toBe(`${process.env.BASE_URL}/uploads/default-profile.png`);      
     }   
   });
 
@@ -254,8 +269,19 @@ describe("Auth Tests", () => {
       .field("bio", "New Bio")
       .field("location", "New Location")
       .field("website", "website.com");
-    expect(response.statusCode).not.toBe(200);    
-  });
+    expect(response.statusCode).not.toBe(200);
+    
+    // Test update invalid user
+    const nonExistentUserId = "60d21b4667d0d8992e610c85";
+    const response2 = await request(app).put(baseUrl + "/user/" + nonExistentUserId)
+    .set("Authorization", `Bearer ${testUser.accessToken}`)    
+    .send({
+      firstName: "Updated Name",      
+    });
+
+    expect(response2.statusCode).toBe(404);
+    expect(response2.body.message).toBe("User not found");        
+  });  
 
   // Test logout
   test("Test logout", async () => {

@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "node -e \"require('fs').copyFileSync('.env', '.env')\" && npm run build && node ./dist/app.js",
-    "test": "node -e \"require('fs').copyFileSync('.env_test', '.env')\" && npx jest --coverage --runInBand"
+    "start": "cross-env NODE_ENV=prod node ./dist/app.js",
+    "test": "cross-env NODE_ENV=test jest --coverage --runInBand"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",

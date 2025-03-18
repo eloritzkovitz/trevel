@@ -21,7 +21,10 @@ let postId = "";
 let commentId = "";
 
 beforeAll(async () => {
-  console.log("beforeAll");
+  process.env.NODE_ENV = "test";
+  process.env.PORT = "4000";
+  console.log(`beforeAll - NODE_ENV: ${process.env.NODE_ENV}, PORT: ${process.env.PORT}`);
+
   app = await initApp();
   await commentsModel.deleteMany();
   await postModel.deleteMany();
