@@ -5,6 +5,7 @@
 /backend/node_modules
 /backend/coverage
 /backend/dist
+/backend/src/tests/img
 
 # Frontend directories
 /frontend/.env

@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "cp .env .env run build && node ./dist/app.js",
-    "test": "cp .env_test .env && npx jest --coverage --runInBand"
+    "start": "cross-env NODE_ENV=prod node ./dist/app.js",
+    "test": "cross-env NODE_ENV=test jest --coverage --runInBand"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
