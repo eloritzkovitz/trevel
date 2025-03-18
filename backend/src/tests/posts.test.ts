@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import postModel from "../models/Post";
 import { Express } from "express";
 import userModel, { IUser } from "../models/User";
+import { create } from "domain";
 
 var app: Express;
 
@@ -22,6 +23,10 @@ const testUser2: User = {
   email: "test2@user.com",
   password: "fakepassword",  
 };
+
+const oldImagePath = path.join(__dirname, "img", "post-test-image.jpg");
+const newImagePath = path.join(__dirname, "img", "post-test-image-new.jpg");
+let createResponse: any = null;
 
 beforeAll(async () => {
   process.env.NODE_ENV = "test";
@@ -54,19 +59,42 @@ describe("Posts Tests", () => {
   });
 
   // Test create post  
-  test("Test Create Post", async () => {    
+  test("Test Create Post", async () => {     
     const response = await request(app).post("/posts")
-      .set({ authorization: "JWT " + testUser.token })
-      .send({
-        title: "Test Post",
-        content: "Test Content",
-        sender: testUser._id,
-      });      
+      .set({ authorization: "JWT " + testUser.token }) 
+      .attach("images", oldImagePath)
+      .field("title", "Test Post")
+      .field("content", "Test Content")         
     expect(response.statusCode).toBe(201);
     expect(response.body.title).toBe("Test Post");
     expect(response.body.content).toBe("Test Content");
     expect(response.body.sender).toBe(testUser._id);
     postId = response.body._id;
+    createResponse = response;
+  });
+
+  // Test create post fail
+  test("Test Create Post fail", async () => {
+    const response = await request(app).post("/posts")
+      .set({ authorization: "JWT " + testUser.token })
+      .send({
+        content: "Test Content 2",
+      });
+    expect(response.statusCode).toBe(400);
+  });
+
+  // Test file upload with invalid file type
+  test("Test file upload with invalid file type", async () => {
+    const invalidFilePath = path.join(__dirname, "img", "invalid-file.txt");
+  
+    const response = await request(app)
+      .post("/posts")
+      .set("authorization", "JWT " + testUser.token)
+      .attach("images", invalidFilePath)
+      .field("title", "Test Post")
+      .field("content", "Test Content")      
+  
+    expect(response.statusCode).toBe(500);    
   });
 
   // Test get post by sender
@@ -163,15 +191,14 @@ describe("Posts Tests", () => {
   });
 
   // Test update post
-  test("Test Update Post", async () => {
-    const imagePath = path.join(__dirname, "img", "post-test-image.png");
-
-    const response = await request(app).put("/posts/" + postId)
+  test("Test Update Post", async () => {  
+    const response = await request(app).put("/posts/" + postId)    
       .set({ authorization: "JWT " + testUser.token })
-      .send({
-        title: "Test Post Updated",
-        content: "Test Content Updated",
-      });      
+      .attach("images", newImagePath)
+      .field("title", "Test Post Updated")
+      .field("content", "Test Content Updated")     
+      .field("deletedImages", JSON.stringify([createResponse.body.images[0]]));
+      
     expect(response.statusCode).toBe(200);
     expect(response.body.title).toBe("Test Post Updated");
     expect(response.body.content).toBe("Test Content Updated");
@@ -184,7 +211,7 @@ describe("Posts Tests", () => {
       .set({ authorization: "JWT " + testUser.token })
       .send({
         title: "Test Post Updated",
-        content: "Test Content Updated",
+        content: "Test Content Updated",        
       }); 
     expect(response.statusCode).toBe(404);
 
@@ -204,15 +231,5 @@ describe("Posts Tests", () => {
     expect(response.statusCode).toBe(200);
     const response2 = await request(app).get("/posts/" + postId);
     expect(response2.statusCode).toBe(404);
-  });  
-
-  // Test create post fail
-  test("Test Create Post fail", async () => {
-    const response = await request(app).post("/posts")
-      .set({ authorization: "JWT " + testUser.token })
-      .send({
-        content: "Test Content 2",
-      });
-    expect(response.statusCode).toBe(400);
-  });
+  }); 
 });

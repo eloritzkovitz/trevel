@@ -30,12 +30,8 @@ class PostsController extends BaseController<IPost> {
       };
       req.body = post;      
       await super.createItem(req, res);
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).json({ error: error.message });
-      } else {
-        res.status(500).json({ error: "An unknown error occurred" });
-      }
+    } catch (error) {      
+      res.status(500).json({ error: error instanceof Error ? error.message : 'An unknown error occurred' });
     }
   }
 
@@ -84,14 +80,10 @@ class PostsController extends BaseController<IPost> {
       } 
       await commentsModel.deleteMany({ postId });
       await super.deleteItem(req, res);
-    } catch (error) {        
-        if (error instanceof Error) {
-          res.status(500).json({ error: error.message });
-        } else {
-          res.status(500).json({ error: "An unknown error occurred" });
-        }
+    } catch (error) {      
+      res.status(500).json({ error: error instanceof Error ? error.message : 'An unknown error occurred' });
     }
   }
-}  
+}
 
 export default new PostsController();

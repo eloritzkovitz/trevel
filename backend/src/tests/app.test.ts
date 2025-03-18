@@ -1,5 +1,7 @@
 import initApp from "../server";
 import mongoose from "mongoose";
+import path from "path";
+import { resolveFilePath } from "../utils/fileService";
 
 let server: any;
 
@@ -24,6 +26,7 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
+// Test initApp
 describe("InitApp Test", () => {
   test("Test if MongoDB is set", async () => {
     const originalMongoUri = process.env.DB_CONNECT;
@@ -40,3 +43,20 @@ describe("InitApp Test", () => {
     process.env.DB_CONNECT = originalMongoUri;
   });
 });
+
+// Test resolveFilePath
+describe('resolveFilePath', () => {
+  it('should resolve the full path to a file based on the provided relative path', () => {
+    const relativePath = 'uploads/test.txt';
+    const expectedPath = path.join(__dirname, '../../', 'uploads/test.txt');
+
+    const result = resolveFilePath(relativePath);
+    expect(result).toBe(expectedPath);
+    });
+
+  it('should handle an empty relative path', () => {
+    const result = resolveFilePath('');  
+    expect(result).toBe('');
+    });
+});
+
