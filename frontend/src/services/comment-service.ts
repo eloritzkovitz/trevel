@@ -18,9 +18,6 @@ export interface Comment {
   createdAt?: string;
   updatedAt?: string;
 }
-
-//19/03- changing the routes to comments 
-
 // Get all comments
 const getComments = async (sender?: string, page: number = 1): Promise<Comment[]> => {    
     const response = await apiClient.get<Comment[]>('/comments', { 
@@ -31,17 +28,17 @@ const getComments = async (sender?: string, page: number = 1): Promise<Comment[]
 
 // Get comments by post ID
 const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
-  const response = await apiClient.get<Comment[]>(`/comments/${postId}`);
+  const response = await apiClient.get<Comment[]>(`/comments/post/${postId}`);
   return response.data;
 };
 
 // Create a comment
-const createComment = async (post: FormData): Promise<Comment> => {
+const createComment = async (comment: FormData): Promise<Comment> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    const response = await apiClient.post<Comment>('/posts', post, {
+    const response = await apiClient.post<Comment>('/comments', comment, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`
@@ -50,13 +47,13 @@ const createComment = async (post: FormData): Promise<Comment> => {
     return response.data;
 };
   
-// Update a comment
-const updateComment = async (id: string, post: FormData): Promise<Comment> => {    
+// Update a comment                  
+const updateComment = async (id: string, comment: FormData): Promise<Comment> => {    
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    const response = await apiClient.put<Comment>(`/posts/${id}`, post, {
+    const response = await apiClient.put<Comment>(`/comments/${id}`, comment, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${token}`
@@ -66,26 +63,37 @@ const updateComment = async (id: string, post: FormData): Promise<Comment> => {
 };
 
 // Like/unlike a comment
+// const likeComment = async (id: string, userId: string): Promise<Comment> => {
+//     const token = Cookies.get("accessToken");
+//     if (!token) {
+//       throw new Error("No access token found.");
+//     }
+//     const response = await apiClient.post<Comment>(`/posts/${id}/like`, { userId }, {
+//       headers: {
+//         'Authorization': `Bearer ${token}`
+//       }
+//     });
+//     return response.data;
+// };
 const likeComment = async (id: string, userId: string): Promise<Comment> => {
-    const token = Cookies.get("accessToken");
-    if (!token) {
-      throw new Error("No access token found.");
+  const token = Cookies.get("accessToken");
+  if (!token) throw new Error("No access token found.");
+
+  const response = await apiClient.post<Comment>(`/comments/${id}/like`, { userId }, { // Changed from /posts/:id/like to /comments/:id/like
+    headers: {
+      'Authorization': `Bearer ${token}`
     }
-    const response = await apiClient.post<Comment>(`/posts/${id}/like`, { userId }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    return response.data;
+  });
+  return response.data;
 };
 
 // Delete a comment  
-const deleteComment = async (id: string, commentId: string): Promise<void> => {
+const deleteComment = async (commentid: string): Promise<void> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
     }
-    await apiClient.delete(`/posts/${id}`, {
+    await apiClient.delete(`/comments/${commentid}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

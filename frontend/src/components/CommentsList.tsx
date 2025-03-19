@@ -32,7 +32,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
       try {
         setIsLoading(true);
         const fetchedComments = await commentService.getCommentByPostId(postId);
-
+        console.log(fetchedComments);
         setComments((prevComments) => {
             const newComments: CommentType[] = fetchedComments.filter(
             (comment: CommentType) => !prevComments.some((c: CommentType) => c._id === comment._id)
@@ -105,7 +105,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
   const handleDeleteComment = async (comment: CommentType) => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
-        await commentService.deleteComment(postId, comment._id!);
+        await commentService.deleteComment(comment._id!);
         setComments((prevComments) => prevComments.filter((c) => c._id !== comment._id));
       } catch (error) {
         console.error("Failed to delete comment", error);
