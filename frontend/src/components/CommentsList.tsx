@@ -1,20 +1,19 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faTimes} from "@fortawesome/free-solid-svg-icons";
 import Comment from "./Comment";
 import commentService, { Comment as CommentType } from "../services/comment-service";
 import { useAuth } from "../context/AuthContext";
 
 interface CommentsListProps {
   postId: string;
-  onToggle: ()=> void;
   show: boolean; 
   refresh: boolean;
-  
+  onClose: () => void;  
 }
 
-const CommentsList: React.FC<CommentsListProps> = ({ postId, onToggle, show, refresh }) => {
+const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onClose }) => {
   const { user: loggedInUser } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,12 +29,12 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, onToggle, show, ref
 
       try {
         setIsLoading(true);
-        const fetchedComments = await commentService.getCommentsByPostId(postId, page);
+        const fetchedComments = await commentService.getCommentByPostId(postId);
 
         setComments((prevComments) => {
-          const newComments = fetchedComments.filter(
-            (comment) => !prevComments.some((c) => c._id === comment._id)
-          );
+            const newComments: CommentType[] = fetchedComments.filter(
+            (comment: CommentType) => !prevComments.some((c: CommentType) => c._id === comment._id)
+            );
           return [...prevComments, ...newComments].sort(
             (a, b) =>
               new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
@@ -79,41 +78,49 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, onToggle, show, ref
   );
 
   // Edit comment handler
-  const handleEditComment = async (commentId: string, updatedContent: string) => {
-    try {
-      const updatedComment = await commentService.updateComment(postId, commentId, { content: updatedContent });
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment._id === updatedComment._id ? updatedComment : comment
-        )
-      );
-    } catch (error) {
-      console.error("Failed to update comment", error);
-    }
-  };
+ const handleEditComment = (comment: CommentType) => {
+     setCurrentComment(comment);
+     setShowEditModal(true);    
+   };
+ 
+   const handleCloseEditModal = () => {
+     setShowEditModal(false);
+     setCurrentComment(null);
+   };
+ 
+   const handleCommentUpdated = (updatedComment: CommentType) => {
+     setShowEditModal(false);
+     setCurrentComment(null);    
+     setComments((prevComments) =>
+       prevComments.map((comment) =>
+         comment._id === updatedComment._id ? updatedComment : comment
+       )
+     );
+   };
+ 
 
   // Delete comment handler
-  const handleDeleteComment = async (commentId: string) => {
+  const handleDeleteComment = async (comment: CommentType) => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
-        await commentService.deleteComment(postId, commentId);
-        setComments((prevComments) => prevComments.filter((c) => c._id !== commentId));
+        await commentService.deleteComment(postId, comment._id!);
+        setComments((prevComments) => prevComments.filter((c) => c._id !== comment._id?));
       } catch (error) {
         console.error("Failed to delete comment", error);
       }
     }
   };
 
-  if (isLoading && comments.length === 0) {
-    return <div>Loading comments...</div>;
-  }
+  // if (isLoading && comments.length === 0) {
+  //   return <div>Loading comments...</div>;
+  // }
 
-  if (!isLoading && comments.length === 0) {
-    return <div>No comments yet</div>;
-  }
-
+  // if (!isLoading && comments.length === 0) {
+  //   return <div>No comments yet</div>;
+  // }
+  
   return (
-    <Modal show={show} onHide={handleClose} centered dialogClassName="comments-modal">
+    <Modal show={show} onHide={onClose} centered dialogClassName="comments-modal">
     <div className="comments-modal-content">
       {/* Modal Header */}
       <Modal.Header closeButton>
@@ -137,8 +144,8 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, onToggle, show, ref
                 likesCount={comment.likesCount || 0}
                 createdAt={comment.createdAt || ""}
                 isOwner={isOwner}
-                onEdit={(updatedContent) => handleEditComment(comment._id, updatedContent)}
-                onDelete={() => handleDeleteComment(comment._id)}
+                onEdit={() => handleEditComment(comment)}
+                onDelete={() => handleDeleteComment(comment)}
               />
             </div>
           ))}
@@ -148,38 +155,12 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, onToggle, show, ref
 
       {/* Modal Footer (Optional) */}
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={onClose}>
           <FontAwesomeIcon icon={faTimes} /> Close
         </Button>
       </Modal.Footer>
     </div>
   </Modal>
-    // <div className="d-flex flex-column gap-3">
-    //   {comments.map((comment, index) => {
-    //     const isOwner = loggedInUser?._id === comment.sender;
-
-    //     return (
-    //       <div ref={index === comments.length - 1 ? lastCommentRef : null} key={comment._id}>
-    //         <Comment
-    //           postId={comment.postId}
-    //           _id={comment._id}
-    //           content={comment.content}
-    //           sender={comment.sender}
-    //           senderName={comment.senderName || "Unknown"}
-    //           senderImage={comment.senderImage || ""}
-    //           images={comment.images}
-    //           likes={comment.likes || []}
-    //           likesCount={comment.likesCount || 0}
-    //           createdAt={comment.createdAt || ""}
-    //           isOwner={isOwner}
-    //           onEdit={(updatedContent) => handleEditComment(comment._id, updatedContent)}
-    //           onDelete={() => handleDeleteComment(comment._id)}
-    //         />
-    //       </div>
-    //     );
-    //   })}
-    //   {error && <div className="alert alert-danger">{error}</div>}
-    // </div>
   );
 };
 

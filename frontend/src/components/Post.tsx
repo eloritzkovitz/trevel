@@ -76,8 +76,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       console.error("Failed to update like status", error);
     }
   };
-  const handleCommentClick = () => {
-    setShowComments(!showComments);
+  const handleCommentsClick = () => {
+    setShowComments(true);
   };
   
 
@@ -155,7 +155,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
           <FontAwesomeIcon icon={faThumbsUp} className="me-2"/> {isLiked ? "Liked" : "Like"}        
         </button>
-        <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
+        <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" onClick={handleCommentsClick}/> Comment</button>
       </div>
 
        {/* Image viewer */}
@@ -170,8 +170,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       <CommentsList 
         show={showComments}
         postId={_id || ""}
-        onToggle={handleCommentClick}
-        refresh={showComments}
+        refresh={false}
+        onClose={() => setShowComments(false)}
       />
     </div>
   );

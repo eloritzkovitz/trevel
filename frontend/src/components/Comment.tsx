@@ -9,7 +9,7 @@ import { formatElapsedTime } from "../utils/date";
 
 interface CommentProps {
   postId: string;
-  _id: string;
+  _id?: string;
   content: string;
   sender: string;
   senderName: string;

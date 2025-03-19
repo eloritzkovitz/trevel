@@ -78,7 +78,7 @@ const likeComment = async (id: string, userId: string): Promise<Comment> => {
 };
 
 // Delete a comment  
-const deleteComment = async (id: string): Promise<void> => {
+const deleteComment = async (id: string, commentId: string): Promise<void> => {
     const token = Cookies.get("accessToken");
     if (!token) {
       throw new Error("No access token found.");
