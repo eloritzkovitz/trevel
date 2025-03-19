@@ -113,7 +113,11 @@ const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
   }
 
   if (!isLoading && posts.length === 0) {
-    return <div>No posts available</div>;
+    return (
+      <div className="card mb-2 panel-posts">
+        <p>No posts available</p>
+      </div>
+    );
   }
 
   return (
