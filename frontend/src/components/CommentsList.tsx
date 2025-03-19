@@ -20,6 +20,8 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentComment, setCurrentComment] = useState<CommentType | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
 
   // Fetch comments when page changes
@@ -104,20 +106,13 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
         await commentService.deleteComment(postId, comment._id!);
-        setComments((prevComments) => prevComments.filter((c) => c._id !== comment._id?));
+        setComments((prevComments) => prevComments.filter((c) => c._id !== comment._id));
       } catch (error) {
         console.error("Failed to delete comment", error);
       }
     }
   };
 
-  // if (isLoading && comments.length === 0) {
-  //   return <div>Loading comments...</div>;
-  // }
-
-  // if (!isLoading && comments.length === 0) {
-  //   return <div>No comments yet</div>;
-  // }
   
   return (
     <Modal show={show} onHide={onClose} centered dialogClassName="comments-modal">
@@ -127,31 +122,42 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
         <Modal.Title>Comments</Modal.Title>
       </Modal.Header>
 
-      {/* Modal Body (Scrollable) */}
       <Modal.Body className="comments-modal-body">
-        <div className="comments-container">
-          {comments.map((comment, index) => (
-            <div key={comment._id}>
-              <Comment
-                postId={comment.postId}
-                _id={comment._id}
-                content={comment.content}
-                sender={comment.sender}
-                senderName={comment.senderName || "Unknown"}
-                senderImage={comment.senderImage || ""}
-                images={comment.images}
-                likes={comment.likes || []}
-                likesCount={comment.likesCount || 0}
-                createdAt={comment.createdAt || ""}
-                isOwner={isOwner}
-                onEdit={() => handleEditComment(comment)}
-                onDelete={() => handleDeleteComment(comment)}
-              />
-            </div>
-          ))}
-          {error && <div className="alert alert-danger">{error}</div>}
+  <div className="comments-container">
+    {comments.map((comment, index) => {
+      const isOwner = loggedInUser?._id === comment.sender; 
+        if (isLoading && comments.length === 0) {
+            return <div>Loading comments...</div>;
+            }
+
+        if (!isLoading && comments.length === 0) {
+            return <div>No comments yet</div>;
+            }
+
+      return (
+        <div key={comment._id}>
+          <Comment
+            postId={comment.postId}
+            _id={comment._id}
+            content={comment.content}
+            sender={comment.sender}
+            senderName={comment.senderName || "Unknown"}
+            senderImage={comment.senderImage || ""}
+            images={comment.images}
+            likes={comment.likes || []}
+            likesCount={comment.likesCount || 0}
+            createdAt={comment.createdAt || ""}
+            isOwner={isOwner} // Pass the value
+            onEdit={() => handleEditComment(comment)}
+            onDelete={() => handleDeleteComment(comment)}
+          />
         </div>
-      </Modal.Body>
+      );
+    })}
+    {error && <div className="alert alert-danger">{error}</div>}
+  </div>
+</Modal.Body>
+
 
       {/* Modal Footer (Optional) */}
       <Modal.Footer>

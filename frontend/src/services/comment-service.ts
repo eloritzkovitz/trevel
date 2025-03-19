@@ -28,10 +28,19 @@ const getComments = async (sender?: string, page: number = 1): Promise<Comment[]
 };
 
 // Get comments by post ID
-const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
-  const response = await apiClient.get<Comment[]>(`/posts/${postId}/comments`);
-  return response.data;
+export const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
+  try {
+    const response = await apiClient.get<Comment[]>(`/api/posts/${postId}/comments`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    throw new Error("Failed to load comments");
+  }
 };
+// const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
+//   const response = await apiClient.get<Comment[]>(`/posts/${postId}/comments`);
+//   return response.data;
+// };
 
 // Create a comment
 const createComment = async (post: FormData): Promise<Comment> => {
