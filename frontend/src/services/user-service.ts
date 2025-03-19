@@ -57,6 +57,21 @@ const getUserData = async (id?: string): Promise<User> => {
     return response.data;
 };
 
+// Get user by name
+const getUsersByName = async (query: string): Promise<User[]> => {
+    const token = Cookies.get("accessToken");
+    if (!token) {
+      throw new Error("No access token found.");
+    }
+    const response = await apiClient.get<User[]>('/auth/users', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      params: { query }
+    });
+    return response.data;
+}
+
 // Update user data
 const updateUser = async (id: string, formData: FormData): Promise<User> => {
     const token = Cookies.get("accessToken");
@@ -80,4 +95,4 @@ const signInWithGoogle = (idToken: string) => {
     return { request, abort: () => abortController.abort() };
 }
 
-export default { register, login, signInWithGoogle, getUserData, updateUser };
+export default { register, login, signInWithGoogle, getUserData, getUsersByName, updateUser };

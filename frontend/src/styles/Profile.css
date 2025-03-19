@@ -86,7 +86,7 @@
     height: 70px;
 }
 
-.panel-posts h4 {
+.panel-posts h4, .panel-posts p {
     margin-top: 15px;
     margin-left: 15px;
 }
