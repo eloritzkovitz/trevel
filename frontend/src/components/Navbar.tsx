@@ -74,7 +74,7 @@ const NavigationBar: React.FC = () => {
             <FontAwesomeIcon icon={faSearch} className="position-absolute text-muted search-bar-icon" />
             <FormControl
               type="search"
-              placeholder="Search"
+              placeholder="Search Trevel"
               className="me-2 rounded-pill ps-5 search-bar"
               aria-label="Search"
               value={searchQuery}
