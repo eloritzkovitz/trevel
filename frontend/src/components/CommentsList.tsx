@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { Modal, Button } from "react-bootstrap";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes} from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
 import Comment from "./Comment";
 import commentService, { Comment as CommentType } from "../services/comment-service";
 import { useAuth } from "../context/AuthContext";
@@ -16,34 +16,18 @@ interface CommentsListProps {
 const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onClose }) => {
   const { user: loggedInUser } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
+  const [newComment, setNewComment] = useState<string>(""); // For the comment text
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]); // For the uploaded images
   const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [currentComment, setCurrentComment] = useState<CommentType | null>(null);
-  const observer = useRef<IntersectionObserver | null>(null);
 
-  // Fetch comments when page changes
+  // Fetch comments when the component loads
   useEffect(() => {
     const fetchComments = async () => {
-      if (!hasMore || isLoading) return;
-
       try {
         setIsLoading(true);
         const fetchedComments = await commentService.getCommentByPostId(postId);
-        console.log(fetchedComments);
-        setComments((prevComments) => {
-            const newComments: CommentType[] = fetchedComments.filter(
-            (comment: CommentType) => !prevComments.some((c: CommentType) => c._id === comment._id)
-            );
-          return [...prevComments, ...newComments].sort(
-            (a, b) =>
-              new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-          );
-        });
-
-        setHasMore(fetchedComments.length > 0);
+        setComments(fetchedComments);
       } catch (error) {
         console.error("Failed to fetch comments", error);
         setError("Error fetching comments...");
@@ -52,121 +36,154 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
       }
     };
 
-    fetchComments();
-  }, [page, postId, refresh]);
+    if (show) fetchComments();
+  }, [postId, show, refresh]);
 
-  // Reset when postId changes
-  useEffect(() => {
-    setComments([]);
-    setPage(1);
-    setHasMore(true);
-  }, [postId, refresh]);
+  // Handle new comment submission
+  const handleAddComment = async () => {
+    if (!newComment.trim() && uploadedImages.length === 0) {
+      alert("Please add some text or upload an image.");
+      return;
+    }
 
-  // Infinite scrolling observer
-  const lastCommentRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (isLoading || !hasMore) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          setPage((prevPage) => prevPage + 1);
-        }
+    try {
+      const formData = new FormData();
+      formData.append("content", newComment);
+      formData.append("postId", postId);
+      uploadedImages.forEach((image, index) => {
+        formData.append(`images[${index}]`, image);
       });
 
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, hasMore]
-  );
-
-  // Edit comment handler
- const handleEditComment = (comment: CommentType) => {
-     setCurrentComment(comment);
-     setShowEditModal(true);    
-   };
- 
-   const handleCloseEditModal = () => {
-     setShowEditModal(false);
-     setCurrentComment(null);
-   };
- 
-   const handleCommentUpdated = (updatedComment: CommentType) => {
-     setShowEditModal(false);
-     setCurrentComment(null);    
-     setComments((prevComments) =>
-       prevComments.map((comment) =>
-         comment._id === updatedComment._id ? updatedComment : comment
-       )
-     );
-   };
- 
-
-  // Delete comment handler
-  const handleDeleteComment = async (comment: CommentType) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      try {
-        await commentService.deleteComment(comment._id!);
-        setComments((prevComments) => prevComments.filter((c) => c._id !== comment._id));
-      } catch (error) {
-        console.error("Failed to delete comment", error);
-      }
+      const addedComment = await commentService.addComment(formData);
+      setComments((prevComments) => [addedComment, ...prevComments]);
+      setNewComment("");
+      setUploadedImages([]);
+    } catch (error) {
+      console.error("Failed to add comment", error);
+      setError("Error adding comment...");
     }
   };
 
-  
+  // Handle image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      if (fileArray.length + uploadedImages.length > 6) {
+        alert("You can upload up to 6 images.");
+        return;
+      }
+      setUploadedImages((prevImages) => [...prevImages, ...fileArray]);
+    }
+  };
+
+  // Remove an uploaded image
+  const handleRemoveImage = (index: number) => {
+    setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
   return (
     <Modal show={show} onHide={onClose} centered dialogClassName="comments-modal">
-    <div className="comments-modal-content">
-      {/* Modal Header */}
-      <Modal.Header closeButton>
-        <Modal.Title>Comments</Modal.Title>
-      </Modal.Header>
+      <div className="comments-modal-content">
+        {/* Modal Header */}
+        <Modal.Header closeButton>
+          <Modal.Title>Comments</Modal.Title>
+        </Modal.Header>
 
-      <Modal.Body className="comments-modal-body">
-  <div className="comments-container">
-    {comments.map((comment, index) => {
-      const isOwner = loggedInUser?._id === comment.sender; 
-        if (isLoading && comments.length === 0) {
-            return <div>Loading comments...</div>;
-            }
+        {/* Add New Comment */}
+        <Modal.Body>
+          <div className="add-comment-section mb-4">
+            <Form.Group controlId="newComment">
+              <Form.Label>Add a Comment</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Write your comment here..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
+            </Form.Group>
 
-        if (!isLoading && comments.length === 0) {
-            return <div>No comments yet</div>;
-            }
+            <Form.Group controlId="uploadImages" className="mt-3">
+              <Form.Label>Upload Images (up to 6)</Form.Label>
+              <Form.Control
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              <div className="uploaded-images mt-2">
+                {uploadedImages.map((image, index) => (
+                  <div key={index} className="uploaded-image-preview">
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={`Uploaded ${index + 1}`}
+                      className="img-thumbnail"
+                    />
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Form.Group>
 
-      return (
-        <div key={comment._id}>
-          <Comment
-            postId={comment.postId}
-            _id={comment._id}
-            content={comment.content}
-            sender={comment.sender}
-            senderName={comment.senderName || "Unknown"}
-            senderImage={comment.senderImage || ""}
-            images={comment.images}
-            likes={comment.likes || []}
-            likesCount={comment.likesCount || 0}
-            createdAt={comment.createdAt || ""}
-            isOwner={isOwner} // Pass the value
-            onEdit={() => handleEditComment(comment)}
-            onDelete={() => handleDeleteComment(comment)}
-          />
-        </div>
-      );
-    })}
-    {error && <div className="alert alert-danger">{error}</div>}
-  </div>
-</Modal.Body>
+            <Button
+              variant="primary"
+              className="mt-3"
+              onClick={handleAddComment}
+              disabled={isLoading}
+            >
+              Add Comment
+            </Button>
+          </div>
 
+          {/* Existing Comments */}
+          <div className="comments-container">
+            {isLoading && <div>Loading comments...</div>}
+            {!isLoading && comments.length === 0 && <div>No comments yet</div>}
+            {comments.map((comment) => (
+              <Comment
+                key={comment._id}
+                postId={comment.postId}
+                _id={comment._id}
+                content={comment.content}
+                sender={comment.sender}
+                senderName={comment.senderName || "Unknown"}
+                senderImage={comment.senderImage || ""}
+                images={comment.images}
+                likes={comment.likes || []}
+                likesCount={comment.likesCount || 0}
+                createdAt={comment.createdAt || ""}
+                isOwner={loggedInUser?._id === comment.sender}
+                onEdit={(updatedContent) => {
+                  setComments((prevComments) =>
+                    prevComments.map((c) =>
+                      c._id === comment._id ? { ...c, content: updatedContent } : c
+                    )
+                  );
+                }}
+                onDelete={() => {
+                  setComments((prevComments) =>
+                    prevComments.filter((c) => c._id !== comment._id)
+                  );
+                }}
+              />
+            ))}
+          </div>
+        </Modal.Body>
 
-      {/* Modal Footer (Optional) */}
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          <FontAwesomeIcon icon={faTimes} /> publish
-        </Button>
-      </Modal.Footer>
-    </div>
-  </Modal>
+        {/* Modal Footer */}
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onClose}>
+            <FontAwesomeIcon icon={faTimes} /> Close
+          </Button>
+        </Modal.Footer>
+      </div>
+    </Modal>
   );
 };
 
