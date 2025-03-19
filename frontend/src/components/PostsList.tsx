@@ -20,15 +20,14 @@ const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
   const [currentPost, setCurrentPost] = useState<PostType | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
 
-  // Fetch posts when page changes
   useEffect(() => {
     const fetchPosts = async () => {
-      if (!hasMore || isLoading) return;
-
+      if (isLoading) return;
+  
       try {
         setIsLoading(true);
         const fetchedPosts = await postService.getPosts(userId, page);
-
+  
         setPosts((prevPosts) => {
           const newPosts = fetchedPosts.filter(
             (post) => !prevPosts.some((p) => p._id === post._id)
@@ -38,7 +37,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
               new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
           );
         });
-
+  
         setHasMore(fetchedPosts.length > 0);
       } catch (error) {
         console.error("Failed to fetch posts", error);
@@ -47,7 +46,7 @@ const PostsList: React.FC<PostsListProps> = ({ userId, refresh }) => {
         setIsLoading(false);
       }
     };
-
+  
     fetchPosts();
   }, [page, userId, refresh]);
 
