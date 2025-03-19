@@ -62,24 +62,12 @@ const updateComment = async (id: string, comment: FormData): Promise<Comment> =>
     return response.data;
 };
 
-// Like/unlike a comment
-// const likeComment = async (id: string, userId: string): Promise<Comment> => {
-//     const token = Cookies.get("accessToken");
-//     if (!token) {
-//       throw new Error("No access token found.");
-//     }
-//     const response = await apiClient.post<Comment>(`/posts/${id}/like`, { userId }, {
-//       headers: {
-//         'Authorization': `Bearer ${token}`
-//       }
-//     });
-//     return response.data;
-// };
+
 const likeComment = async (id: string, userId: string): Promise<Comment> => {
   const token = Cookies.get("accessToken");
   if (!token) throw new Error("No access token found.");
 
-  const response = await apiClient.post<Comment>(`/comments/${id}/like`, { userId }, { // Changed from /posts/:id/like to /comments/:id/like
+  const response = await apiClient.post<Comment>(`/comments/${id}/like`, { userId }, { 
     headers: {
       'Authorization': `Bearer ${token}`
     }

@@ -153,15 +153,14 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         <hr />
 
   {/* Lower buttons */}
-<button
-  className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
-  onClick={handleLikeClick}
->
-  <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
-</button>
-<button className="btn post-btn" onClick={handleCommentsClick}>
-  <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
-</button>
+    <button
+      className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
+      onClick={handleLikeClick} >
+    <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
+    </button>
+      <button className="btn post-btn" onClick={handleCommentsClick}>
+        <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
+          </button>
       </div>
 
        {/* Image viewer */}

@@ -162,7 +162,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
       {/* Modal Footer (Optional) */}
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>
-          <FontAwesomeIcon icon={faTimes} /> Close
+          <FontAwesomeIcon icon={faTimes} /> publish
         </Button>
       </Modal.Footer>
     </div>
