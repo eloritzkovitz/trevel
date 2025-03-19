@@ -36,6 +36,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
   const [likeCount, setLikeCount] = useState(likesCount);  
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showComments, setShowComments] = useState(false);
 
   // Toggle options dropdown
   const handleToggleDropdown = () => {
@@ -75,6 +76,10 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       console.error("Failed to update like status", error);
     }
   };
+  const handleCommentClick = () => {
+    setShowComments(!showComments);
+  };
+  
 
   return (
     <div className="card mb-2 panel">
@@ -159,6 +164,14 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         images={images || []}
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}        
+      />
+      
+      {/* Comments */}
+      <CommentsList 
+        show={showComments}
+        postId={_id || ""}
+        onToggle={handleCommentClick}
+        refresh={showComments}
       />
     </div>
   );
