@@ -7,10 +7,14 @@ import logo from "../assets/logo.png";
 import logoWhite from "../assets/logo-white.png";
 import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
+import getUsersByName from "../services/user-service";
 
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     // Apply the theme class to the body
@@ -18,9 +22,41 @@ const NavigationBar: React.FC = () => {
     localStorage.setItem("theme", theme); // Store theme preference
   }, [theme]);
 
+  // Toggle theme change
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
+
+  // Fetch users based on the search query using the service function
+  const fetchUsers = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    try {
+      const data = await getUsersByName.getUsersByName(query); // Use the service function
+      setSearchResults(data);
+      setShowDropdown(true);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setSearchResults([]);
+      setShowDropdown(false);
+    }
+  };  
+
+  // Handle search input change
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    fetchUsers(query);
+  };
+
+  const handleSearchBlur = () => {
+    // Hide the dropdown after a short delay to allow clicks
+    setTimeout(() => setShowDropdown(false), 200);
+  };  
 
   return (
     <Navbar
@@ -33,21 +69,36 @@ const NavigationBar: React.FC = () => {
         </Navbar.Brand>
 
         {/* Search */}
-        <Form
-          className="d-flex ms-auto position-relative search-bar-form"          
-        >
+        <Form className="d-flex ms-auto position-relative search-bar-form" onSubmit={(e) => e.preventDefault()}>
           <InputGroup>
-            <FontAwesomeIcon
-              icon={faSearch}
-              className="position-absolute text-muted search-bar-icon"
-            />
+            <FontAwesomeIcon icon={faSearch} className="position-absolute text-muted search-bar-icon" />
             <FormControl
               type="search"
               placeholder="Search"
               className="me-2 rounded-pill ps-5 search-bar"
-              aria-label="Search"              
+              aria-label="Search"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onBlur={handleSearchBlur}
             />
           </InputGroup>
+          {showDropdown && searchResults.length > 0 && (
+            <div className="search-dropdown">
+              {searchResults.map((user) => (
+                <Link
+                  to={`/profile/${user._id}`}
+                  key={user._id}
+                  className="search-result-item"
+                  onClick={() => setShowDropdown(false)}
+                >
+                  <img src={user.profilePicture} alt={user.firstName} className="search-result-image" />
+                  <span className="search-result-name">
+                    {user.firstName} {user.lastName}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </Form>
 
         {/* Menu */}

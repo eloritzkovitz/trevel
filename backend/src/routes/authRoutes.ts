@@ -208,6 +208,50 @@ router.get("/user/:id?", authMiddleware, authController.getUserData);
 
 /**
  * @swagger
+ * /auth/users:
+ *   get:
+ *     summary: Search users by name
+ *     description: Retrieve a list of users whose first or last name matches the query.
+ *     tags:
+ *       - Auth
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The search query (part of the first or last name)
+ *     responses:
+ *       200:
+ *         description: List of matching users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     example: 60d21b4667d0d8992e610c85
+ *                   firstName:
+ *                     type: string
+ *                     example: John
+ *                   lastName:
+ *                     type: string
+ *                     example: Doe
+ *                   profilePicture:
+ *                     type: string
+ *                     example: https://example.com/profile/john.jpg
+ *       400:
+ *         description: Query parameter is required
+ *       500:
+ *         description: Server error
+ */
+router.get("/users", authMiddleware, authController.getUserByName);
+
+/**
+ * @swagger
  * /auth/user/{userId}:
  *   put:
  *     summary: Update user data

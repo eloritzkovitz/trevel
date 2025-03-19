@@ -142,6 +142,27 @@ const getUserData = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+// Get user by name
+const getUserByName = async(req: Request, res: Response): Promise<void> => {
+    const query = req.query.query as string;
+    if (!query) {
+      res.status(400).json({ error: "Query parameter is required" });
+      return;
+    }
+  
+    try {
+        const users = await userModel.find({
+          $or: [
+            { firstName: { $regex: query, $options: "i" } },
+            { lastName: { $regex: query, $options: "i" } },  
+          ],
+      }).select("_id firstName lastName profilePicture");
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Error fetching users" });
+    }
+};
+
 interface UpdateUserRequestBody {
     firstName?: string;
     lastName?: string;
@@ -269,6 +290,7 @@ export default {
     googleSignIn,
     login,
     getUserData,
+    getUserByName,
     updateUser,
     refresh,
     logout
