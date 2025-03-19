@@ -19,28 +19,21 @@ export interface Comment {
   updatedAt?: string;
 }
 
+//19/03- changing the routes to comments 
+
 // Get all comments
 const getComments = async (sender?: string, page: number = 1): Promise<Comment[]> => {    
-    const response = await apiClient.get<Comment[]>('/posts', {
+    const response = await apiClient.get<Comment[]>('/comments', { 
         params: { sender, page }
     });
     return response.data;
 };
 
 // Get comments by post ID
-export const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
-  try {
-    const response = await apiClient.get<Comment[]>(`/api/posts/${postId}/comments`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    throw new Error("Failed to load comments");
-  }
+const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
+  const response = await apiClient.get<Comment[]>(`/comments/${postId}`);
+  return response.data;
 };
-// const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
-//   const response = await apiClient.get<Comment[]>(`/posts/${postId}/comments`);
-//   return response.data;
-// };
 
 // Create a comment
 const createComment = async (post: FormData): Promise<Comment> => {
