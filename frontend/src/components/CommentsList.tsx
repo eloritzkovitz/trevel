@@ -10,10 +10,11 @@ interface CommentsListProps {
   postId: string;
   show: boolean; 
   refresh: boolean;
-  onClose: () => void;  
+  onClose: () => void;
+  onCommentAdded: () => void;  
 }
 
-const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onClose }) => {
+const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onClose, onCommentAdded }) => {
   const { user: loggedInUser } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState<string>(""); // For the comment text
@@ -51,15 +52,26 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
       const formData = new FormData();
       formData.append("content", newComment);
       formData.append("postId", postId);
-      uploadedImages.forEach((image, index) => {
-        formData.append(`images[${index}]`, image);
+
+      uploadedImages.forEach((image) => {
+        formData.append("images", image); //check the back for images ot images[]
       });
+
+      // Debugging: Log the FormData content
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
 
       const addedComment = await commentService.createComment(formData);
       console.log("Comment added:", addedComment);
 
       // Update the comments list with the new comment
       setComments((prevComments) => [addedComment, ...prevComments]);
+
+      // Notify the parent component
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
 
       // Clear the input fields
       setNewComment("");
