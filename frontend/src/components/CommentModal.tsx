@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { Comment as CommentType } from "../services/comment-service";
-import Comment from "./Comment"; // Ensure this is the correct path to the Comment component
+import Comment from "./Comment"; 
 import EditComment from "./EditComment";
 
 interface CommentModalProps {
@@ -27,14 +27,38 @@ const CommentModal: React.FC<CommentModalProps> = ({
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim() && uploadedImages.length === 0) {
       alert("Please add some text or upload an image.");
       return;
     }
-    onAddComment(newComment, uploadedImages);
-    setNewComment("");
-    setUploadedImages([]);
+
+    try {
+      const formData = new FormData();
+      formData.append("content", newComment);
+      formData.append("postId", postId);
+
+      // Append each image to the FormData
+      uploadedImages.forEach((image) => {
+        formData.append("images", image); // Ensure the key matches the backend's expectation
+      });
+
+      // Debugging: Log the FormData content
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      // Call the parent function to handle adding the comment
+      await onAddComment(newComment, uploadedImages);
+
+      // Clear the form and close the modal only after successful submission
+      setNewComment("");
+      setUploadedImages([]);
+      onClose();
+    } catch (error) {
+      console.error("Failed to add comment", error);
+      alert("Failed to add comment. Please try again.");
+    }
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
