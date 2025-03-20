@@ -4,7 +4,7 @@ import { Dropdown, DropdownButton } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faPencil, faTrash, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
-import commentService, {Comment as CommentType } from "../services/comment-service";
+import commentService from "../services/comment-service";
 import { formatElapsedTime } from "../utils/date";
 // import "../styles/Comment.css";
 import ImageViewer from "./ImageViewer";
