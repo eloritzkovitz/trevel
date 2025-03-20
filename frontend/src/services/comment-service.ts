@@ -5,14 +5,14 @@ import Cookies from "js-cookie";
 export interface Comment {
   _id: string;
   postId: string;
-  content: string; // The text content of the comment
-  sender: string; // User ID of the sender
-  senderName: string; // Name of the sender
-  senderImage: string; // Profile image of the sender
-  images?: string[]; // Array of image URLs (optional)
-  likes: string[]; // Array of user IDs who liked the comment
-  likesCount: number; // Total number of likes
-  createdAt: string; // Timestamp of when the comment was created
+  content: string; 
+  sender: string; 
+  senderName: string; 
+  senderImage: string; 
+  images?: string[]; 
+  likes: string[]; 
+  likesCount: number; 
+  createdAt: string; // Timestamp 
 }
 // Get all comments
 const getComments = async (sender?: string, page: number = 1): Promise<Comment[]> => {    

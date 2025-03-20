@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import Comment from "./Comment";
+import { Comment as CommentType } from "../services/comment-service";
+import Comment from "./Comment"; // Ensure this is the correct path to the Comment component
 import EditComment from "./EditComment";
 
 interface CommentModalProps {
@@ -124,7 +125,6 @@ const CommentModal: React.FC<CommentModalProps> = ({
           </>
         )}
       </Modal.Body>
-    
     </Modal>
   );
 };

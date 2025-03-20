@@ -52,7 +52,9 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onClose }) =>
   // Edit an existing comment
   const handleEditComment = async (commentId: string, updatedContent: string) => {
     try {
-      const updatedComment = await commentService.updateComment(commentId, { content: updatedContent });
+      const formData = new FormData();
+      formData.append("content", updatedContent);
+      const updatedComment = await commentService.updateComment(commentId, formData);
       setComments((prevComments) =>
         prevComments.map((comment) =>
           comment._id === commentId ? { ...comment, content: updatedContent } : comment
