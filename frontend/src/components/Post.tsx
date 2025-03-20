@@ -34,7 +34,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewer = { _id: useAuth().user?._id };
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
-  const [likeCount, setLikeCount] = useState(likesCount);  
+  const [likeCount, setLikeCount] = useState(likesCount); 
+  const [currentCommentsCount, setCommentsCount] = useState(commentsCount); 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showComments, setShowComments] = useState(false);
 
@@ -147,20 +148,18 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
             <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
           </div>
           <div>
-            <span>{commentsCount}</span> <FontAwesomeIcon icon={faComment}/>
+            <span>{currentCommentsCount}</span> <FontAwesomeIcon icon={faComment}/>
           </div>
         </div>
         <hr />
 
-  {/* Lower buttons */}
-    <button
-      className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
-      onClick={handleLikeClick} >
-    <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
-    </button>
-      <button className="btn post-btn" onClick={handleCommentsClick}>
-        <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
-          </button>
+        {/* Lower buttons */}
+        <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
+          <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
+        </button>
+        <button className="btn post-btn" onClick={handleCommentsClick}>
+          <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
+        </button>
       </div>
 
        {/* Image viewer */}
@@ -175,7 +174,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       <CommentsList 
         show={showComments}
         postId={_id || ""}
-        onClose={() => setShowComments(false)} />
+        onCommentChange={(change: number) => setCommentsCount((prev) => prev + change)}
+        onClose={() => setShowComments(false)} />        
     </div>
   );
 };

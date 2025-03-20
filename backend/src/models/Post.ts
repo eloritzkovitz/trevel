@@ -7,7 +7,8 @@ export interface IPost extends ILikeable {
   senderImage?: string;
   title: string;
   content: string;
-  images?: string[];    
+  images?: string[];  
+  commentsCount: number;  
   createdAt: string; 
   updatedAt: string; 
 }
@@ -43,6 +44,10 @@ const postSchema = new mongoose.Schema<IPost>({
     type: Number,
     default: 0,
   },  
+  commentsCount: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: String,
   },
