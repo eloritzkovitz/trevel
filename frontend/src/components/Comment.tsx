@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import commentService, {Comment as CommentType } from "../services/comment-service";
 import { formatElapsedTime } from "../utils/date";
 // import "../styles/Comment.css";
+import ImageViewer from "./ImageViewer";
 
 interface CommentProps {
   postId: string;
@@ -24,8 +25,10 @@ interface CommentProps {
   onDelete: () => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete }) => {
-  const [showDropdown, setShowDropdown] = useState(false);  
+const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showImageViewer, setImageViewer] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);  
   const viewer = { _id: useAuth().user?._id };  
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
   const [likeCount, setLikeCount] = useState(likesCount);  
@@ -49,6 +52,12 @@ const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderN
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
+
+  // Handle image click
+  const handleImageClick = (index: number) => {
+    setCurrentIndex(index);
+    setImageViewer(true);
+  };
 
   // Handle like button click
   const handleLikeClick = async () => {
@@ -95,7 +104,7 @@ const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderN
               onToggle={handleToggleDropdown}
               show={showDropdown}
             >
-              <Dropdown.Item onClick={() => onEdit(content)}>
+              <Dropdown.Item onClick={() => onEdit(content)}>                
                 <FontAwesomeIcon icon={faPencil} className="me-2" />
                 Edit Comment
               </Dropdown.Item>
@@ -109,6 +118,24 @@ const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderN
 
         <div>
           <p className="mb-1">{content}</p>
+          {images && images.length > 0 && (
+          <div className="image-grid">
+            {images.slice(0, 3).map((image, index) => (
+              <div key={index} className="image-grid-item" onClick={() => handleImageClick(index)}>
+                <img
+                  src={image}
+                  alt={`Post image ${index + 1}`}
+                  className="image-grid-img"
+                />
+                {index === 2 && images.length > 3 && (
+                  <div className="image-grid-more" onClick={() => handleImageClick(index)}>
+                    +{images.length - 3} more
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}      
           <div className="d-flex align-items-center mt-2">
             <button
               className={`btn btn-sm ${isLiked ? "text-primary" : "text-muted"}`}
@@ -120,6 +147,14 @@ const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderN
           </div>
         </div>
       </div>
+
+      {/* Image viewer */}
+      <ImageViewer 
+        show={showImageViewer}
+        images={images || []}
+        currentIndex={currentIndex}
+        onClose={() => setImageViewer(false)}
+      />
     </div>
   );
 };

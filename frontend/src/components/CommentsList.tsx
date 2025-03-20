@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import commentService, { Comment as CommentType } from "../services/comment-service";
 import Comment from "./Comment";
 import EditComment from "./EditComment";
+import ImageUpload from "./ImageUpload";
 
 interface CommentsListProps {
   postId: string;
@@ -20,7 +21,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
-  const [images, setImages] = useState<FileList | null>(null);
+  const [images, setImages] = useState<File[] | null>(null);
   const [currentComment, setCurrentComment] = useState<CommentType | null>(null);
  
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
@@ -109,8 +110,8 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     setComments((prevComments) =>
       prevComments.map((comment) =>
         comment._id === updatedComment._id ? updatedComment : comment
-      )
-    );
+      )    
+    );    
   };
   
   // Delete comment handler
@@ -128,6 +129,9 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   // Reset editing when modal is closed
   const handleClose = () => {
     setCurrentComment(null);
+    setNewComment("");
+    setImages(null);
+    setError(null);
     onClose(); 
   };
 
@@ -178,32 +182,36 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
           )}
           {error && <div className="alert alert-danger">{error}</div>}
         </div>
-      </Modal.Body>
+      </Modal.Body>      
       <Modal.Footer>
-        <div className="d-flex align-items-center w-100">
-          <Form.Control
-            type="text"
-            placeholder="Write a comment..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="me-2"
+        <div className="d-flex flex-column align-items-start w-100">
+        <div className="d-flex w-100 align-items-start gap-2">
+          <img
+            className="profile-picture-4 rounded-circle"
+            src={loggedInUser?.profilePicture || ""}
+            alt="Profile"
+            style={{ width: "40px", height: "40px", objectFit: "cover" }}
           />
-          <Form.Group controlId="formImages" className="mt-3">
+
+          <div className="d-flex flex-column flex-grow-1">
             <Form.Control
-              type="file"
-              multiple
-              onChange={(e) => setImages((e.target as HTMLInputElement).files)}
-            />
-            <Button
-              variant="primary"
-              onClick={() => handleAddComment(newComment, images ? Array.from(images) : [])}
-            >
-              Post
-            </Button>
-          </Form.Group>
+              type="text"
+              placeholder="Write a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}              
+          />
+
+          {/* Image Upload */}
+          <ImageUpload onImagesSelected={(files) => setImages(files)} resetTrigger={images === null} />
         </div>
-      </Modal.Footer>
-    </Modal>
+
+        <Button variant="primary" onClick={() => handleAddComment(newComment, images ? images : [])}>
+          Post
+        </Button>
+        </div>
+      </div>
+    </Modal.Footer>
+  </Modal>
   );
 };
 

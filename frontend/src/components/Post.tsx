@@ -162,7 +162,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         </button>
       </div>
 
-       {/* Image viewer */}
+      {/* Image viewer */}
       <ImageViewer 
         show={showImageViewer}        
         images={images || []}
