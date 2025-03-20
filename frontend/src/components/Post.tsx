@@ -36,6 +36,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
   const [likeCount, setLikeCount] = useState(likesCount);  
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showComments, setShowComments] = useState(false);
 
   // Toggle options dropdown
   const handleToggleDropdown = () => {
@@ -75,6 +76,11 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       console.error("Failed to update like status", error);
     }
   };
+  const handleCommentsClick = async() => {
+    console.log("Comments clicked");
+    setShowComments(true);
+  };
+  
 
   return (
     <div className="card mb-2 panel">
@@ -146,11 +152,15 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         </div>
         <hr />
 
-         {/* Lower buttons */}
-        <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
-          <FontAwesomeIcon icon={faThumbsUp} className="me-2"/> {isLiked ? "Liked" : "Like"}        
-        </button>
-        <button className="btn post-btn"> <FontAwesomeIcon icon={faComment} className="me-2" /> Comment</button>
+  {/* Lower buttons */}
+    <button
+      className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
+      onClick={handleLikeClick} >
+    <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
+    </button>
+      <button className="btn post-btn" onClick={handleCommentsClick}>
+        <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
+          </button>
       </div>
 
        {/* Image viewer */}
@@ -160,6 +170,12 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}        
       />
+      
+      {/* Comments */}
+      <CommentsList 
+        show={showComments}
+        postId={_id || ""}
+        onClose={() => setShowComments(false)} />
     </div>
   );
 };

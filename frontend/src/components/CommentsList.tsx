@@ -1,24 +1,100 @@
-import React from "react";
-import Comment from "./Comment";
+import React, { useState, useEffect } from "react";
+import commentService, { Comment as CommentType } from "../services/comment-service";
+import CommentModal from "./CommentModal";
 
-interface Comment {
+interface CommentsListProps {
   postId: string;
-  content: string;
-  sender: string;
+  show: boolean;
+  onClose: () => void;
 }
 
-interface CommentListProps {
-  comments: Comment[];
-}
+const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onClose }) => {
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const CommentList: React.FC<CommentListProps> = ({ comments }) => {
+  // Fetch comments when the component loads
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedComments = await commentService.getCommentByPostId(postId);
+        setComments(fetchedComments);
+      } catch (error) {
+        console.error("Failed to fetch comments", error);
+        setError("Error fetching comments...");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (show) fetchComments();
+  }, [postId, show]);
+
+  // Add a new comment
+  const handleAddComment = async (content: string, images: File[]) => {
+    try {
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("postId", postId);
+
+      // Append each image to the FormData
+      images.forEach((image) => {
+        formData.append("images", image); // Ensure the key matches the backend's expectation
+      });
+
+      // Debugging: Log the FormData content
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      const addedComment = await commentService.createComment(formData);
+      setComments((prevComments) => [addedComment, ...prevComments]);
+    } catch (error) {
+      console.error("Failed to add comment", error);
+      setError("Error adding comment. Please try again.");
+    }
+  };
+
+  // Edit an existing comment
+  const handleEditComment = async (commentId: string, updatedContent: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("content", updatedContent);
+      const updatedComment = await commentService.updateComment(commentId, formData);
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === commentId ? { ...comment, content: updatedContent } : comment
+        )
+      );
+    } catch (error) {
+      console.error("Failed to edit comment", error);
+      setError("Error editing comment. Please try again.");
+    }
+  };
+
+  // Delete a comment
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await commentService.deleteComment(commentId);
+      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+    } catch (error) {
+      console.error("Failed to delete comment", error);
+      setError("Error deleting comment. Please try again.");
+    }
+  };
+
   return (
-    <div className="mt-3">
-      {comments.map((comment, index) => (
-        <Comment key={index} postId={comment.postId} content={comment.content} sender={comment.sender} />
-      ))}
-    </div>
+    <CommentModal
+      show={show}
+      onClose={onClose}
+      comments={comments}
+      postId={postId}
+      onAddComment={handleAddComment}
+      onEditComment={handleEditComment}
+      onDeleteComment={handleDeleteComment}
+    />
   );
 };
 
-export default CommentList;
+export default CommentsList;

@@ -28,8 +28,12 @@ const postSchema = new mongoose.Schema<IPost>({
     type: String,
     required: true,
   },
-  content: String,
-  images: [String],
+  content: {
+    type: String,
+  },
+  images: {
+    type:[String],
+  },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
