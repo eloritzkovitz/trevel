@@ -47,6 +47,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
     }
 
     try {
+      console.log("Submitting comment...");
       const formData = new FormData();
       formData.append("content", newComment);
       formData.append("postId", postId);
@@ -54,13 +55,18 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
         formData.append(`images[${index}]`, image);
       });
 
-      const addedComment = await commentService.addComment(formData);
+      const addedComment = await commentService.createComment(formData);
+      console.log("Comment added:", addedComment);
+
+      // Update the comments list with the new comment
       setComments((prevComments) => [addedComment, ...prevComments]);
+
+      // Clear the input fields
       setNewComment("");
       setUploadedImages([]);
     } catch (error) {
       console.error("Failed to add comment", error);
-      setError("Error adding comment...");
+      setError("Error adding comment. Please try again.");
     }
   };
 
@@ -175,13 +181,6 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
             ))}
           </div>
         </Modal.Body>
-
-        {/* Modal Footer */}
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onClose}>
-            <FontAwesomeIcon icon={faTimes} /> Close
-          </Button>
-        </Modal.Footer>
       </div>
     </Modal>
   );
