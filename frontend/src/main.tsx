@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.css';
-import App from './components/App.tsx';
+import App from './App.tsx';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import './styles/styles.css';
 
