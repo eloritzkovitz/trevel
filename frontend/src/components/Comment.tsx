@@ -23,21 +23,7 @@ interface CommentProps {
   onDelete: () => void;
 }
 
-const Comment: React.FC<CommentProps> = ({
-  postId,
-  _id,
-  content,
-  sender,
-  senderName,
-  senderImage,
-  images,
-  likes,
-  likesCount,
-  createdAt,
-  isOwner,
-  onEdit,
-  onDelete
-}) => {
+const Comment: React.FC<CommentProps> = ({ postId, _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
@@ -47,9 +33,7 @@ const Comment: React.FC<CommentProps> = ({
 
   // Handle like
   const handleLike = async () => {
-    try {
-      // Implement like functionality similar to your Post component
-      // For now, let's just toggle the state
+    try {      
       setIsLiked(!isLiked);
       setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
     } catch (error) {
@@ -81,38 +65,43 @@ const Comment: React.FC<CommentProps> = ({
   };
 
   return (
-    <div className="comment-container">
-      <div className="d-flex align-items-start">
-        <img className="profile-picture-small rounded-circle mr-2" src={senderImage} alt="Profile" />
-        <div className="comment-content">
-          <div className="d-flex justify-content-between align-items-center">
+    <div className="card mb-2 panel">
+      <div className="card-body">
+        <div className="d-flex justify-content-between align-items-center mb-2">
+          <div className="d-flex align-items-center">
+            <img className="profile-picture-4 rounded-circle mr-10" src={senderImage} alt="Profile" />
             <div>
-              <Link to={`/profile/${sender}`} className="text-decoration-none">
-                <span className="fw-bold me-2">{senderName}</span>
-              </Link>
+              <h5 className="card-text mb-0">
+                <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">
+                  <small>{senderName}</small>
+                </Link>
+              </h5>
               <small className="text-muted">{formatElapsedTime(createdAt)}</small>
             </div>
-            
-            {isOwner && (
-              <div className="position-relative" ref={dropdownRef}>
-                <button className="btn btn-link btn-sm p-0" onClick={handleToggleDropdown}>
-                  <FontAwesomeIcon icon={faEllipsisH} />
-                </button>
-                {showDropdown && (
-                  <div className="dropdown-menu dropdown-menu-end show">
-                    <button className="dropdown-item" onClick={handleEdit}>
-                      <FontAwesomeIcon icon={faPencil} className="me-2" />
-                      Edit
-                    </button>
-                    <button className="dropdown-item" onClick={onDelete}>
-                      <FontAwesomeIcon icon={faTrash} className="me-2" />
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
+              
+          {/* Dropdown menu */}
+          {isOwner && (
+            <DropdownButton 
+              className="post-options"             
+              align="end"
+              title={<FontAwesomeIcon className="post-options-btn" icon={faEllipsisH} />}
+              id="dropdown-menu-align-end"
+              variant="link"
+              onToggle={handleToggleDropdown}              
+              show={showDropdown}
+              >
+                <Dropdown.Item onClick={handleEdit}>
+                  <FontAwesomeIcon icon={faPencil} className="me-2" />
+                    Edit Comment
+                </Dropdown.Item>
+                <Dropdown.Item onClick={onDelete}>
+                  <FontAwesomeIcon icon={faTrash} className="me-2" />
+                    Delete Comment
+                </Dropdown.Item>
+              </DropdownButton>
+          )}
+        </div>     
           
           {isEditing ? (
             <div className="mt-2">
@@ -145,8 +134,7 @@ const Comment: React.FC<CommentProps> = ({
             </button>
           </div>
         </div>
-      </div>
-    </div>
+      </div>    
   );
 };
 

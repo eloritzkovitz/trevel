@@ -24,7 +24,7 @@ class CommentController extends BaseController<IComment> {
     try {
       const post = await postModel.findById(postId);
       if (post) {
-        const userId = req.body.sender;
+        const userId = req.params.userId;
         const user = await userModel.findById(userId);
         const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];
         const comment : IComment =  {

@@ -43,14 +43,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
         formData.append("images", image); // Ensure the key matches the backend's expectation
       });
 
-      // Debugging: Log the FormData content
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
-
-      console.log("Submitting comment...");
-      await onAddComment(newComment, uploadedImages);
-      console.log("Comment successfully added");
+      await onAddComment(newComment, uploadedImages);      
 
       // Clear the form and close the modal only after successful submission
       setNewComment("");
@@ -141,7 +134,7 @@ const CommentModal: React.FC<CommentModalProps> = ({
                   likes={comment.likes || []}
                   likesCount={comment.likesCount || 0}
                   createdAt={comment.createdAt || ""}
-                  isOwner={true} // Replace with actual ownership logic
+                  isOwner={true}
                   onEdit={() => setEditingCommentId(comment._id)}
                   onDelete={() => onDeleteComment(comment._id)}
                 />

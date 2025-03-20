@@ -28,7 +28,7 @@ interface PostProps {
   onDelete: () => void;   
 }
 
-const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
+const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -80,8 +80,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
   const handleCommentsClick = async() => {
     console.log("Comments clicked");
     setShowComments(true);
-  };
-  
+  };  
 
   return (
     <div className="card mb-2 panel">

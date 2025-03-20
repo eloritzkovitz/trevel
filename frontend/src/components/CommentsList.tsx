@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
 import commentService, { Comment as CommentType } from "../services/comment-service";
+import Comment from "./Comment";
 import CommentModal from "./CommentModal";
 
 interface CommentsListProps {
@@ -10,32 +13,39 @@ interface CommentsListProps {
 }
 
 const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChange, onClose }) => {
+  const { user: loggedInUser } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState<string>("");
+  const [images, setImages] = useState<FileList | null>(null);
+ 
+  const modalBodyRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch comments when the component loads
   useEffect(() => {
-      const fetchComments = async () => {
-        if (isLoading) return;
+    const fetchComments = async () => {
+      if (isLoading) return;
     
-        try {
-          setIsLoading(true);
-          const fetchedComments = await commentService.getCommentByPostId(postId);
+      try {
+        setIsLoading(true);
+        const fetchedComments = await commentService.getCommentByPostId(postId);
+
+        console.log(fetchedComments);
     
-          setComments((prevComments) => {
-            const newComments = fetchedComments.filter(
-              (comment) => !prevComments.some((p) => p._id === comment._id)
-            );
+        setComments((prevComments) => {
+          const newComments = fetchedComments.filter(
+            (comment) => !prevComments.some((p) => p._id === comment._id)            
+            );            
             return [...prevComments, ...newComments].sort(
-              (a, b) =>
+              (a, b) =>                
                 new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
             );
-          });
-    
-          setHasMore(fetchedComments.length > 0);
+        });
+
+        setHasMore(fetchedComments.length > 0);
         } catch (error) {
           console.error("Failed to fetch coimments", error);
           setError("Error fetching comments...");
@@ -43,26 +53,26 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
           setIsLoading(false);
         }
       };
-    
+         
       fetchComments();
     }, [page, postId]);
 
-  // useEffect(() => {
-  //   const fetchComments = async () => {
-  //     try {
-  //       setIsLoading(true);
-  //       const fetchedComments = await commentService.getCommentByPostId(postId);
-  //       setComments(fetchedComments);
-  //     } catch (error) {
-  //       console.error("Failed to fetch comments", error);
-  //       setError("Error fetching comments...");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
+  // Reset when userId changes
+  useEffect(() => {
+    setComments([]);
+    setPage(1);
+    setHasMore(true);
+  }, [postId]);
+    
+  // Infinite scrolling logic
+  const handleScroll = () => {
+    if (!modalBodyRef.current || isLoading || !hasMore) return;
 
-  //   if (show) fetchComments();
-  // }, [postId, show]);
+    const { scrollTop, scrollHeight, clientHeight } = modalBodyRef.current;
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
 
   // Add a new comment
   const handleAddComment = async (content: string, images: File[]) => {
@@ -115,15 +125,60 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   };
 
   return (
-    <CommentModal
-      show={show}
-      onClose={onClose}
-      comments={comments}
-      postId={postId}
-      onAddComment={handleAddComment}
-      onEditComment={handleEditComment}
-      onDeleteComment={handleDeleteComment}
-    />
+    <Modal show={show} onHide={onClose} size="lg" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Comments</Modal.Title>
+      </Modal.Header>
+      <Modal.Body
+        ref={modalBodyRef}
+        onScroll={handleScroll}
+        style={{ maxHeight: "60vh", overflowY: "auto" }}
+      >
+        <div className="d-flex flex-column gap-3">
+          {comments.map((comment, index) => {
+            const isOwner = loggedInUser?._id === comment.sender;
+
+            return (
+              <div key={comment._id}>
+                <Comment
+                  _id={comment._id}
+                  postId={postId}
+                  content={comment.content}
+                  sender={comment.sender}
+                  senderName={comment.senderName || "Unknown"}
+                  senderImage={comment.senderImage || ""}
+                  images={comment.images}
+                  likes={comment.likes || []}
+                  likesCount={comment.likesCount || 0}
+                  createdAt={comment.createdAt || ""}
+                  isOwner={isOwner}
+                  onEdit={() => handleEditComment(comment._id, comment.content)}
+                  onDelete={() => handleDeleteComment(comment._id)}
+                />
+              </div>
+            );
+          })}
+          {error && <div className="alert alert-danger">{error}</div>}
+        </div>
+      </Modal.Body>      
+      <Modal.Footer>
+        <div className="d-flex align-items-center w-100">
+          <Form.Control
+            type="text"
+            placeholder="Write a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            className="me-2"
+          />
+          <Form.Group controlId="formImages" className="mt-3">            
+            <Form.Control type="file" multiple onChange={(e) => setImages((e.target as HTMLInputElement).files)}/>
+            <Button variant="primary" onClick={() => handleAddComment(newComment, images ? Array.from(images) : [])}>
+                  Post
+            </Button>  
+          </Form.Group> 
+        </div>    
+      </Modal.Footer>
+    </Modal>
   );
 };
 
