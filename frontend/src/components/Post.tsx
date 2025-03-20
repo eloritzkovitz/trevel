@@ -175,10 +175,7 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       <CommentsList 
         show={showComments}
         postId={_id || ""}
-        refresh={false}
-        onClose={() => setShowComments(false)} onCommentAdded={function (): void {
-          throw new Error("Function not implemented.");
-        } }      />
+        onClose={() => setShowComments(false)} />
     </div>
   );
 };

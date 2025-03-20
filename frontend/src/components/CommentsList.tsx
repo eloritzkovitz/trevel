@@ -37,9 +37,16 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onClose }) =>
       const formData = new FormData();
       formData.append("content", content);
       formData.append("postId", postId);
+
+      // Append each image to the FormData
       images.forEach((image) => {
-        formData.append("images", image);
+        formData.append("images", image); // Ensure the key matches the backend's expectation
       });
+
+      // Debugging: Log the FormData content
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
 
       const addedComment = await commentService.createComment(formData);
       setComments((prevComments) => [addedComment, ...prevComments]);
