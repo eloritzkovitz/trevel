@@ -74,12 +74,13 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
         />
       </Form.Group>
       <div className="d-flex justify-content-end mt-3">
+        <Button variant="primary" type="submit" disabled={isLoading} onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}>
+          {isLoading ? "Updating..." : "Save"}
+        </Button>
         <Button variant="secondary" onClick={onCancel}>
           Cancel
-        </Button>
-        <Button variant="primary" onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}>
-          Save
-        </Button>
+        </Button>       
+        {error && <div className="alert alert-danger mt-3">{error}</div>}
       </div>
     </div>
   );

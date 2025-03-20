@@ -125,8 +125,14 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     }
   };  
 
+  // Reset editing when modal is closed
+  const handleClose = () => {
+    setCurrentComment(null);
+    onClose(); 
+  };
+
   return (
-    <Modal show={show} onHide={onClose} size="lg" centered>
+    <Modal show={show} onHide={handleClose} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>Comments</Modal.Title>
       </Modal.Header>

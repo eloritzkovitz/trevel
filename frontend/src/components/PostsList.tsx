@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useAuth } from "../context/AuthContext";
 import postService, { Post as PostType } from "../services/post-service";
 import Post from "./Post";
-import { useAuth } from "../context/AuthContext";
 import EditPost from "./EditPost";
 
 interface PostsListProps {

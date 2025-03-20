@@ -154,7 +154,7 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
 
           {error && <div className="alert alert-danger mt-3">{error}</div>}
           <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
-            {isLoading ? "Updating..." : "Update Post"}
+            {isLoading ? "Updating..." : "Save"}
           </Button>
         </Form>
       </Modal.Body>
