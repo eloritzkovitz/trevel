@@ -176,6 +176,6 @@ router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(comment
  *       200:
  *         description: Comment liked successfully
  */
-router.put("/:id/like", authMiddleware, commentsController.handleLike.bind(commentsController));
+router.post("/:id/like", authMiddleware, commentsController.handleLike.bind(commentsController));
 
 export default router;

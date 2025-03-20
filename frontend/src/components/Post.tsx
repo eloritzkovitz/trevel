@@ -77,8 +77,9 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       console.error("Failed to update like status", error);
     }
   };
-  const handleCommentsClick = async() => {
-    console.log("Comments clicked");
+
+  // Open the comments panel
+  const handleCommentsClick = async() => {    
     setShowComments(true);
   };  
 

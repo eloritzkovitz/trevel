@@ -12,8 +12,9 @@ export interface Comment {
   images?: string[]; 
   likes: string[]; 
   likesCount: number; 
-  createdAt: string; // Timestamp 
+  createdAt: string;
 }
+
 // Get all comments
 const getComments = async (sender?: string, page: number = 1): Promise<Comment[]> => {    
     const response = await apiClient.get<Comment[]>('/comments', { 
@@ -58,7 +59,7 @@ const updateComment = async (id: string, comment: FormData): Promise<Comment> =>
     return response.data;
 };
 
-
+// Like/unlike a comment
 const likeComment = async (id: string, userId: string): Promise<Comment> => {
   const token = Cookies.get("accessToken");
   if (!token) throw new Error("No access token found.");

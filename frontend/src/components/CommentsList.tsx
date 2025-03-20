@@ -3,7 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
 import commentService, { Comment as CommentType } from "../services/comment-service";
 import Comment from "./Comment";
-import CommentModal from "./CommentModal";
+import EditComment from "./EditComment";
 
 interface CommentsListProps {
   postId: string;
@@ -21,6 +21,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
   const [images, setImages] = useState<FileList | null>(null);
+  const [currentComment, setCurrentComment] = useState<CommentType | null>(null);
  
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
 
@@ -31,9 +32,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     
       try {
         setIsLoading(true);
-        const fetchedComments = await commentService.getCommentByPostId(postId);
-
-        console.log(fetchedComments);
+        const fetchedComments = await commentService.getCommentByPostId(postId);        
     
         setComments((prevComments) => {
           const newComments = fetchedComments.filter(
@@ -84,45 +83,47 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       // Append each image to the FormData
       images.forEach((image) => {
         formData.append("images", image);
-      });      
+      });    
 
       const addedComment = await commentService.createComment(formData);
       setComments((prevComments) => [addedComment, ...prevComments]);
       onCommentChange(1);
+
+      // Clear the form after successful submission
+      setNewComment("");
+      setImages(null);
+
     } catch (error) {
       console.error("Failed to add comment", error);
       setError("Error adding comment. Please try again.");
     }
   };
 
-  // Edit an existing comment
-  const handleEditComment = async (commentId: string, updatedContent: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("content", updatedContent);
-      const updatedComment = await commentService.updateComment(commentId, formData);
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment._id === commentId ? { ...comment, content: updatedContent } : comment
-        )
-      );
-    } catch (error) {
-      console.error("Failed to edit comment", error);
-      setError("Error editing comment. Please try again.");
-    }
+  // Edit comment handlers
+  const handleEditComment = (comment: CommentType) => {
+    setCurrentComment(comment);        
+  }; 
+  
+  const handleCommentUpdated = (updatedComment: CommentType) => {    
+    setCurrentComment(null);    
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment._id === updatedComment._id ? updatedComment : comment
+      )
+    );
   };
-
-  // Delete a comment
-  const handleDeleteComment = async (commentId: string) => {
-    try {
-      await commentService.deleteComment(commentId);
-      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
-      onCommentChange(-1);
-    } catch (error) {
-      console.error("Failed to delete comment", error);
-      setError("Error deleting comment. Please try again.");
+  
+  // Delete comment handler
+  const handleDeleteComment = async (comment: CommentType) => {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      try {
+        await commentService.deleteComment(comment._id!);
+        setComments((prevComments) => prevComments.filter((p) => p._id !== comment._id));
+      } catch (error) {
+        console.error("Failed to delete comment", error);
+      }
     }
-  };
+  };  
 
   return (
     <Modal show={show} onHide={onClose} size="lg" centered>
@@ -135,32 +136,43 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
         style={{ maxHeight: "60vh", overflowY: "auto" }}
       >
         <div className="d-flex flex-column gap-3">
-          {comments.map((comment, index) => {
-            const isOwner = loggedInUser?._id === comment.sender;
+          {!isLoading && comments.length === 0 && <p>No comments yet.</p>}
 
-            return (
-              <div key={comment._id}>
-                <Comment
-                  _id={comment._id}
-                  postId={postId}
-                  content={comment.content}
-                  sender={comment.sender}
-                  senderName={comment.senderName || "Unknown"}
-                  senderImage={comment.senderImage || ""}
-                  images={comment.images}
-                  likes={comment.likes || []}
-                  likesCount={comment.likesCount || 0}
-                  createdAt={comment.createdAt || ""}
-                  isOwner={isOwner}
-                  onEdit={() => handleEditComment(comment._id, comment.content)}
-                  onDelete={() => handleDeleteComment(comment._id)}
-                />
-              </div>
-            );
-          })}
+          {/* Render EditComment if a comment is being edited */}
+          {currentComment ? (
+            <EditComment
+              comment={currentComment}
+              onCommentUpdated={handleCommentUpdated}
+              onCancel={() => setCurrentComment(null)}
+            />
+          ) : (
+            comments.map((comment) => {
+              const isOwner = loggedInUser?._id === comment.sender;
+
+              return (
+                <div key={comment._id}>
+                  <Comment
+                    _id={comment._id}
+                    postId={postId}
+                    content={comment.content}
+                    sender={comment.sender}
+                    senderName={comment.senderName || "Unknown"}
+                    senderImage={comment.senderImage || ""}
+                    images={comment.images}
+                    likes={comment.likes || []}
+                    likesCount={comment.likesCount || 0}
+                    createdAt={comment.createdAt || ""}
+                    isOwner={isOwner}
+                    onEdit={() => handleEditComment(comment)}
+                    onDelete={() => handleDeleteComment(comment)}
+                  />
+                </div>
+              );
+            })
+          )}
           {error && <div className="alert alert-danger">{error}</div>}
         </div>
-      </Modal.Body>      
+      </Modal.Body>
       <Modal.Footer>
         <div className="d-flex align-items-center w-100">
           <Form.Control
@@ -170,13 +182,20 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
             onChange={(e) => setNewComment(e.target.value)}
             className="me-2"
           />
-          <Form.Group controlId="formImages" className="mt-3">            
-            <Form.Control type="file" multiple onChange={(e) => setImages((e.target as HTMLInputElement).files)}/>
-            <Button variant="primary" onClick={() => handleAddComment(newComment, images ? Array.from(images) : [])}>
-                  Post
-            </Button>  
-          </Form.Group> 
-        </div>    
+          <Form.Group controlId="formImages" className="mt-3">
+            <Form.Control
+              type="file"
+              multiple
+              onChange={(e) => setImages((e.target as HTMLInputElement).files)}
+            />
+            <Button
+              variant="primary"
+              onClick={() => handleAddComment(newComment, images ? Array.from(images) : [])}
+            >
+              Post
+            </Button>
+          </Form.Group>
+        </div>
       </Modal.Footer>
     </Modal>
   );
