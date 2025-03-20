@@ -48,8 +48,9 @@ const CommentModal: React.FC<CommentModalProps> = ({
         console.log(`${key}:`, value);
       }
 
-      // Call the parent function to handle adding the comment
+      console.log("Submitting comment...");
       await onAddComment(newComment, uploadedImages);
+      console.log("Comment successfully added");
 
       // Clear the form and close the modal only after successful submission
       setNewComment("");
