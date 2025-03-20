@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
-import MainPage from "./MainPage";
-import Login from "./Login";
-import Signup from "./Signup";
-import Profile from "./Profile";
-import { AuthProvider, useAuth } from "../context/AuthContext";
+import MainPage from "./pages/MainPage";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const App: React.FC = () => {
   return (

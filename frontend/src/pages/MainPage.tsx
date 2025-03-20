@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./Navbar";
-import PostsList from "./PostsList";
-import PostModal from "./PostModal";
+import Navbar from "../components/Navbar";
+import PostsList from "../components/PostsList";
+import PostModal from "../components/PostModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
