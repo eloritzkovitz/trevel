@@ -1,24 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faUpload } from "@fortawesome/free-solid-svg-icons";
-import Comment from "./Comment";
+import React, { useState, useEffect } from "react";
 import commentService, { Comment as CommentType } from "../services/comment-service";
-import { useAuth } from "../context/AuthContext";
+import CommentModal from "./CommentModal";
 
 interface CommentsListProps {
   postId: string;
-  show: boolean; 
-  refresh: boolean;
+  show: boolean;
   onClose: () => void;
-  onCommentAdded: () => void;  
 }
 
-const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onClose, onCommentAdded }) => {
-  const { user: loggedInUser } = useAuth();
+const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onClose }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
-  const [newComment, setNewComment] = useState<string>(""); // For the comment text
-  const [uploadedImages, setUploadedImages] = useState<File[]>([]); // For the uploaded images
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,163 +29,62 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, refresh, onCl
     };
 
     if (show) fetchComments();
-  }, [postId, show, refresh]);
+  }, [postId, show]);
 
-  // Handle new comment submission
-  const handleAddComment = async () => {
-    if (!newComment.trim() && uploadedImages.length === 0) {
-      alert("Please add some text or upload an image.");
-      return;
-    }
-
+  // Add a new comment
+  const handleAddComment = async (content: string, images: File[]) => {
     try {
-      console.log("Submitting comment...");
       const formData = new FormData();
-      formData.append("content", newComment);
+      formData.append("content", content);
       formData.append("postId", postId);
-
-      uploadedImages.forEach((image) => {
-        formData.append("images", image); //check the back for images ot images[]
+      images.forEach((image) => {
+        formData.append("images", image);
       });
 
-      // Debugging: Log the FormData content
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
       const addedComment = await commentService.createComment(formData);
-      console.log("Comment added:", addedComment);
-
-      // Update the comments list with the new comment
       setComments((prevComments) => [addedComment, ...prevComments]);
-
-      // Notify the parent component
-      if (onCommentAdded) {
-        onCommentAdded();
-      }
-
-      // Clear the input fields
-      setNewComment("");
-      setUploadedImages([]);
     } catch (error) {
       console.error("Failed to add comment", error);
       setError("Error adding comment. Please try again.");
     }
   };
 
-  // Handle image upload
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      if (fileArray.length + uploadedImages.length > 6) {
-        alert("You can upload up to 6 images.");
-        return;
-      }
-      setUploadedImages((prevImages) => [...prevImages, ...fileArray]);
+  // Edit an existing comment
+  const handleEditComment = async (commentId: string, updatedContent: string) => {
+    try {
+      const updatedComment = await commentService.updateComment(commentId, { content: updatedContent });
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === commentId ? { ...comment, content: updatedContent } : comment
+        )
+      );
+    } catch (error) {
+      console.error("Failed to edit comment", error);
+      setError("Error editing comment. Please try again.");
     }
   };
 
-  // Remove an uploaded image
-  const handleRemoveImage = (index: number) => {
-    setUploadedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  // Delete a comment
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await commentService.deleteComment(commentId);
+      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+    } catch (error) {
+      console.error("Failed to delete comment", error);
+      setError("Error deleting comment. Please try again.");
+    }
   };
 
   return (
-    <Modal show={show} onHide={onClose} centered dialogClassName="comments-modal">
-      <div className="comments-modal-content">
-        {/* Modal Header */}
-        <Modal.Header closeButton>
-          <Modal.Title>Comments</Modal.Title>
-        </Modal.Header>
-
-        {/* Add New Comment */}
-        <Modal.Body>
-          <div className="add-comment-section mb-4">
-            <Form.Group controlId="newComment">
-              <Form.Label>Add a Comment</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Write your comment here..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="uploadImages" className="mt-3">
-              <Form.Label>Upload Images (up to 6)</Form.Label>
-              <Form.Control
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-              <div className="uploaded-images mt-2">
-                {uploadedImages.map((image, index) => (
-                  <div key={index} className="uploaded-image-preview">
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Uploaded ${index + 1}`}
-                      className="img-thumbnail"
-                    />
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </Form.Group>
-
-            <Button
-              variant="primary"
-              className="mt-3"
-              onClick={handleAddComment}
-              disabled={isLoading}
-            >
-              Add Comment
-            </Button>
-          </div>
-
-          {/* Existing Comments */}
-          <div className="comments-container">
-            {isLoading && <div>Loading comments...</div>}
-            {!isLoading && comments.length === 0 && <div>No comments yet</div>}
-            {comments.map((comment) => (
-              <Comment
-                key={comment._id}
-                postId={comment.postId}
-                _id={comment._id}
-                content={comment.content}
-                sender={comment.sender}
-                senderName={comment.senderName || "Unknown"}
-                senderImage={comment.senderImage || ""}
-                images={comment.images}
-                likes={comment.likes || []}
-                likesCount={comment.likesCount || 0}
-                createdAt={comment.createdAt || ""}
-                isOwner={loggedInUser?._id === comment.sender}
-                onEdit={(updatedContent) => {
-                  setComments((prevComments) =>
-                    prevComments.map((c) =>
-                      c._id === comment._id ? { ...c, content: updatedContent } : c
-                    )
-                  );
-                }}
-                onDelete={() => {
-                  setComments((prevComments) =>
-                    prevComments.filter((c) => c._id !== comment._id)
-                  );
-                }}
-              />
-            ))}
-          </div>
-        </Modal.Body>
-      </div>
-    </Modal>
+    <CommentModal
+      show={show}
+      onClose={onClose}
+      comments={comments}
+      postId={postId}
+      onAddComment={handleAddComment}
+      onEditComment={handleEditComment}
+      onDeleteComment={handleDeleteComment}
+    />
   );
 };
 
