@@ -141,6 +141,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
         <Modal.Title>Comments</Modal.Title>
       </Modal.Header>
       <Modal.Body
+        className="panel-secondary"
         ref={modalBodyRef}
         onScroll={handleScroll}
         style={{ maxHeight: "60vh", overflowY: "auto" }}
