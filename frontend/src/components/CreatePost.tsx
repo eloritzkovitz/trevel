@@ -69,7 +69,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mb-2"
+            className="mb-2 rounded-pill"
             style={{ width: "50%" }}
           />
 
@@ -82,7 +82,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
-              className="flex-grow-1"
+              className="flex-grow-1 rounded-pill"
             />
 
             {/* Post Button */}

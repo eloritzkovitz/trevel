@@ -121,6 +121,8 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       try {
         await commentService.deleteComment(comment._id!);
         setComments((prevComments) => prevComments.filter((p) => p._id !== comment._id));
+        onCommentChange(-1);
+        
       } catch (error) {
         setError("Failed to delete comment. Please try again.");
       }
@@ -183,28 +185,29 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
             })
           )}         
         </div>
-      </Modal.Body>      
+      </Modal.Body>    
       <Modal.Footer>
         <div className="d-flex flex-column align-items-start w-100">
-        <div className="d-flex w-100 align-items-start gap-2">
-          <img
-            className="profile-picture-4 rounded-circle"
-            src={loggedInUser?.profilePicture || ""}
-            alt="Profile"
-            style={{ width: "40px", height: "40px", objectFit: "cover" }}
-          />
+          <div className="d-flex w-100 align-items-start gap-2">
+            <img
+              className="profile-picture-4 rounded-circle"
+              src={loggedInUser?.profilePicture || ""}
+              alt="Profile"
+              style={{ width: "40px", height: "40px", objectFit: "cover" }}
+            />
 
-          <div className="d-flex flex-column flex-grow-1">
-            <Form.Control
-              type="text"
-              placeholder="Write a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}              
-          />
+            <div className="d-flex flex-column flex-grow-1">
+              <Form.Control
+                type="text"
+                placeholder="Write a comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="rounded-pill"              
+            />
 
-          {/* Image Upload */}
-          <ImageUpload onImagesSelected={(files) => setImages(files)} resetTrigger={images === null} />
-        </div>
+            {/* Image Upload */}
+            <ImageUpload onImagesSelected={(files) => setImages(files)} resetTrigger={images === null} />
+          </div>
 
         <Button variant="primary" onClick={() => handleAddComment(newComment, images ? images : [])}>
           Post

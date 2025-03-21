@@ -6,7 +6,6 @@ import { faEllipsisH, faPencil, faTrash, faThumbsUp } from "@fortawesome/free-so
 import { useAuth } from "../context/AuthContext";
 import commentService from "../services/comment-service";
 import { formatElapsedTime } from "../utils/date";
-// import "../styles/Comment.css";
 import ImageViewer from "./ImageViewer";
 
 interface CommentProps {
