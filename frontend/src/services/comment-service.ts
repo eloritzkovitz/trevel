@@ -12,8 +12,9 @@ export interface Comment {
   images?: string[]; 
   likes: string[]; 
   likesCount: number; 
-  createdAt: string; // Timestamp 
+  createdAt: string;
 }
+
 // Get all comments
 const getComments = async (sender?: string, page: number = 1): Promise<Comment[]> => {    
     const response = await apiClient.get<Comment[]>('/comments', { 
@@ -23,7 +24,7 @@ const getComments = async (sender?: string, page: number = 1): Promise<Comment[]
 };
 
 // Get comments by post ID
-const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
+const getCommentsByPostId = async (postId: string): Promise<Comment[]> => {
   const response = await apiClient.get<Comment[]>(`/comments/post/${postId}`);
   return response.data;
 };
@@ -58,7 +59,7 @@ const updateComment = async (id: string, comment: FormData): Promise<Comment> =>
     return response.data;
 };
 
-
+// Like/unlike a comment
 const likeComment = async (id: string, userId: string): Promise<Comment> => {
   const token = Cookies.get("accessToken");
   if (!token) throw new Error("No access token found.");
@@ -84,4 +85,4 @@ const deleteComment = async (commentid: string): Promise<void> => {
     });
 };
 
-export default { getComments, getCommentByPostId, createComment, updateComment, likeComment,  deleteComment };
+export default { getComments, getCommentsByPostId, createComment, updateComment, likeComment,  deleteComment };

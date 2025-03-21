@@ -41,6 +41,7 @@ Trevel is a React application that allows user to share travel experiences.
   * `assets/:` Static assets.
   * `components/:` Reusable UI elements.
   * `context/:` Context providers for global state management.
+  * `pages/:` Page-level components.
   * `services/:` API service functions for interacting with the backend. 
   * `styles/:` Custom CSS styles. 
   * `utils/:` Contains utility functions.

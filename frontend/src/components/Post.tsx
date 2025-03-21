@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faPencil, faTrash, faThumbsUp, faComment } from "@fortawesome/free-solid-svg-icons";
-import postService from "../services/post-service";
 import { useAuth } from "../context/AuthContext";
+import postService from "../services/post-service";
 import { formatElapsedTime } from "../utils/date";
 import ImageViewer from "./ImageViewer";
 import CommentsList from "./CommentsList";
@@ -28,13 +28,14 @@ interface PostProps {
   onDelete: () => void;   
 }
 
-const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, comments, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
+const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, senderImage, images, likes, likesCount, commentsCount, createdAt, isOwner, onEdit, onDelete }) => {  
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewer = { _id: useAuth().user?._id };
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
-  const [likeCount, setLikeCount] = useState(likesCount);  
+  const [likeCount, setLikeCount] = useState(likesCount); 
+  const [currentCommentsCount, setCommentsCount] = useState(commentsCount); 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showComments, setShowComments] = useState(false);
 
@@ -76,11 +77,11 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       console.error("Failed to update like status", error);
     }
   };
-  const handleCommentsClick = async() => {
-    console.log("Comments clicked");
+
+  // Open the comments panel
+  const handleCommentsClick = async() => {    
     setShowComments(true);
-  };
-  
+  };  
 
   return (
     <div className="card mb-2 panel">
@@ -147,23 +148,21 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
             <FontAwesomeIcon icon={faThumbsUp}/> <span>{likeCount}</span>
           </div>
           <div>
-            <span>{commentsCount}</span> <FontAwesomeIcon icon={faComment}/>
+            <span>{currentCommentsCount}</span> <FontAwesomeIcon icon={faComment}/>
           </div>
         </div>
         <hr />
 
-  {/* Lower buttons */}
-    <button
-      className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`}
-      onClick={handleLikeClick} >
-    <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
-    </button>
-      <button className="btn post-btn" onClick={handleCommentsClick}>
-        <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
-          </button>
+        {/* Lower buttons */}
+        <button className={`btn post-btn ${isLiked ? "btn-primary" : "btn-outline-primary"}`} onClick={handleLikeClick}>
+          <FontAwesomeIcon icon={faThumbsUp} className="me-2" /> {isLiked ? "Liked" : "Like"}
+        </button>
+        <button className="btn post-btn" onClick={handleCommentsClick}>
+          <FontAwesomeIcon icon={faComment} className="me-2" /> Comment
+        </button>
       </div>
 
-       {/* Image viewer */}
+      {/* Image viewer */}
       <ImageViewer 
         show={showImageViewer}        
         images={images || []}
@@ -175,7 +174,8 @@ const Post: React.FC<PostProps> = ({ _id, title, content, sender, senderName, se
       <CommentsList 
         show={showComments}
         postId={_id || ""}
-        onClose={() => setShowComments(false)} />
+        onCommentChange={(change: number) => setCommentsCount((prev) => prev + change)}
+        onClose={() => setShowComments(false)} />        
     </div>
   );
 };

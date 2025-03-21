@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import postModel from "../models/Post";
 import userModel from "../models/User";
+import PostModel from "../models/Post";
 import commentModel, { IComment } from "../models/Comment";
 import BaseController from "./baseController";
 import { deleteFile } from "../utils/fileService";
@@ -23,7 +24,7 @@ class CommentController extends BaseController<IComment> {
     try {
       const post = await postModel.findById(postId);
       if (post) {
-        const userId = req.body.sender;
+        const userId = req.params.userId;
         const user = await userModel.findById(userId);
         const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];
         const comment : IComment =  {
@@ -39,6 +40,10 @@ class CommentController extends BaseController<IComment> {
         };
         req.body = comment;
         super.createItem(req, res);
+
+        // Increment the commentsCount in the Post document
+        await PostModel.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
+
       } else {
         res.status(404).send({ message: "Post not found" });
       }
@@ -95,14 +100,29 @@ class CommentController extends BaseController<IComment> {
     try {
       const commentId = req.params.id;
       const comment = await commentModel.findById(commentId);
+      
       if (comment) {
-       // remove all images associated with the comment
-       comment.images?.forEach(image => {
-          deleteFile(image);
-      });
-    }
-    await commentModel.deleteMany({commentId});
-    await super.deleteItem(req, res);
+        // Remove all images associated with the comment
+        if (comment.images && comment.images.length > 0) {
+          comment.images.forEach((image) => {
+            try {
+              deleteFile(image); // Safely delete each image
+            } catch (error) {
+              console.error(`Error deleting image: ${image}`, error);
+            }
+          });
+        }
+      
+        // Decrement the commentsCount in the Post document
+        try {
+          await PostModel.findByIdAndUpdate(comment.postId, { $inc: { commentsCount: -1 } });
+        } catch (error) {
+          console.error(`Error decrementing commentsCount for post: ${comment.postId}`, error);
+        }
+      }
+
+      await commentModel.deleteMany({commentId});
+      await super.deleteItem(req, res);      
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });
@@ -113,4 +133,5 @@ class CommentController extends BaseController<IComment> {
     }
   }
 }
+
 export default new CommentController();

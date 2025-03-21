@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import postService, { Post as PostType } from "../services/post-service";
+import ImageEditor from "./ImageEditor";
 
 interface EditPostProps {
   show: boolean;
@@ -16,35 +15,21 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
   const [content, setContent] = useState(post.content);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingImages, setExistingImages] = useState<string[]>(post.images || []);
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [imagesState, setImagesState] = useState({
+    existingImages: post.images || [],
+    newImages: [] as File[],
+    deletedImages: [] as string[],
+  });
 
   useEffect(() => {
     setTitle(post.title);
     setContent(post.content);
-    setExistingImages(post.images || []);
-    setDeletedImages([]);
-    setNewImages([]);
-  }, [post]);
-
-  // Handle image change
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setNewImages([...newImages, ...Array.from(e.target.files)]);
-    }
-  };
-
-  // Remove existing image from the post
-  const removeExistingImage = (image: string) => {
-    setExistingImages(existingImages.filter((img) => img !== image));
-    setDeletedImages([...deletedImages, image]); // Mark for deletion
-  };
-
-  // Remove new image that has not been uploaded yet
-  const removeNewImage = (index: number) => {
-    setNewImages(newImages.filter((_, i) => i !== index));
-  };
+    setImagesState({
+      existingImages: post.images || [],
+      newImages: [] as File[],
+      deletedImages: [] as string[],
+    });    
+  }, [post]);  
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,24 +43,27 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
       formData.append("content", content);
   
       // Append existing images that should remain
-      existingImages.forEach((img) => formData.append("existingImages", img));
+      imagesState.existingImages.forEach((img) => formData.append("existingImages", img));
   
       // Append deleted images (as JSON string)
-      formData.append("deletedImages", JSON.stringify(deletedImages));
+      formData.append("deletedImages", JSON.stringify(imagesState.deletedImages));
   
       // Append new images
-      newImages.forEach((file) => formData.append("images", file));
+      imagesState.newImages.forEach((file) => formData.append("images", file));
   
       await postService.updatePost(post._id!, formData);
-  
+          
       // Update UI after successful update
       const updatedPost = {
         ...post,
-        title,
+        title,  
         content,
-        images: existingImages.concat(newImages.map((file) => URL.createObjectURL(file))), // Only for preview
+        images: imagesState.existingImages.concat(
+          imagesState.newImages.map((file) => URL.createObjectURL(file))
+        ),
       };
   
+      // Use the updated post data from the backend
       onPostUpdated(updatedPost);
       handleClose();
     } catch (error) {
@@ -115,46 +103,17 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
             />
           </Form.Group>
 
-          {/* Display Existing Images with Remove Option */}
-          <Form.Group className="mt-3">
-            <Form.Label>Existing Images</Form.Label>
-            <div className="d-flex flex-wrap">
-              {existingImages.map((img, index) => (
-                <div key={index} className="position-relative me-2">
-                  <img src={img} alt="Post" className="img-thumbnail" style={{ width: 100, height: 100 }} />
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-danger position-absolute top-0 end-0"
-                    style={{ cursor: "pointer", background: "white", borderRadius: "50%" }}
-                    onClick={() => removeExistingImage(img)}
-                  />
-                </div>
-              ))}
-            </div>
-          </Form.Group>
+          {/* ImageEditor Component */}
+          <ImageEditor
+            initialExistingImages={imagesState.existingImages}
+            initialNewImages={imagesState.newImages}
+            onImagesUpdated={(updatedImages) => setImagesState(updatedImages)}
+          />
 
-          {/* Display Newly Added Images */}
-          <Form.Group className="mt-3">
-            <Form.Label>New Images</Form.Label>
-            <div className="d-flex flex-wrap">
-              {newImages.map((img, index) => (
-                <div key={index} className="position-relative me-2">
-                  <img src={URL.createObjectURL(img)} alt="New" className="img-thumbnail" style={{ width: 100, height: 100 }} />
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-danger position-absolute top-0 end-0"
-                    style={{ cursor: "pointer", background: "white", borderRadius: "50%" }}
-                    onClick={() => removeNewImage(index)}
-                  />
-                </div>
-              ))}
-            </div>
-            <Form.Control type="file" multiple onChange={handleImageChange} className="mt-2" />
-          </Form.Group>
-
+          {/* Action buttons */}
           {error && <div className="alert alert-danger mt-3">{error}</div>}
           <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
-            {isLoading ? "Updating..." : "Update Post"}
+            {isLoading ? "Updating..." : "Save"}
           </Button>
         </Form>
       </Modal.Body>

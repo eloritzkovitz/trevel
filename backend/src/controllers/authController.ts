@@ -5,6 +5,7 @@ import userModel from '../models/User';
 import { deleteFile } from '../utils/fileService';
 import { generateToken, verifyRefreshToken } from '../utils/tokenService';
 import postModel from '../models/Post';
+import commentModel from '../models/Comment';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -72,7 +73,7 @@ const register = async (req: Request, res: Response) => {
             email: req.body.email,
             password: hashedPassword,
             profilePicture,
-            joinDate: new Date().toISOString        
+            joinDate: new Date().toISOString()        
         });
         res.status(200).send(user);
     } catch (err) {
@@ -229,6 +230,24 @@ const updateUser = async (req: Request<{ id: string }, {}, UpdateUserRequestBody
             senderName: `${user.firstName} ${user.lastName}`,
             senderImage: user.profilePicture
           }
+        }
+      );
+
+      // Find all comments related to this user
+      const comments = await commentModel.find({ sender: userId });
+      if (comments.length === 0) {
+        res.json(user);
+        return;
+      }
+
+      // Batch update senderName and senderImage for all comments associated with user
+      const commentResult = await commentModel.updateMany(
+        { sender: userId },
+        {
+            $set: {
+            senderName: `${user.firstName} ${user.lastName}`,
+            senderImage: user.profilePicture
+            }
         }
       );
 

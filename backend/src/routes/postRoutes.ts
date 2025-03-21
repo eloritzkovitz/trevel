@@ -14,7 +14,7 @@ import upload from "../middleware/upload";
 /**
  * @swagger
  * components:
- *   schemas:     
+ *   schemas:
  *     Post:
  *       type: object
  *       required:
@@ -31,10 +31,17 @@ import upload from "../middleware/upload";
  *         sender:
  *           type: string
  *           description: The ID of the user who created the post
+ *         images:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: binary
+ *           description: Array of image files associated with the post
  *       example:
- *         title: 'Sample Post'
- *         content: 'This is a sample post content.'
- *         sender: '60d0fe4f5311236168a109ca'
+ *         title: "Sample Post"
+ *         content: "This is a sample post content."
+ *         sender: "60d0fe4f5311236168a109ca"
+ *         images: ["image1.jpg", "image2.jpg"]
  */
 
 /**
@@ -46,6 +53,14 @@ import upload from "../middleware/upload";
  *     responses:
  *       200:
  *         description: List of all posts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Post'
+ *       500:
+ *         description: Server error
  */
 router.get("/", postsController.getAll.bind(postsController));
 
@@ -65,8 +80,14 @@ router.get("/", postsController.getAll.bind(postsController));
  *     responses:
  *       200:
  *         description: Post retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
 router.get("/:id", postsController.getById.bind(postsController));
 
@@ -81,7 +102,7 @@ router.get("/:id", postsController.getById.bind(postsController));
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -91,9 +112,22 @@ router.get("/:id", postsController.getById.bind(postsController));
  *                 type: string
  *               sender:
  *                 type: string
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
  *     responses:
  *       201:
  *         description: Post created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
  */
 router.post("/", authMiddleware, upload.array("images", 6), postsController.createItem.bind(postsController));
 
@@ -126,8 +160,14 @@ router.post("/", authMiddleware, upload.array("images", 6), postsController.crea
  *     responses:
  *       200:
  *         description: Post updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Post'
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
 router.put("/:id", authMiddleware, upload.array("images", 6), postsController.updateItem.bind(postsController));
 
@@ -151,6 +191,8 @@ router.put("/:id", authMiddleware, upload.array("images", 6), postsController.up
  *         description: Post deleted successfully
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
 router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
 
@@ -181,8 +223,18 @@ router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsContr
  *     responses:
  *       200:
  *         description: Post liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 likesCount:
+ *                   type: number
+ *                   description: Updated number of likes
  *       404:
  *         description: Post not found
+ *       500:
+ *         description: Server error
  */
 router.post("/:id/like", authMiddleware, postsController.handleLike.bind(postsController));
 

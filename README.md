@@ -54,30 +54,7 @@ Trevel is a social networking platform designed for users to share their travel 
 
 ## 📖 API Documentation
 
-**User Endpoints**
-* `POST/auth/register`: Register a new user.
-* `POST/auth/login`: Log in a user and receive a JWT token.
-* `POST/auth/google`: Log in using Google OAuth.
-* `POST/auth/refresh`: Refresh access tokens using a refresh token.
-* `GET/auth/user/:id?`: Get user information.
-* `PUT/auth/user/:id`: Update user information.
-* `POST/auth/logout`: Log out a user.
-
-**Post Endpoints**
-* `GET/posts`: Retrieve all posts.
-* `GET/posts/:id`: Retrieve all posts by user ID.
-* `POST/posts`: Create a new post.
-* `PUT/posts/:id`: Update an existing post.
-* `DELETE/posts/:id`: Delete a post.
-* `POST/posts/:id/like`: Like or unlike a post.
-
-**Comment Endpoints**
-* `GET/comments`: Retrieve all comments.
-* `GET/comments/:postId`: Retrieve all comments by post ID.
-* `POST/comments`: Add a comment to a post.
-* `PUT/comments/:id`: Update a comment.
-* `DELETE/comments/:id`: Delete a comment.
-* `POST/comments/:id/like`: Like or unlike a comment.
+- [Swagger API Documentation](http://localhost:3000/api-docs)
 
 ---
 

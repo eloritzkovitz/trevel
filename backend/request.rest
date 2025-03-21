@@ -1,10 +1,20 @@
-### Register a new user
-POST http://localhost:3000/auth/register
+### Google sign-in
+POST http://localhost:5000/auth/google
 Content-Type: application/json
 
 {
-  "email": "Elor@elormail",
-  "password": "123456"
+    "idToken": "your-google-id-token"
+}
+
+### Register a new user
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+    "email": "elor@gmail.com",
+    "password": "123456",
+    "firstName": "Elor",
+    "lastName": "Itzkovitz"
 }
 
 ### Login
@@ -12,7 +22,7 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "email": "Elor@elormail",
+  "email": "elor@gmail.com",
   "password": "123456"
 }
 
@@ -25,6 +35,25 @@ Content-Type: application/json
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZTRhYjVjMDU2MDUxN2U0NjllNTAiLCJyYW5kb20iOiIwLjE1ODkxMTQyNzUzNjA0NzkyIiwiaWF0IjoxNzM2Njk3MTAxLCJleHAiOjE3MzczMDE5MDF9.18uphsxcXoUcG63ADAWCbhclS2NOsIP7Maw6spGuL84"
 }
 
+### Get user data (Authenticated)
+GET http://localhost:5000/auth/user
+Authorization: Bearer your-access-token
+
+### Search users by name
+GET http://localhost:5000/auth/users?query=Bob
+Authorization: Bearer your-access-token
+
+### Update user data
+PUT http://localhost:5000/auth/user/60d21b4667d0d8992e610c85
+Content-Type: multipart/form-data
+Authorization: Bearer your-access-token
+
+{
+    "firstName": "UpdatedElor",
+    "lastName": "UpdatedItzkovitz",
+    "password": "newpassword"
+}
+
 ### Logout
 POST http://localhost:3000/auth/logout
 Content-Type: application/json
@@ -33,7 +62,7 @@ Content-Type: application/json
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZTRhYjVjMDU2MDUxN2U0NjllNTAiLCJyYW5kb20iOiIwLjc4MzA2Nzk2ODY4MDQwNzYiLCJpYXQiOjE3MzY2OTcxMjEsImV4cCI6MTczNzMwMTkyMX0.bmNMJADEslzsMJG3JyrU7HPvHAZ2VDVWZiPPTTngi3A"
 }
 
-### Add a New Post
+### Create a New Post
 POST http://localhost:3000/posts
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZDM3ZmNlYTVhODYwODM5YzdiZGMiLCJyYW5kb20iOiIwLjMwMTc1Mjg4MTY4NjE2NTkiLCJpYXQiOjE3MzY2OTI2ODAsImV4cCI6MTczNjcwMzQ4MH0.pk10Z8UOVfnd5vF28vlMtXSDIS8ohRUR8cBLp2KaBG4
@@ -41,66 +70,61 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZDM3ZmNlYTVh
 { 
   "title": "First Post",
   "content": "This is my first post!",
-  "sender": "Elor"
+  "sender": "67da902edf69b6d2a95a1020"
 }
 
-### Get post by id
-
-GET http://localhost:3000/posts/677c451bdb9d5917464523b9
-
-### Get all posts by sender
-
-GET http://localhost:3000/posts?sender=6784f4b186565e92f5378ec5
-
 ### Get all posts
-
 GET http://localhost:3000/posts
 
-### Update post
+### Get post by id
+GET http://localhost:3000/posts/677c451bdb9d5917464523b9
 
+### Update post
 PUT http://localhost:3000/posts/677c451bdb9d5917464523b9
 Content-Type: application/json
 
 { 
   "title": "First Post - Edited",
   "content": "This is my first post, now edited!",
-  "sender": "Elor"
+  "sender": "67da902edf69b6d2a95a1020"
 }
 
-### Delete post
+### Like/unlike post
+POST http://localhost:3000/posts/677c451bdb9d5917464523b9/like
+Authorization: Bearer your-access-token
 
+### Delete post
 DELETE http://localhost:3000/posts/677c451bdb9d5917464523b9
 
-### Add a new comment
-
+### Create a new comment
 POST http://localhost:3000/comments
 Content-Type: application/json
 
 { 
   "postId": "677c451bdb9d5917464523b9",
   "content": "This is my first comment!",
-  "sender": "Adi"
+  "sender": "67da902edf69b6d2a95a1020"
 }
 
-### Get all comment
-
+### Get all comments
 GET http://localhost:3000/comments
 
 ### Get comments by post id
-
 GET http://localhost:3000/comments?postId=677c451bdb9d5917464523b9
 
 ### Update comment
-
 PUT http://localhost:3000/comments/677c4d3e0b9a6dc090dd9772
 Content-Type: application/json
 
 { 
   "postId": "677c451bdb9d5917464523b9",
   "content": "This is my first comment, edited!",
-  "sender": "Adi"
+  "sender": "67da902edf69b6d2a95a1020"
 }
 
-### Delete comment
+### Like/unlike comment
+POST http://localhost:3000/comments/677c4d3e0b9a6dc090dd9772/like
+Authorization: Bearer your-access-token
 
+### Delete comment
 DELETE http://localhost:3000/comments/677c4d3e0b9a6dc090dd9772

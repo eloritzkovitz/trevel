@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Tabs, Tab } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faPencil, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faMapMarkerAlt, faGlobe, faCalendarAlt, faPencil } from "@fortawesome/free-solid-svg-icons";
 import Navbar from "../components/Navbar";
 import EditProfile from "../components/EditProfile";
 import PostsList from "../components/PostsList";
-import PostModal from "../components/PostModal";
+import CreatePost from "../components/CreatePost";
 import ImageViewer from "../components/ImageViewer";
 import { useAuth } from "../context/AuthContext";
 import userService, { User } from "../services/user-service";
@@ -20,7 +20,6 @@ const Profile: React.FC = () => {
   const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [images, setImages] = useState<string[]>([]);
-  const [showPostModal, setShowPostModal] = useState(false);
   const [refreshPosts, setRefreshPosts] = useState(false);
 
   // Load page data
@@ -36,24 +35,21 @@ const Profile: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const isOwnProfile = loggedInUser?._id === userId;
+  const isOwnProfile = loggedInUser?._id === userId;  
 
   // Image modal for profile picture
   const handleProfileImageClick = () => {
     setImages([user.profilePicture || ""]);
     setCurrentIndex(0);
     setImageViewer(true);
-  };  
-
-  // Post modal handlers
-  const handleShowPostModal = () => setShowPostModal(true);
-  const handleClosePostModal = () => setShowPostModal(false);
+  };
   
-  const handlePostCreated = () => {
-    setShowPostModal(false);
+  // Refresh posts when a new post is created
+  const handlePostCreated = () => {    
     setRefreshPosts((prev) => !prev);
   };
 
+  // Refresh posts when the profile is updated
   const handleProfileUpdated = (updatedUser: User) => {
     setUser(updatedUser);
     setRefreshPosts((prev) => !prev);
@@ -84,11 +80,7 @@ const Profile: React.FC = () => {
 
                   {/* Edit Profile and New Post buttons */}
                   {isOwnProfile && (
-                    <>
-                      <Button className="profile-button" variant="primary" style={{ marginRight: '10px' }} onClick={handleShowPostModal}>
-                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '5px' }} />
-                        New Post
-                      </Button>
+                    <>                      
                       <Button className="profile-button" variant="primary" onClick={() => setEditProfile(true)}>
                         <FontAwesomeIcon icon={faPencil} style={{ marginRight: '5px' }} />
                         Edit Profile
@@ -122,6 +114,9 @@ const Profile: React.FC = () => {
               </div>
             </div>
 
+             {/* Create Post Section */}
+             <CreatePost onPostCreated={handlePostCreated} />
+
             {/* Posts Section */}
             <div>
               <div className="card mb-2 panel-posts">
@@ -150,14 +145,7 @@ const Profile: React.FC = () => {
         images={images}
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}        
-      />
-
-      {/* Post Modal */}
-      <PostModal 
-        show={showPostModal} 
-        handleClose={handleClosePostModal} 
-        onPostCreated={handlePostCreated}
-      />
+      />      
     </div>
   );
 };

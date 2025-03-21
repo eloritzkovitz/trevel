@@ -65,6 +65,18 @@ h1, h2, h3, h4, h5, h6, p, a, small, hr {
   color: var(--primary-text-color);
 }
 
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-primary:hover {
+  color: var(--primary-hover-color) !important;
+}
+
+.text-muted {
+  color: var(--text-color) !important;
+}
+
 .mr-10 {
   margin-right: 10px;
 }
@@ -88,6 +100,16 @@ h1, h2, h3, h4, h5, h6, p, a, small, hr {
 
 .modal-content {
   background-color: var(--panel-color);
+  box-shadow: none;
+}
+
+.modal-header {
+  border: none !important;
+  box-shadow: var(--panel-shadow);
+}
+
+.modal-footer {
+  border: none !important;
   box-shadow: var(--panel-shadow);
 }
 
@@ -114,6 +136,10 @@ h1, h2, h3, h4, h5, h6, p, a, small, hr {
   margin-top: 20px;
   background-color: var(--panel-color);
   box-shadow: var(--panel-shadow);
+}
+
+.panel-secondary {
+  background-color: var(--search-bar-color);  
 }
 
 /* Custom styles for dropdown menu */
