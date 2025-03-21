@@ -92,6 +92,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       // Clear the form after successful submission
       setNewComment("");
       setImages(null);
+      setError(null);
 
     } catch (error) {
       console.error("Failed to add comment", error);
@@ -101,7 +102,8 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
 
   // Edit comment handlers
   const handleEditComment = (comment: CommentType) => {
-    setCurrentComment(comment);        
+    setCurrentComment(comment);
+    setError(null);        
   }; 
   
   const handleCommentUpdated = (updatedComment: CommentType) => {    
@@ -120,10 +122,10 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
         await commentService.deleteComment(comment._id!);
         setComments((prevComments) => prevComments.filter((p) => p._id !== comment._id));
       } catch (error) {
-        console.error("Failed to delete comment", error);
+        setError("Failed to delete comment. Please try again.");
       }
     }
-  };  
+  };
 
   // Reset editing when modal is closed
   const handleClose = () => {
@@ -179,8 +181,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
                 </div>
               );
             })
-          )}
-          {error && comments.length > 0 && <div className="alert alert-danger">{error}</div>}
+          )}         
         </div>
       </Modal.Body>      
       <Modal.Footer>
@@ -210,6 +211,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
         </Button>
         </div>
       </div>
+      {error && comments.length > 0 && <div className="alert alert-danger">{error}</div>}
     </Modal.Footer>
   </Modal>
   );

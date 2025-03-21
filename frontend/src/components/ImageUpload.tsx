@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -37,10 +37,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
   useEffect(() => {
     if (resetTrigger) {
       setSelectedFiles([]);
-      setPreviewImages([]);
-      onImagesSelected([]); // Notify parent that images are cleared
     }
-  }, [resetTrigger, onImagesSelected]);
+  }, [resetTrigger]);
 
   return (
     <div className="d-flex flex-column align-items-start gap-2">

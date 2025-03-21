@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import commentService, { Comment as CommentType } from "../services/comment-service";
+import ImageEditor from "./ImageEditor";
 
 interface EditCommentProps {
   comment: CommentType;
@@ -12,17 +13,11 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
   const [content, setContent] = useState(comment.content);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [existingImages, setExistingImages] = useState<string[]>(comment.images || []);
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [deletedImages, setDeletedImages] = useState<string[]>([]);
-
-  // Update state when the `comment` prop changes
-  useEffect(() => {
-    setContent(comment.content);
-    setExistingImages(comment.images || []);
-    setNewImages([]);
-    setDeletedImages([]);
-  }, [comment]);
+  const [imagesState, setImagesState] = useState({
+    existingImages: comment.images || [],
+    newImages: [] as File[],
+    deletedImages: [] as string[],
+  });
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,13 +30,13 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
       formData.append("content", content);
   
       // Append existing images that should remain
-      existingImages.forEach((img) => formData.append("existingImages", img));
+      imagesState.existingImages.forEach((img) => formData.append("existingImages", img));
     
       // Append deleted images (as JSON string)
-      formData.append("deletedImages", JSON.stringify(deletedImages));
+      formData.append("deletedImages", JSON.stringify(imagesState.deletedImages));
     
       // Append new images
-      newImages.forEach((file) => formData.append("images", file));
+      imagesState.newImages.forEach((file) => formData.append("images", file));
 
       console.log(comment);
 
@@ -51,7 +46,9 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
       const updatedComment = {
         ...comment,    
         content,
-        images: existingImages.concat(newImages.map((file) => URL.createObjectURL(file))),
+        images: imagesState.existingImages.concat(
+          imagesState.newImages.map((file) => URL.createObjectURL(file))
+        ),
       };
     
       onCommentUpdated(updatedComment);      
@@ -73,6 +70,15 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
           onChange={(e) => setContent(e.target.value)}          
         />
       </Form.Group>
+
+      {/* ImageEditor Component */}
+      <ImageEditor
+        initialExistingImages={imagesState.existingImages}
+        initialNewImages={imagesState.newImages}
+        onImagesUpdated={(updatedImages) => setImagesState(updatedImages)}
+      />
+
+      {/* Action buttons */}
       <div className="d-flex justify-content-end mt-3">
         <Button variant="primary" type="submit" disabled={isLoading} onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}>
           {isLoading ? "Updating..." : "Save"}

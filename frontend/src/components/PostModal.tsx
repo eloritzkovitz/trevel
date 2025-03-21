@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { useAuth } from "../context/AuthContext";
 import postService from "../services/post-service";
+import ImageUpload from "./ImageUpload";
 
 interface PostModalProps {
   show: boolean;
@@ -9,11 +11,12 @@ interface PostModalProps {
 }
 
 const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated }) => {
+  const { user: loggedInUser } = useAuth();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<FileList | null>(null);
+  const [images, setImages] = useState<File[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);  
 
   // Reset form state when modal is shown
   useEffect(() => {
@@ -35,7 +38,8 @@ const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated 
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
-      if (images) {
+      
+      if (images) {        
         Array.from(images).forEach((image) => {
           formData.append("images", image);
         });
@@ -58,41 +62,50 @@ const PostModal: React.FC<PostModalProps> = ({ show, handleClose, onPostCreated 
         <Modal.Title>Create Post</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="formTitle">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
+        <div className="d-flex align-items-start gap-2">
+          <img
+            className="profile-picture-4 rounded-circle"
+            src={loggedInUser?.profilePicture || ""}
+            alt="Profile"
+            style={{ width: "40px", height: "40px", objectFit: "cover" }}
+          />
+          <Form className="flex-grow-1" onSubmit={handleSubmit}>
+            {/* Title Input */}
+            <Form.Group controlId="formTitle" className="mb-3">
+              <Form.Control
+                type="text"
+                placeholder="Post title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            {/* Content Input */}
+            <Form.Group controlId="formContent" className="mb-3">
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="What's on your mind?"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+              />
+            </Form.Group>
+            
+            {/* Image Upload */}
+            <ImageUpload
+              onImagesSelected={(files) => setImages(Array.from(files))}
+              resetTrigger={!images || images.length === 0}
             />
-          </Form.Group>
-          <Form.Group controlId="formContent" className="mt-3">
-            <Form.Label>Content</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Enter content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="formImages" className="mt-3">
-            <Form.Label>Images</Form.Label>
-            <Form.Control
-              type="file"
-              multiple
-              onChange={(e) => setImages((e.target as HTMLInputElement).files)}
-            />
-          </Form.Group>
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
-          <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create Post"}
-          </Button>
-        </Form>
+            {error && <div className="alert alert-danger mt-3">{error}</div>}
+            <div className="d-flex justify-content-end mt-3">
+              <Button variant="primary" type="submit" disabled={isLoading}>
+                {isLoading ? "Posting..." : "Post"}
+              </Button>
+            </div>
+          </Form>
+        </div>
       </Modal.Body>
     </Modal>
   );
