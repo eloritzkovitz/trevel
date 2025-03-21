@@ -37,6 +37,8 @@ const Profile: React.FC = () => {
 
   const isOwnProfile = loggedInUser?._id === userId;
 
+  console.log("Join Date:", user.joinDate);
+
   // Image modal for profile picture
   const handleProfileImageClick = () => {
     setImages([user.profilePicture || ""]);

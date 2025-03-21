@@ -73,7 +73,7 @@ const register = async (req: Request, res: Response) => {
             email: req.body.email,
             password: hashedPassword,
             profilePicture,
-            joinDate: new Date().toISOString        
+            joinDate: new Date().toISOString()        
         });
         res.status(200).send(user);
     } catch (err) {
