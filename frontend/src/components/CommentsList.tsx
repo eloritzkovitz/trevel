@@ -22,8 +22,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
   const [images, setImages] = useState<File[] | null>(null);
-  const [currentComment, setCurrentComment] = useState<CommentType | null>(null);
- 
+  const [currentComment, setCurrentComment] = useState<CommentType | null>(null); 
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch comments when the component loads
@@ -33,11 +32,11 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     
       try {
         setIsLoading(true);
-        const fetchedComments = await commentService.getCommentByPostId(postId);        
+        const fetchedComments = await commentService.getCommentsByPostId(postId);        
     
         setComments((prevComments) => {
           const newComments = fetchedComments.filter(
-            (comment) => !prevComments.some((p) => p._id === comment._id)            
+            (comment) => !prevComments.some((c) => c._id === comment._id)            
             );            
             return [...prevComments, ...newComments].sort(
               (a, b) =>                
@@ -57,7 +56,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       fetchComments();
     }, [page, postId]);
 
-  // Reset when userId changes
+  // Reset when postId changes
   useEffect(() => {
     setComments([]);
     setPage(1);
@@ -181,7 +180,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
               );
             })
           )}
-          {error && <div className="alert alert-danger">{error}</div>}
+          {error && comments.length > 0 && <div className="alert alert-danger">{error}</div>}
         </div>
       </Modal.Body>      
       <Modal.Footer>

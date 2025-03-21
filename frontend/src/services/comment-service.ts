@@ -24,7 +24,7 @@ const getComments = async (sender?: string, page: number = 1): Promise<Comment[]
 };
 
 // Get comments by post ID
-const getCommentByPostId = async (postId: string): Promise<Comment[]> => {
+const getCommentsByPostId = async (postId: string): Promise<Comment[]> => {
   const response = await apiClient.get<Comment[]>(`/comments/post/${postId}`);
   return response.data;
 };
@@ -85,4 +85,4 @@ const deleteComment = async (commentid: string): Promise<void> => {
     });
 };
 
-export default { getComments, getCommentByPostId, createComment, updateComment, likeComment,  deleteComment };
+export default { getComments, getCommentsByPostId, createComment, updateComment, likeComment,  deleteComment };
