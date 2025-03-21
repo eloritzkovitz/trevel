@@ -66,7 +66,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
           {/* Title Input */}
           <Form.Control
             type="text"
-            placeholder="Title"
+            placeholder="Give your post a title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="mb-2 rounded-pill"
