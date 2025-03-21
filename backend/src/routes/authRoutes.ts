@@ -12,15 +12,30 @@ import upload from "../middleware/upload";
 */
 
 /**
-* @swagger
-* components:
-*   securitySchemes:
-*     bearerAuth:
-*       type: http
-*       scheme: bearer
-*       bearerFormat: JWT
-*/
-
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           description: The user's email address
+ *         password:
+ *           type: string
+ *           description: The user's password
+ *       example:
+ *         email: "user@example.com"
+ *         password: "123456"
+ */
 
 /**
  * @swagger
@@ -63,56 +78,37 @@ import upload from "../middleware/upload";
 router.post("/google", authController.googleSignIn);
 
 /**
-* @swagger
-* components:
-*   schemas:
-*     User:
-*       type: object
-*       required:
-*         - email
-*         - password
-*       properties:
-*         email:
-*           type: string
-*           description: The user email
-*         password:
-*           type: string
-*           description: The user password
-*       example:
-*         email: 'bob@gmail.com'
-*         password: '123456'
-*/
-
-/**
-* @swagger
-* /auth/register:
-*   post:
-*     summary: Registers a new user
-*     tags: [Auth]
-*     requestBody:
-*       required: true
-*       content:
-*         application/json:
-*           schema:
-*             $ref: '#/components/schemas/User'
-*     responses:
-*       200:
-*         description: The new user
-*         content:
-*           application/json:
-*             schema:
-*               $ref: '#/components/schemas/User'
-*/
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *     responses:
+ *       200:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
 router.post("/register", authController.register);
 
 /**
  * @swagger
  * /auth/login:
  *   post:
- *     summary: User login
- *     description: Authenticate user and return tokens
- *     tags:
- *       - Auth
+ *     summary: Log in a user
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -129,15 +125,15 @@ router.post("/register", authController.register);
  *               properties:
  *                 accessToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   description: JWT access token
  *                 refreshToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   description: JWT refresh token
  *                 _id:
  *                   type: string
- *                   example: 60d0fe4f5311236168a109ca
+ *                   description: User ID
  *       400:
- *         description: Invalid credentials or request
+ *         description: Invalid credentials
  *       500:
  *         description: Server error
  */
@@ -148,9 +144,7 @@ router.post("/login", authController.login);
  * /auth/refresh:
  *   post:
  *     summary: Refresh tokens
- *     description: Refresh access and refresh tokens using the provided refresh token
- *     tags:
- *       - Auth
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -160,7 +154,7 @@ router.post("/login", authController.login);
  *             properties:
  *               refreshToken:
  *                 type: string
- *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 description: The refresh token
  *     responses:
  *       200:
  *         description: Tokens refreshed successfully
@@ -171,10 +165,10 @@ router.post("/login", authController.login);
  *               properties:
  *                 accessToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   description: New JWT access token
  *                 refreshToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                   description: New JWT refresh token
  *       400:
  *         description: Invalid refresh token
  *       500:
@@ -305,10 +299,8 @@ router.put("/user/:id", authMiddleware, upload.single("profilePicture"), authCon
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: User logout
- *     description: Logout user and invalidate the refresh token
- *     tags:
- *       - Auth
+ *     summary: Log out a user
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -318,10 +310,10 @@ router.put("/user/:id", authMiddleware, upload.single("profilePicture"), authCon
  *             properties:
  *               refreshToken:
  *                 type: string
- *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 description: The refresh token to invalidate
  *     responses:
  *       200:
- *         description: Successful logout
+ *         description: User logged out successfully
  *       400:
  *         description: Invalid refresh token
  *       500:

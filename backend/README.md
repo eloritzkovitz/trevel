@@ -62,12 +62,13 @@ The Trevel Backend is a Node.js application that provides API endpoints for user
 ## API Endpoints
 
 **User Endpoints**
+* `POST/auth/google`: Log in using Google OAuth.
 * `POST/auth/register`: Register a new user.
 * `POST/auth/login`: Log in a user and receive a JWT token.
-* `POST/auth/google`: Log in using Google OAuth.
 * `POST/auth/refresh`: Refresh access tokens using a refresh token.
-* `GET/auth/user/:id?`: Get user information.
-* `PUT/auth/user/:id`: Update user information.
+* `GET/auth/user/:id?`: Get user data.
+* `GET/auth/users`: Search users by name.
+* `PUT/auth/user/:id`: Update user data.
 * `POST/auth/logout`: Log out a user.
 
 **Post Endpoints**

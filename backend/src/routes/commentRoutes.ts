@@ -46,6 +46,14 @@ import upload from "../middleware/upload";
  *     responses:
  *       200:
  *         description: List of all comments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
+ *       500:
+ *         description: Server error
  */
 router.get("/", commentsController.getAll.bind(commentsController));
 
@@ -65,8 +73,16 @@ router.get("/", commentsController.getAll.bind(commentsController));
  *     responses:
  *       200:
  *         description: Comments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Comment'
  *       404:
  *         description: Comments not found
+ *       500:
+ *         description: Server error
  */
 router.get("/post/:postId", commentsController.getCommentsByPostId.bind(commentsController));
 
@@ -83,17 +99,18 @@ router.get("/post/:postId", commentsController.getCommentsByPostId.bind(comments
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               content:
- *                 type: string
- *               postId:
- *                 type: string
- *               sender:
- *                 type: string
+ *             $ref: '#/components/schemas/Comment'
  *     responses:
  *       201:
  *         description: Comment created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
  */
 router.post("/", authMiddleware, upload.array("images", 6), commentsController.createItem.bind(commentsController));
 
@@ -121,9 +138,20 @@ router.post("/", authMiddleware, upload.array("images", 6), commentsController.c
  *             properties:
  *               content:
  *                 type: string
+ *                 description: Updated comment content
  *     responses:
  *       200:
  *         description: Comment updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Comment'
+ *       400:
+ *         description: Invalid input
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
  */
 router.put("/:id", authMiddleware, upload.array("images",6), commentsController.updateItem.bind(commentsController));
 
@@ -145,13 +173,17 @@ router.put("/:id", authMiddleware, upload.array("images",6), commentsController.
  *     responses:
  *       200:
  *         description: Comment deleted successfully
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
  */
 router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(commentsController));
 
 /**
  * @swagger
  * /comments/{id}/like:
- *   put:
+ *   post:
  *     summary: Like a comment
  *     tags: [Comments]
  *     security:
@@ -172,9 +204,22 @@ router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(comment
  *             properties:
  *               userId:
  *                 type: string
+ *                 description: ID of the user liking the comment
  *     responses:
  *       200:
  *         description: Comment liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 likesCount:
+ *                   type: number
+ *                   description: Updated number of likes
+ *       404:
+ *         description: Comment not found
+ *       500:
+ *         description: Server error
  */
 router.post("/:id/like", authMiddleware, commentsController.handleLike.bind(commentsController));
 
