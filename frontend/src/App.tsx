@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import MainPage from "./pages/MainPage";
+import NavigationBar from './components/Navbar'; 
+import Trips from './pages/Trips';
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";

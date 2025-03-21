@@ -9,12 +9,14 @@ import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
 import getUsersByName from "../services/user-service";
 
+
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+
 
   useEffect(() => {
     // Apply the theme class to the body
