@@ -119,7 +119,7 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/trips"
-              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}              
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}
             >
               <FontAwesomeIcon className="navbar-icon" icon={faPlane} />
               <span>Trips</span>

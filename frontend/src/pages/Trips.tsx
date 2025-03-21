@@ -1,4 +1,9 @@
 import React, { useState } from 'react';
+import Navbar from "../components/Navbar";
+import PostsList from "../components/PostsList";
+import PostModal from "../components/PostModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const Trips: React.FC = () => {
   const [prompt, setPrompt] = useState('');
