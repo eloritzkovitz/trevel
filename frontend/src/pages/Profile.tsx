@@ -35,9 +35,7 @@ const Profile: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const isOwnProfile = loggedInUser?._id === userId;
-
-  console.log("Join Date:", user.joinDate);
+  const isOwnProfile = loggedInUser?._id === userId;  
 
   // Image modal for profile picture
   const handleProfileImageClick = () => {
@@ -46,10 +44,12 @@ const Profile: React.FC = () => {
     setImageViewer(true);
   };
   
+  // Refresh posts when a new post is created
   const handlePostCreated = () => {    
     setRefreshPosts((prev) => !prev);
   };
 
+  // Refresh posts when the profile is updated
   const handleProfileUpdated = (updatedUser: User) => {
     setUser(updatedUser);
     setRefreshPosts((prev) => !prev);
