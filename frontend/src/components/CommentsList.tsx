@@ -122,7 +122,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
         await commentService.deleteComment(comment._id!);
         setComments((prevComments) => prevComments.filter((p) => p._id !== comment._id));
         onCommentChange(-1);
-        
+
       } catch (error) {
         setError("Failed to delete comment. Please try again.");
       }
@@ -136,6 +136,23 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     setImages(null);
     setError(null);
     onClose(); 
+  };
+
+  // Handle like change
+  const handleLikeChange = (commentId: string, isLiked: boolean, likeCount: number) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment._id === commentId
+          ? {
+              ...comment,
+              likesCount: likeCount,
+              likes: isLiked
+                ? [...(comment.likes || []), loggedInUser?._id].filter((id): id is string => id !== undefined)
+                : (comment.likes || []).filter((id): id is string => id !== loggedInUser?._id && id !== undefined),
+            }
+          : comment
+      )
+    );
   };
 
   return (
@@ -179,6 +196,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
                     isOwner={isOwner}
                     onEdit={() => handleEditComment(comment)}
                     onDelete={() => handleDeleteComment(comment)}
+                    onLikeChange={handleLikeChange}
                   />
                 </div>
               );

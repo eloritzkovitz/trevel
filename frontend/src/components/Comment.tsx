@@ -21,10 +21,11 @@ interface CommentProps {
   createdAt: string;
   isOwner: boolean;
   onEdit: (updatedContent: string) => void;
-  onDelete: () => void;
+  onDelete: () => void;  
+  onLikeChange: (commentId: string, isLiked: boolean, likeCount: number) => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete }) => {
+const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete, onLikeChange }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageViewer, setImageViewer] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);  
@@ -64,9 +65,16 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
       if (!_id) {
         throw new Error("Comment ID is required");
       }
+
       const updatedComment = await commentService.likeComment(_id, viewer?._id || "");
+      const updatedIsLiked = updatedComment.likes?.includes(viewer._id || "") || false;
+      const updatedLikeCount = updatedComment.likesCount || 0;
+      
       setIsLiked(updatedComment.likes?.includes(viewer?._id || "") || false);
       setLikeCount(updatedComment.likesCount || 0);
+
+      onLikeChange(_id, updatedIsLiked, updatedLikeCount);
+
     } catch (error) {
       console.error("Failed to update like status", error);
     }
