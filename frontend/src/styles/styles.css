@@ -88,6 +88,16 @@ h1, h2, h3, h4, h5, h6, p, a, small, hr {
 
 .modal-content {
   background-color: var(--panel-color);
+  box-shadow: none;
+}
+
+.modal-header {
+  border: none !important;
+  box-shadow: var(--panel-shadow);
+}
+
+.modal-footer {
+  border: none !important;
   box-shadow: var(--panel-shadow);
 }
 
@@ -117,8 +127,7 @@ h1, h2, h3, h4, h5, h6, p, a, small, hr {
 }
 
 .panel-secondary {
-  background-color: var(--search-bar-color);
-  box-shadow: var(--panel-shadow);
+  background-color: var(--search-bar-color);  
 }
 
 /* Custom styles for dropdown menu */
