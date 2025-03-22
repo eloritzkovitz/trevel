@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import express, { Express } from "express";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
+import generateTrip from "./routes/generateTrip";
 import authRoutes from "./routes/authRoutes";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -24,6 +25,7 @@ app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/auth", authRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../dist/uploads')));
+app.use("/trips", generateTrip);
 
 // Swagger documentation
 const options = {
