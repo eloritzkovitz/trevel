@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface ImageUploadProps {
   onImagesSelected: (files: File[]) => void;
@@ -62,26 +61,19 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
             <img
               src={src}
               alt="preview"
-              className="rounded border"
-              style={{ width: "50px", height: "50px", objectFit: "cover" }}
+              className="rounded border img-thumbnail"
+              style={{ width: 100, height: 100 }}              
             />
-            <Button
-              variant="danger"
-              size="sm"
-              className="position-absolute top-0 end-0 p-0"
+            <FontAwesomeIcon
+              icon={faTrash}
+              className="text-danger position-absolute top-0 end-0"
               style={{
-                width: "16px",
-                height: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "0.7rem",
-                borderRadius: "50%",
+              cursor: "pointer",
+              background: "white",
+              borderRadius: "50%",
               }}
               onClick={() => handleRemoveImage(index)}
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </Button>
+            />
           </div>
         ))}
       </div>
