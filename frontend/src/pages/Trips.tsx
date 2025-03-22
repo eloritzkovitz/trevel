@@ -20,8 +20,13 @@ const Trips: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
       });
+
+      if (!res.ok) {
+        throw new Error('Failed to generate trip.');
+      }
+
       const data = await res.json();
-      setResponse(data.result);
+      setResponse(data.trip);
       setHistory((prev) => [...prev, prompt]);
     } catch (error) {
       console.error('Error generating trip:', error);
