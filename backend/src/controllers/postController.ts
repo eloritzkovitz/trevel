@@ -13,7 +13,7 @@ class PostsController extends BaseController<IPost> {
   
   // Create a new post
   async createItem(req: Request, res: Response) {
-    try {
+    try { 
       const userId = req.params.userId;      
       const user = await userModel.findById(userId);
       const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];      
@@ -30,6 +30,7 @@ class PostsController extends BaseController<IPost> {
       };
       req.body = post;      
       await super.createItem(req, res);
+
     } catch (error) {      
       res.status(500).json({ error: error instanceof Error ? error.message : 'An unknown error occurred' });
     }

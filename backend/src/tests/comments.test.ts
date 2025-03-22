@@ -6,6 +6,7 @@ import postModel from "../models/Post";
 import userModel, { IUser } from "../models/User";
 import { Express } from "express";
 import testComments from "./testComments.json";
+import path from "path";
 
 var app: Express;
 
@@ -19,6 +20,10 @@ const testUser: User = {
 
 let postId = "";
 let commentId = "";
+
+const oldImagePath = path.join(__dirname, "img", "post-test-image.jpg");
+const newImagePath = path.join(__dirname, "img", "post-test-image-new.jpg");
+let createResponse: any = null;
 
 beforeAll(async () => {
   process.env.NODE_ENV = "test";
@@ -64,17 +69,15 @@ describe("Comments Tests", () => {
 
   test("Test Create Comment", async () => {
     const response = await request(app).post("/comments")
-      .set({ authorization: "JWT " + testUser.token })
-      .send({
-        content: testComments[0].content,
-        postId: postId,
-        sender: testUser._id,
-      });
+          .set({ authorization: "JWT " + testUser.token })          
+          .field("postId", postId)
+          .field("content", "This is a comment") 
     expect(response.statusCode).toBe(201);
     expect(response.body.postId).toBe(postId);
     expect(response.body.content).toBe(testComments[0].content);
     expect(response.body.sender).toBe(testUser._id);
     commentId = response.body._id;
+    createResponse = response;
   });
 
   test("Test Create Comment with Missing Post ID", async () => {
@@ -131,6 +134,7 @@ describe("Comments Tests", () => {
     expect(response.body[0].sender).toBe(testUser._id);
   });  
 
+  // Test get comment by post ID
   test("Get comments by post ID", async () => {
     // Create a comment first
     await request(app).post("/comments")
@@ -149,25 +153,50 @@ describe("Comments Tests", () => {
     expect(response.body[0].sender).toBe(testUser._id);
   });
 
+  // Test get comment by post ID fail
+  test("Get comments by post ID", async () => {
+    const response = await request(app).get("/comments/post/invalidPostId");
+    expect(response.statusCode).toBe(500);    
+  });
+
   test("Test Update Comment", async () => {
     // Create a comment first
-    const createRes = await request(app).post("/comments")
-      .set({ authorization: "JWT " + testUser.token })
-      .send({
-        content: testComments[0].content,
-        postId: postId,
-        sender: testUser._id,
-      });
-    commentId = createRes.body._id;
+    createResponse = await request(app).post("/comments/")    
+          .set({ authorization: "JWT " + testUser.token })
+          .attach("images", oldImagePath)          
+          .field("postId", postId)
+          .field("content", "Test Content")
+    commentId = createResponse.body._id;
 
     const response = await request(app).put("/comments/" + commentId)
+           .set({ authorization: "JWT " + testUser.token })
+           .attach("images", newImagePath)         
+           .field("content", "Updated Content")     
+           .field("deletedImages", JSON.stringify([createResponse.body.images[0]]));
+    expect(response.statusCode).toBe(200);
+    expect(response.body.content).toBe("Updated Content");
+
+    const response2 = await request(app).delete("/comments/" + commentId)
+      .set({ authorization: "JWT " + testUser.token });
+    expect(response2.statusCode).toBe(200);
+  });
+
+  // Test update comment fail
+  test("Test Update Comment fail", async () => {
+    const response = await request(app).put("/comments/" + "60f7b3b3b1b3f3b3b3b3b3b3")
       .set({ authorization: "JWT " + testUser.token })
       .send({
         content: "Updated Content",
       });
-    expect(response.statusCode).toBe(200);
-    expect(response.body.content).toBe("Updated Content");
-  });
+    expect(response.statusCode).toBe(404);
+    
+    const response2 = await request(app).put("/comments/invalidCommentId")
+      .set({ authorization: "JWT " + testUser.token })
+      .send({
+        content: "Updated Content",
+      });
+    expect(response2.statusCode).toBe(500);    
+  });  
 
   test("Test Delete Comment", async () => {
     // Create a comment first

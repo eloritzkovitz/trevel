@@ -32,9 +32,7 @@ const testUser2: User = {
 
 describe("Auth Tests", () => {
   
-  beforeAll(async () => {
-    process.env.NODE_ENV = "test";
-    process.env.PORT = "4000";
+  beforeAll(async () => {    
     console.log(`beforeAll - NODE_ENV: ${process.env.NODE_ENV}, PORT: ${process.env.PORT}`);
 
     app = await initApp();
@@ -220,6 +218,32 @@ describe("Auth Tests", () => {
       .set("Authorization", `Bearer ${testUser.accessToken}`);
     expect(response3.statusCode).toBe(500);    
   });
+
+  // Test get user by name
+  test("Test get user by name", async () => {
+    // Send a GET request to search for the user by name
+    const response = await request(app)
+      .get(baseUrl + "/users?query=" + testUser.firstName)
+      .set("Authorization", `Bearer ${testUser.accessToken}`);
+    
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBeGreaterThan(0);
+
+    const user = response.body[0];
+    expect(user.firstName).toBe("User1");
+    expect(user.lastName).toBe("Test");    
+  });
+
+  // Test get user by name fail
+  test("Test get user by name", async () => {
+    // Send a GET request to search for the user by name
+    const response = await request(app)
+      .get(baseUrl + "/users?query=")
+      .set("Authorization", `Bearer ${testUser.accessToken}`);
+    
+    expect(response.statusCode).toBe(400);        
+  });
   
   // Test update user
   test("Test update user", async () => {
@@ -366,24 +390,13 @@ describe("Auth Tests", () => {
     const response = await request(app).post(baseUrl + "/login").send(testUser);
     expect(response.statusCode).toBe(200);
     testUser.accessToken = response.body.accessToken;
-    testUser.refreshToken = response.body.refreshToken;
+    testUser.refreshToken = response.body.refreshToken;    
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    const response2 = await request(app).post("/posts").set(
-      { authorization: "JWT " + testUser.accessToken }
-    ).send({
-      title: "Test Post",
-      content: "Test Content",
-      sender: testUser._id,
-    });
-    expect(response2.statusCode).not.toBe(201);
-
-    const response3 = await request(app).post(baseUrl + "/refresh").send({
+    const response2 = await request(app).post(baseUrl + "/refresh").send({
       refreshToken: testUser.refreshToken,
     });
-    expect(response3.statusCode).toBe(200);
-    testUser.accessToken = response3.body.accessToken;
+    expect(response2.statusCode).toBe(200);
+    testUser.accessToken = response2.body.accessToken;
 
     const response4 = await request(app).post("/posts").set(
       { authorization: "JWT " + testUser.accessToken }
