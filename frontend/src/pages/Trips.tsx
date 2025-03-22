@@ -15,7 +15,7 @@ const Trips: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/generate-trip', {
+      const res = await fetch('http://localhost:5173/routes/generateTrip', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
