@@ -7,12 +7,26 @@ interface ImageUploadProps {
   resetTrigger?: boolean;
 }
 
+const MAX_IMAGES = 6;
+
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigger }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
+
+    const totalFiles = selectedFiles.length + files.length;
+
+    // Check if the total number of images exceeds the limit
+    if (totalFiles > MAX_IMAGES) {
+      setError(`You can only upload up to ${MAX_IMAGES} images.`);
+      return;
+    }
+
+    setError(null);    
+    
     const newFiles = [...selectedFiles, ...files];
 
     // Generate previews
@@ -53,6 +67,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
           onChange={handleFileChange}
         />
       </label>
+
+      {/* Error Message */}
+      {error && <div className="text-danger">{error}</div>}
 
       {/* Preview Selected Images with Remove Option */}
       <div className="d-flex gap-2 flex-wrap">

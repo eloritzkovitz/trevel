@@ -9,6 +9,8 @@ interface ImageEditorProps {
   onImagesUpdated: (updatedImages: { existingImages: string[]; newImages: File[]; deletedImages: string[] }) => void;
 }
 
+const MAX_IMAGES = 6;
+
 const ImageEditor: React.FC<ImageEditorProps> = ({
   initialExistingImages,
   initialNewImages,
@@ -17,6 +19,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const [existingImages, setExistingImages] = useState<string[]>(initialExistingImages);
   const [newImages, setNewImages] = useState<File[]>(initialNewImages);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   // Use useCallback to prevent unnecessary re-renders
   const memoizedOnImagesUpdated = useCallback(onImagesUpdated, []);
@@ -35,6 +38,16 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   // Handle adding new images
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const totalImages = existingImages.length + newImages.length + files.length;
+
+      // Check if the total number of images exceeds the limit
+      if (totalImages > MAX_IMAGES) {
+        setError(`You can only upload up to ${MAX_IMAGES} images.`);
+        return;
+      }
+
+      setError(null);
       setNewImages([...newImages, ...Array.from(e.target.files)]);
     }
   };
@@ -111,6 +124,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           className="mt-2"
         />
       </Form.Group>
+
+      {/* Error Message */}
+      {error && <div className="text-danger mt-2">{error}</div>}
     </div>
   );
 };
