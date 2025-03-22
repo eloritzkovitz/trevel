@@ -56,6 +56,12 @@ class CommentController extends BaseController<IComment> {
   async getCommentsByPostId(req: Request, res: Response): Promise<void> {
     const postId = req.params.postId;
     try {
+
+      // Check if postId is a valid MongoDB ObjectId
+      if (!mongoose.Types.ObjectId.isValid(postId)) {
+        throw new Error("Invalid Post ID");
+      }
+
       const comments = await this.model.find({ postId });
       res.status(200).json(comments);
     } catch (error) {

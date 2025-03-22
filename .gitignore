@@ -1,7 +1,8 @@
 # Backend directories
 /backend/.env
-/backend/.env_dev
-/backend/.env_test
+/backend/.env.dev
+/backend/.env.test
+/backend/.env.prod
 /backend/node_modules
 /backend/coverage
 /backend/dist

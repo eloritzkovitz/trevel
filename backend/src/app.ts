@@ -1,21 +1,28 @@
 import dotenv from "dotenv";
 import initApp from "./server";
 
-// Determine which environment file to load
-const env = process.env.NODE_ENV || "dev"; // Default to 'development' if not set
-const envFile = `.env_${env}`;
+// Load the appropriate .env file based on NODE_ENV
+const env = process.env.NODE_ENV || "dev";
+dotenv.config({
+  path: (() => {
+    switch (env) {
+      case "production":
+        return ".env.prod";
+      case "test":
+        return ".env.test";
+      case "development":
+        return ".env.dev";
+      default:
+        return ".env"; // Default to .env if NODE_ENV is not set
+    }
+  })(),
+});
 
-dotenv.config({ path: envFile });
-
-// Debugging logs
-console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-console.log(`Loaded environment file: ${envFile}`);
-console.log(`DB_CONNECT: ${process.env.DB_CONNECT}`);
-
-const port = process.env.PORT || 3000; // Fallback to 3000 if PORT is undefined
+// Get the port from the environment variables or use the default
+const port = process.env.PORT || 3000;
 
 initApp().then((app) => {
   app.listen(port, () => {
-    console.log(`Server is running on port ${port} (Environment: ${env}, Loaded: ${envFile})`);
+    console.log(`Server is running on port ${port} (Environment: ${env})`);
   });
 });

@@ -80,7 +80,7 @@ describe("Posts Tests", () => {
       .send({
         content: "Test Content 2",
       });
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(400);    
   });
 
   // Test file upload with invalid file type
