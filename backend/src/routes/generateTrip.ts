@@ -1,3 +1,4 @@
+import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
@@ -9,10 +10,15 @@ if (!apiKey) {
   throw new Error('API key not configured properly.');
 }
 
-// Generate a trip schedule using the OpenAI API
-const generateTrip = async (prompt: string): Promise<void> => {
+const router: express.Router = express.Router();
+
+// POST /trips - Generate a trip schedule
+router.post('/', async (req: express.Request, res: express.Response): Promise<void> => {
+  const { prompt } = req.body;
+
   if (!prompt || typeof prompt !== 'string') {
-    throw new Error('Prompt is required and must be a string.');
+    res.status(400).json({ message: 'Prompt is required and must be a string.' });
+    return; 
   }
 
   try {
@@ -40,16 +46,16 @@ const generateTrip = async (prompt: string): Promise<void> => {
       }
     );
 
-        // Check if a response was generated
-        if (response.data && response.data.choices && response.data.choices.length > 0) {
-          console.log(response.data.choices[0].message.content.trim());
-        } else {
-          throw new Error('No trip generated.');
-        }
-      } catch (error: any) {
-        console.error('Error generating trip:', error.message || error);
-        throw new Error('Failed to generate trip.');
-      }
-    };
-    
-    export { generateTrip };
+    // Check if a response was generated
+    if (response.data && response.data.choices && response.data.choices.length > 0) {
+      res.status(200).json({ trip: response.data.choices[0].message.content.trim() });
+    } else {
+      throw new Error('No trip generated.');
+    }
+  } catch (error: any) {
+    console.error('Error generating trip:', error.message || error);
+    res.status(500).json({ message: 'Failed to generate trip.' });
+  }
+});
+
+export default router;
