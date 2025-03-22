@@ -75,6 +75,11 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
 
   // Add a new comment
   const handleAddComment = async (content: string, images: File[]) => {
+    if (!content.trim()) {
+      setError("Please add a text to your comment.");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("content", content);
