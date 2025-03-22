@@ -36,9 +36,7 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
       formData.append("deletedImages", JSON.stringify(imagesState.deletedImages));
     
       // Append new images
-      imagesState.newImages.forEach((file) => formData.append("images", file));
-
-      console.log(comment);
+      imagesState.newImages.forEach((file) => formData.append("images", file));      
 
       await commentService.updateComment(comment._id!, formData);
     

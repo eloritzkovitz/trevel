@@ -37,6 +37,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
   useEffect(() => {
     if (resetTrigger) {
       setSelectedFiles([]);
+      setPreviewImages([]);      
     }
   }, [resetTrigger]);
 
