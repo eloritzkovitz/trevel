@@ -11,8 +11,7 @@ export const handleGoogleResponse = async (
     if (credentialResponse.credential) {
       try {
         const response = await userService.signInWithGoogle(credentialResponse.credential);
-        const data = await response.request;
-        console.log(data.data);
+        const data = await response.request;        
         login(data.data.accessToken, data.data.refreshToken); // Store tokens and update auth state
         navigate('/'); // Redirect to main page after successful login
       } catch (error) {
