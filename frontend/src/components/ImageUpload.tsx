@@ -1,18 +1,32 @@
 import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 interface ImageUploadProps {
   onImagesSelected: (files: File[]) => void;
   resetTrigger?: boolean;
 }
 
+const MAX_IMAGES = 6;
+
 const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigger }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files ? Array.from(event.target.files) : [];
+    const totalImages = selectedFiles.length + files.length;
+
+    // Check if the total number of images exceeds the limit
+    if (totalImages > MAX_IMAGES) {
+      setError(`You can only upload up to ${MAX_IMAGES} images.`);
+      return;
+    }
+
+    setError(null);
+    
     const newFiles = [...selectedFiles, ...files];
 
     // Generate previews
@@ -54,6 +68,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
         />
       </label>
 
+      {/* Error Message */}
+      {error && <div className="text-danger">{error}</div>}
+
       {/* Preview Selected Images with Remove Option */}
       <div className="d-flex gap-2 flex-wrap">
         {previewImages.map((src, index) => (
@@ -61,19 +78,26 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImagesSelected, resetTrigge
             <img
               src={src}
               alt="preview"
-              className="rounded border img-thumbnail"
-              style={{ width: 100, height: 100 }}              
+              className="rounded border"
+              style={{ width: "50px", height: "50px", objectFit: "cover" }}
             />
-            <FontAwesomeIcon
-              icon={faTrash}
-              className="text-danger position-absolute top-0 end-0"
+            <Button
+              variant="danger"
+              size="sm"
+              className="position-absolute top-0 end-0 p-0"
               style={{
-              cursor: "pointer",
-              background: "white",
-              borderRadius: "50%",
+                width: "16px",
+                height: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.7rem",
+                borderRadius: "50%",
               }}
               onClick={() => handleRemoveImage(index)}
-            />
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </Button>
           </div>
         ))}
       </div>

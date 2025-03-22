@@ -10,6 +10,7 @@
     "test": "cross-env NODE_ENV=test jest --coverage --runInBand"
   },
   "dependencies": {
+    "@google-cloud/vertexai": "^1.9.3",
     "@types/bcrypt": "^5.0.2",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",

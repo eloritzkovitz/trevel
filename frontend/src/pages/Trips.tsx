@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlane, faHistory } from "@fortawesome/free-solid-svg-icons";
-import { generateTrip } from '../services/openai-service';
+import { generateTrip } from '../services/ai-service';
 import Navbar from '../components/Navbar';
 
 const Trips: React.FC = () => {
