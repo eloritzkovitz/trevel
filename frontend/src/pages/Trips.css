@@ -1,0 +1,96 @@
+.trips-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.trips-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #007bff;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.trips-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.trips-input {
+  width: 100%;
+  max-width: 600px;
+  height: 100px;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+}
+
+.trips-generate-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.trips-generate-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.trips-generate-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.trips-response,
+.trips-history {
+  width: 100%;
+  max-width: 800px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.trips-section-title {
+  font-size: 1.5rem;
+  color: #555;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trips-response-text {
+  font-size: 1rem;
+  color: #333;
+}
+
+.trips-history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.trips-history-item {
+  font-size: 1rem;
+  color: #555;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.trips-history-item:last-child {
+  border-bottom: none;
+}

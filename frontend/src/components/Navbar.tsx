@@ -9,12 +9,14 @@ import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
 import getUsersByName from "../services/user-service";
 
+
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+
 
   useEffect(() => {
     // Apply the theme class to the body
@@ -119,7 +121,7 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/trips"
-              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}              
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}
             >
               <FontAwesomeIcon className="navbar-icon" icon={faPlane} />
               <span>Trips</span>
