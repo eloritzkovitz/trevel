@@ -1,6 +1,7 @@
 import express from 'express';
-import axios from 'axios';
 import dotenv from 'dotenv';
+import axios from 'axios';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -12,16 +13,23 @@ if (!apiKey) {
 
 const router: express.Router = express.Router();
 
+// Enable CORS for this route
+router.use(cors());
+
 // POST /trips - Generate a trip schedule
 router.post('/', async (req: express.Request, res: express.Response): Promise<void> => {
-  const { prompt } = req.body;
+  const { prompt } = req.body;  
 
+  // Validate the prompt
   if (!prompt || typeof prompt !== 'string') {
     res.status(400).json({ message: 'Prompt is required and must be a string.' });
-    return; 
+    return;
   }
 
+  console.log('Prompt:', prompt);
+
   try {
+    console.log('Making request to OpenAI API...');
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -29,7 +37,7 @@ router.post('/', async (req: express.Request, res: express.Response): Promise<vo
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that creates trip schedules.'
+            content: 'You are a helpful assistant that creates trip itineraries.'
           },
           {
             role: 'user',
@@ -45,17 +53,23 @@ router.post('/', async (req: express.Request, res: express.Response): Promise<vo
         }
       }
     );
-
-    // Check if a response was generated
+  
+    console.log('OpenAI API Response:', response.data);
+  
     if (response.data && response.data.choices && response.data.choices.length > 0) {
       res.status(200).json({ trip: response.data.choices[0].message.content.trim() });
     } else {
-      throw new Error('No trip generated.');
+      console.error('No choices returned from OpenAI API.');
+      res.status(500).json({ message: 'No trip generated. Please try again.' });
     }
   } catch (error: any) {
-    console.error('Error generating trip:', error.message || error);
-    res.status(500).json({ message: 'Failed to generate trip.' });
+    console.error('Error generating trip:', error.response?.data || error.message || error);
+    res.status(500).json({
+      message: 'Failed to generate trip.',
+      error: error.response?.data || error.message || 'An unexpected error occurred.'
+    });
   }
-});
+}
+);
 
 export default router;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import './Trips.css'; // Import the CSS file for styling
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlane, faHistory } from "@fortawesome/free-solid-svg-icons";
+import { generateTrip } from '../services/openai-service';
+import Navbar from '../components/Navbar';
 
 const Trips: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -11,75 +12,100 @@ const Trips: React.FC = () => {
 
   // Function to handle AI trip generation
   const handleGenerateTrip = async () => {
-    if (!prompt.trim()) return alert("Please enter a destination or trip details!");
+    if (!prompt.trim()) {
+      alert("Please enter a destination or trip details!");
+      return;
+    }
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3000/trips', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to generate trip.');
-      }
-
-      const data = await res.json();
-      setResponse(data.trip);
+      const generatedTrip = await generateTrip(prompt);
+      setResponse(generatedTrip);
       setHistory((prev) => [...prev, prompt]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating trip:', error);
-      alert("Failed to generate trip. Please try again.");
+      alert(error.message || "Failed to generate trip. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="trips-container">
-      <h1 className="trips-title">
-        <FontAwesomeIcon icon={faPlane} /> Plan Your Trip
-      </h1>
-      <div className="trips-content">
-        {/* Input for trip prompt */}
-        <textarea
-          className="trips-input"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Enter your destination or trip details..."
-        />
-        <button
-          className="trips-generate-button"
-          onClick={handleGenerateTrip}
-          disabled={loading}
-        >
-          {loading ? "Generating..." : "Generate Trip"}
-        </button>
+    <div className="container-fluid min-vh-100">
+      {/* Navbar */}
+      <Navbar />
 
-        {/* Display generated trip */}
-        {response && (
-          <div className="trips-response">
-            <h2 className="trips-section-title">Generated Trip</h2>
-            <p className="trips-response-text">{response}</p>
-          </div>
-        )}
+      {/* Main Content */}
+      <div className="container mt-5 pt-5">
+        <div className="row justify-content-center">
+          {/* Trips Section */}
+          <div className="col-md-8">
+            <div className="trips-container p-4">
+              <h1 className="text-center mb-4">
+                <FontAwesomeIcon icon={faPlane} className="me-2" />
+                Plan Your Itinerary
+              </h1>
 
-        {/* Display search history */}
-        {history.length > 0 && (
-          <div className="trips-history">
-            <h2 className="trips-section-title">
-              <FontAwesomeIcon icon={faHistory} /> Search History
-            </h2>
-            <ul className="trips-history-list">
-              {history.map((item, index) => (
-                <li key={index} className="trips-history-item">
-                  {item}
-                </li>
-              ))}
-            </ul>
+              <div className="trips-content card panel p-4 shadow-sm">
+                {/* Input for trip prompt */}
+                <div className="mb-3">
+                  <textarea
+                    className="form-control trips-input"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Enter your destination or trip details..."
+                    rows={4}
+                  />
+                </div>
+                <div className="text-center">
+                  <button
+                    className="btn btn-primary trips-generate-button"
+                    onClick={handleGenerateTrip}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" />
+                        Generating...
+                      </span>
+                    ) : (
+                      "Generate Trip"
+                    )}
+                  </button>
+                </div>
+
+                {/* Display generated trip */}
+                {response && (
+                  <div className="trips-response mt-4">
+                    <div className="card panel p-3">
+                      <h2 className="trips-section-title text-primary">Generated Trip</h2>
+                      <p className="trips-response-text">{response}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display search history */}
+                {history.length > 0 && (
+                  <div className="trips-history mt-4">
+                    <div className="card panel p-3">
+                      <h2 className="trips-section-title text-secondary">
+                        <FontAwesomeIcon icon={faHistory} className="me-2" />
+                        Search History
+                      </h2>
+                      <ul className="list-group trips-history-list">
+                        {history.map((item, index) => (
+                          <li key={index} className="list-group-item trips-history-item">
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
