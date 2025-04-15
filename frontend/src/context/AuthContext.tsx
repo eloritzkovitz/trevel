@@ -5,35 +5,44 @@ import userService, { User } from "../services/user-service";
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (accessToken: string, refreshToken: string) => void;
-  logout: () => void;
+  logout: () => void;  
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Define the AuthProvider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);  
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const token = Cookies.get("accessToken");
     if (token) {
-      setIsAuthenticated(true);
-      if (user && user._id) {
-        userService.getUserData(user._id).then(setUser).catch(() => {
+      userService
+        .getUserData()
+        .then((fetchedUser) => {
+          setUser(fetchedUser);
+          setIsAuthenticated(true);
+        })
+        .catch(() => {
           setIsAuthenticated(false);
           setUser(null);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-      }
+    } else {
+      setLoading(false);
     }
   }, []);
 
   // Authenticate user on login
   const login = (accessToken: string, refreshToken: string) => {
-    Cookies.set("accessToken", accessToken, { secure: true, sameSite: 'strict' });
-    Cookies.set("refreshToken", refreshToken, { secure: true, sameSite: 'strict' });
+    Cookies.set("accessToken", accessToken, { expires: 7 }); 
+    Cookies.set("refreshToken", refreshToken, { expires: 7 });
     setIsAuthenticated(true);
     userService.getUserData().then(setUser);
   };
@@ -47,7 +56,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
