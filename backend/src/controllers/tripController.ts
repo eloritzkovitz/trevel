@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI, GenerateContentResult } from '@google/generative-ai';
+import Trip from '../models/Trip';
 
 dotenv.config();
 
@@ -12,8 +13,15 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 
+// Generate a trip
 export const generateTrip = async (req: Request, res: Response): Promise<void> => {
   const { prompt } = req.body;
+  const ownerId = req.params.userId;
+
+  if (!ownerId) {
+    res.status(401).json({ message: 'Unauthorized. Please log in to generate a trip.' });
+    return;
+  }
 
   if (!prompt || typeof prompt !== 'string') {
     res.status(400).json({ message: 'Prompt is required and must be a string.' });
@@ -59,5 +67,58 @@ export const generateTrip = async (req: Request, res: Response): Promise<void> =
       message: errorMessage,
       error,
     });
+  }
+};
+
+// Save a trip
+export const saveTrip = async (req: Request, res: Response): Promise<void> => {
+  const { prompt, response } = req.body;
+  const ownerId = req.params.userId;
+
+  if (!prompt || !response) {
+    res.status(400).json({ message: 'Prompt and response are required.' });
+    return;
+  }
+
+  try {
+    const trip = new Trip({ ownerId, prompt, response });
+    await trip.save();
+    res.status(201).json({ message: 'Trip saved successfully.', trip });
+  } catch (error: any) {
+    console.error('Error saving trip:', error);
+    res.status(500).json({ message: 'Failed to save trip. An unexpected error occurred.' });
+  }
+};
+
+// Get all trips for the authenticated user
+export const getTrips = async (req: Request, res: Response): Promise<void> => {
+  const ownerId = req.params.userId;
+
+  try {
+    const trips = await Trip.find({ ownerId }).sort({ createdAt: -1 });
+    res.status(200).json(trips);
+  } catch (error: any) {
+    console.error('Error retrieving trips:', error);
+    res.status(500).json({ message: 'Failed to retrieve trips. An unexpected error occurred.' });
+  }
+};
+
+// Delete a trip
+export const deleteTrip = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const ownerId = req.params.userId;
+
+  try {
+    const trip = await Trip.findOneAndDelete({ _id: id, ownerId });
+
+    if (!trip) {
+      res.status(404).json({ message: 'Trip not found.' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Trip deleted successfully.' });
+  } catch (error: any) {
+    console.error('Error deleting trip:', error);
+    res.status(500).json({ message: 'Failed to delete trip. An unexpected error occurred.' });
   }
 };
