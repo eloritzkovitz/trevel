@@ -40,7 +40,12 @@ const ConditionalNavbar: React.FC = () => {
 
 // Authentication wrapper
 const RequireAuth: React.FC<{ children: JSX.Element }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 

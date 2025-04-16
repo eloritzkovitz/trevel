@@ -2,10 +2,10 @@ import dotenv from "dotenv"
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import express, { Express } from "express";
+import authRoutes from "./routes/authRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
-import generateTrip from "./routes/generateTrip";
-import authRoutes from "./routes/authRoutes";
+import tripRoutes from "./routes/tripRoutes";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import path from "path";
@@ -25,7 +25,7 @@ app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/auth", authRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../dist/uploads')));
-app.use("/trips", generateTrip);
+app.use("/trips", tripRoutes);
 
 // Swagger documentation
 const options = {
