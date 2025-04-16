@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlane, faHistory } from "@fortawesome/free-solid-svg-icons";
 import { generateTrip } from '../services/ai-service';
@@ -79,7 +80,10 @@ const Trips: React.FC = () => {
                   <div className="trips-response mt-4">
                     <div className="card panel p-3">
                       <h2 className="trips-section-title text-primary">Generated Trip</h2>
-                      <p className="trips-response-text">{response}</p>
+                      {/* Render Markdown response */}
+                      <div className="trips-response-text">
+                        <ReactMarkdown>{response}</ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )}
