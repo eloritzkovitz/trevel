@@ -3,8 +3,6 @@
 ## 🌍 Overview
 Trevel is a social networking platform designed for users to share their travel experiences, post trip highlights, and interact with fellow travelers. Users can upload photos, write travel stories, comment on posts, and mark their favorite content. The platform integrates 🤖 **AI-powered content suggestions** to enhance user experience and provide relevant travel insights.
 
----
-
 ## ✨ Features
 
 ### 🔐 **Authentication**
@@ -31,8 +29,6 @@ Trevel is a social networking platform designed for users to share their travel 
 - 🌙 **Dark Theme:** Tired of bright colors? You can adjust the appearance for a dark display.
 - 🛡️ **Form Validation:** Secure user input handling.
 
----
-
 ## ⚙️ **Technology Stack**
 
 ### 💻 **Backend**
@@ -50,13 +46,9 @@ Trevel is a social networking platform designed for users to share their travel 
 - 🔒 **HTTPS & SSL** - Secure connection.
 - ♻️ **PM2** - Process management.
 
----
-
 ## 📖 API Documentation
 
 - [Swagger API Documentation](http://localhost:3000/api-docs)
-
----
 
 ## 👤 Authors
 - [Elor Itzkovitz](https://github.com/Elor-Itz)
