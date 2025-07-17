@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { getImageUrl } from "../utils/imageUrl";
 import { useAuth } from "../context/AuthContext";
 import postService from "../services/post-service";
 import ImageUpload from "./ImageUpload";
 
-interface PostModalProps {  
+interface PostModalProps {
   onPostCreated: () => void;
 }
 
@@ -14,7 +15,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);  
+  const [error, setError] = useState<string | null>(null);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,8 +27,8 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
-      
-      if (images) {        
+
+      if (images) {
         Array.from(images).forEach((image) => {
           formData.append("images", image);
         });
@@ -40,7 +41,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
       setContent("");
       setImages(null);
 
-      onPostCreated();      
+      onPostCreated();
     } catch (error) {
       console.error("Failed to create post", error);
       setError("Failed to create post");
@@ -55,14 +56,13 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
         {/* Profile Picture */}
         <img
           className="profile-picture-4 rounded-circle"
-          src={loggedInUser?.profilePicture || ""}
+          src={getImageUrl(loggedInUser?.profilePicture, "profile")}
           alt="Profile"
           style={{ width: "40px", height: "40px", objectFit: "cover" }}
         />
 
         {/* Post Form */}
         <Form className="flex-grow-1" onSubmit={handleSubmit}>
-
           {/* Title Input */}
           <Form.Control
             type="text"
@@ -74,7 +74,7 @@ const CreatePost: React.FC<PostModalProps> = ({ onPostCreated }) => {
           />
 
           {/* Content Input */}
-          <div className="d-flex align-items-center gap-2">            
+          <div className="d-flex align-items-center gap-2">
             <Form.Control
               as="textarea"
               rows={1}

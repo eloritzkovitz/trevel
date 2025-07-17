@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useAuth } from "../context/AuthContext";
-import commentService, { Comment as CommentType } from "../services/comment-service";
+import commentService, {
+  Comment as CommentType,
+} from "../services/comment-service";
+import { getImageUrl } from "../utils/imageUrl";
 import Comment from "./Comment";
 import EditComment from "./EditComment";
 import ImageUpload from "./ImageUpload";
@@ -13,7 +16,12 @@ interface CommentsListProps {
   onClose: () => void;
 }
 
-const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChange, onClose }) => {
+const CommentsList: React.FC<CommentsListProps> = ({
+  postId,
+  show,
+  onCommentChange,
+  onClose,
+}) => {
   const { user: loggedInUser } = useAuth();
   const [comments, setComments] = useState<CommentType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,39 +30,44 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>("");
   const [images, setImages] = useState<File[] | null>(null);
-  const [currentComment, setCurrentComment] = useState<CommentType | null>(null); 
+  const [currentComment, setCurrentComment] = useState<CommentType | null>(
+    null
+  );
   const modalBodyRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch comments when the component loads
   useEffect(() => {
     const fetchComments = async () => {
       if (isLoading) return;
-    
+
       try {
         setIsLoading(true);
-        const fetchedComments = await commentService.getCommentsByPostId(postId);        
-    
+        const fetchedComments = await commentService.getCommentsByPostId(
+          postId
+        );
+
         setComments((prevComments) => {
           const newComments = fetchedComments.filter(
-            (comment) => !prevComments.some((c) => c._id === comment._id)            
-            );            
-            return [...prevComments, ...newComments].sort(
-              (a, b) =>                
-                new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-            );
+            (comment) => !prevComments.some((c) => c._id === comment._id)
+          );
+          return [...prevComments, ...newComments].sort(
+            (a, b) =>
+              new Date(b.createdAt!).getTime() -
+              new Date(a.createdAt!).getTime()
+          );
         });
 
         setHasMore(fetchedComments.length > 0);
-        } catch (error) {
-          console.error("Failed to fetch coimments", error);
-          setError("Error fetching comments...");
-        } finally {
-          setIsLoading(false);
-        }
-      };
-         
-      fetchComments();
-    }, [page, postId]);
+      } catch (error) {
+        console.error("Failed to fetch coimments", error);
+        setError("Error fetching comments...");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [page, postId]);
 
   // Reset when postId changes
   useEffect(() => {
@@ -62,7 +75,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     setPage(1);
     setHasMore(true);
   }, [postId]);
-    
+
   // Infinite scrolling logic
   const handleScroll = () => {
     if (!modalBodyRef.current || isLoading || !hasMore) return;
@@ -88,7 +101,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       // Append each image to the FormData
       images.forEach((image) => {
         formData.append("images", image);
-      });    
+      });
 
       const addedComment = await commentService.createComment(formData);
       setComments((prevComments) => [addedComment, ...prevComments]);
@@ -98,7 +111,6 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
       setNewComment("");
       setImages(null);
       setError(null);
-
     } catch (error) {
       console.error("Failed to add comment", error);
       setError("Error adding comment. Please try again.");
@@ -108,26 +120,27 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
   // Edit comment handlers
   const handleEditComment = (comment: CommentType) => {
     setCurrentComment(comment);
-    setError(null);        
-  }; 
-  
-  const handleCommentUpdated = (updatedComment: CommentType) => {    
-    setCurrentComment(null);    
+    setError(null);
+  };
+
+  const handleCommentUpdated = (updatedComment: CommentType) => {
+    setCurrentComment(null);
     setComments((prevComments) =>
       prevComments.map((comment) =>
         comment._id === updatedComment._id ? updatedComment : comment
-      )    
-    );    
+      )
+    );
   };
-  
+
   // Delete comment handler
   const handleDeleteComment = async (comment: CommentType) => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
         await commentService.deleteComment(comment._id!);
-        setComments((prevComments) => prevComments.filter((p) => p._id !== comment._id));
+        setComments((prevComments) =>
+          prevComments.filter((p) => p._id !== comment._id)
+        );
         onCommentChange(-1);
-
       } catch (error) {
         setError("Failed to delete comment. Please try again.");
       }
@@ -140,11 +153,15 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
     setNewComment("");
     setImages(null);
     setError(null);
-    onClose(); 
+    onClose();
   };
 
   // Handle like change
-  const handleLikeChange = (commentId: string, isLiked: boolean, likeCount: number) => {
+  const handleLikeChange = (
+    commentId: string,
+    isLiked: boolean,
+    likeCount: number
+  ) => {
     setComments((prevComments) =>
       prevComments.map((comment) =>
         comment._id === commentId
@@ -152,8 +169,13 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
               ...comment,
               likesCount: likeCount,
               likes: isLiked
-                ? [...(comment.likes || []), loggedInUser?._id].filter((id): id is string => id !== undefined)
-                : (comment.likes || []).filter((id): id is string => id !== loggedInUser?._id && id !== undefined),
+                ? [...(comment.likes || []), loggedInUser?._id].filter(
+                    (id): id is string => id !== undefined
+                  )
+                : (comment.likes || []).filter(
+                    (id): id is string =>
+                      id !== loggedInUser?._id && id !== undefined
+                  ),
             }
           : comment
       )
@@ -206,15 +228,15 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
                 </div>
               );
             })
-          )}         
+          )}
         </div>
-      </Modal.Body>    
+      </Modal.Body>
       <Modal.Footer>
         <div className="d-flex flex-column align-items-start w-100">
           <div className="d-flex w-100 align-items-start gap-2">
             <img
               className="profile-picture-4 rounded-circle"
-              src={loggedInUser?.profilePicture || ""}
+              src={getImageUrl(loggedInUser?.profilePicture, "profile")}
               alt="Profile"
               style={{ width: "40px", height: "40px", objectFit: "cover" }}
             />
@@ -225,21 +247,29 @@ const CommentsList: React.FC<CommentsListProps> = ({ postId, show, onCommentChan
                 placeholder="Write a comment..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="rounded-pill"              
-            />
+                className="rounded-pill"
+              />
 
-            {/* Image Upload */}
-            <ImageUpload onImagesSelected={(files) => setImages(files)} resetTrigger={images === null} />
+              {/* Image Upload */}
+              <ImageUpload
+                onImagesSelected={(files) => setImages(files)}
+                resetTrigger={images === null}
+              />
+            </div>
+
+            <Button
+              variant="primary"
+              onClick={() => handleAddComment(newComment, images ? images : [])}
+            >
+              Post
+            </Button>
           </div>
-
-        <Button variant="primary" onClick={() => handleAddComment(newComment, images ? images : [])}>
-          Post
-        </Button>
         </div>
-      </div>
-      {error && comments.length > 0 && <div className="alert alert-danger">{error}</div>}
-    </Modal.Footer>
-  </Modal>
+        {error && comments.length > 0 && (
+          <div className="alert alert-danger">{error}</div>
+        )}
+      </Modal.Footer>
+    </Modal>
   );
 };
 

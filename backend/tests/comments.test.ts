@@ -1,9 +1,9 @@
 import request from "supertest";
-import initApp from "../server";
+import initApp from "../src/server";
 import mongoose from "mongoose";
-import commentsModel from "../models/Comment";
-import postModel from "../models/Post";
-import userModel, { IUser } from "../models/User";
+import commentsModel from "../src/models/Comment";
+import postModel from "../src/models/Post";
+import userModel, { IUser } from "../src/models/User";
 import { Express } from "express";
 import testComments from "./testComments.json";
 import path from "path";

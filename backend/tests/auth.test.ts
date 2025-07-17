@@ -1,11 +1,11 @@
 import { Express } from "express";
 import request from "supertest";
 import path from "path";
-import initApp from "../server";
+import initApp from "../src/server";
 import mongoose from "mongoose";
-import userModel, { IUser } from "../models/User";
-import postModel from "../models/Post";
-import { generateToken, verifyRefreshToken } from "../utils/tokenService";
+import userModel, { IUser } from "../src/models/User";
+import postModel from "../src/models/Post";
+import { generateToken, verifyRefreshToken } from "../src/utils/tokenService";
 
 var app: Express;
 
