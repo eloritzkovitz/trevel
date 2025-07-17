@@ -1,7 +1,7 @@
-import initApp from "../server";
+import initApp from "../src/server";
 import mongoose from "mongoose";
 import path from "path";
-import { resolveFilePath } from "../utils/fileService";
+import { resolveFilePath } from "../src/utils/fileService";
 
 let server: any;
 
