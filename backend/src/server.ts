@@ -36,7 +36,6 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/auth", authRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use("/trips", tripRoutes);
 
 // Swagger documentation

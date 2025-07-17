@@ -8,6 +8,6 @@ export function getImageUrl(path?: string, type: "profile" | "image" = "image"):
   const defaultImage = "/images/placeholder_image.png";
   if (!path) return type === "profile" ? defaultProfile : defaultImage;
   if (path.startsWith("http")) return path;
-  const BASE_URL = process.env.VITE_BACKEND_URL || "http://localhost:3000";
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
   return `${BASE_URL}${path}`;
 }
