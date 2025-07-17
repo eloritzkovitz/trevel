@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import commentService, { Comment as CommentType } from "../services/comment-service";
+import commentService, {
+  Comment as CommentType,
+} from "../services/comment-service";
+import { getImageUrl } from "../utils/imageUrl";
 import ImageEditor from "./ImageEditor";
 
 interface EditCommentProps {
@@ -9,7 +12,11 @@ interface EditCommentProps {
   onCancel: () => void;
 }
 
-const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, onCancel }) => {  
+const EditComment: React.FC<EditCommentProps> = ({
+  comment,
+  onCommentUpdated,
+  onCancel,
+}) => {
   const [content, setContent] = useState(comment.content);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,32 +31,37 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-  
+
     try {
-      const formData = new FormData();      
+      const formData = new FormData();
       formData.append("content", content);
-  
+
       // Append existing images that should remain
-      imagesState.existingImages.forEach((img) => formData.append("existingImages", img));
-    
+      imagesState.existingImages.forEach((img) =>
+        formData.append("existingImages", img)
+      );
+
       // Append deleted images (as JSON string)
-      formData.append("deletedImages", JSON.stringify(imagesState.deletedImages));
-    
+      formData.append(
+        "deletedImages",
+        JSON.stringify(imagesState.deletedImages)
+      );
+
       // Append new images
-      imagesState.newImages.forEach((file) => formData.append("images", file));      
+      imagesState.newImages.forEach((file) => formData.append("images", file));
 
       await commentService.updateComment(comment._id!, formData);
-    
+
       // Update UI after successful update
       const updatedComment = {
-        ...comment,    
+        ...comment,
         content,
         images: imagesState.existingImages.concat(
           imagesState.newImages.map((file) => URL.createObjectURL(file))
         ),
       };
-    
-      onCommentUpdated(updatedComment);      
+
+      onCommentUpdated(updatedComment);
     } catch (error) {
       console.error("Failed to update post", error);
       setError("Failed to update post");
@@ -60,30 +72,37 @@ const EditComment: React.FC<EditCommentProps> = ({ comment, onCommentUpdated, on
 
   return (
     <div className="edit-comment">
-      <Form.Group controlId="editCommentContent">        
+      <Form.Group controlId="editCommentContent">
         <Form.Control
           as="textarea"
           rows={3}
           value={content}
-          onChange={(e) => setContent(e.target.value)}          
+          onChange={(e) => setContent(e.target.value)}
         />
       </Form.Group>
 
       {/* ImageEditor Component */}
       <ImageEditor
-        initialExistingImages={imagesState.existingImages}
+        initialExistingImages={imagesState.existingImages.map((img) =>
+          getImageUrl(img, "image")
+        )}
         initialNewImages={imagesState.newImages}
         onImagesUpdated={(updatedImages) => setImagesState(updatedImages)}
       />
 
       {/* Action buttons */}
       <div className="d-flex justify-content-end mt-3">
-        <Button variant="primary" type="submit" disabled={isLoading} onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={isLoading}
+          onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
+        >
           {isLoading ? "Updating..." : "Save"}
         </Button>
         <Button variant="secondary" onClick={onCancel}>
           Cancel
-        </Button>       
+        </Button>
         {error && <div className="alert alert-danger mt-3">{error}</div>}
       </div>
     </div>

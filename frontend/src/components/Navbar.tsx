@@ -1,14 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Nav, NavDropdown, Container, Form, FormControl, InputGroup} from "react-bootstrap";
+import {
+  Navbar,
+  Nav,
+  NavDropdown,
+  Container,
+  Form,
+  FormControl,
+  InputGroup,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faHome, faPlane, faChevronDown, faUser, faSignOutAlt, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearch,
+  faHome,
+  faPlane,
+  faChevronDown,
+  faUser,
+  faSignOutAlt,
+  faSun,
+  faMoon,
+} from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/logo.png";
 import logoWhite from "../assets/logo-white.png";
-import "../styles/Navbar.css";
 import { useAuth } from "../context/AuthContext";
 import getUsersByName from "../services/user-service";
-
+import { getImageUrl } from "../utils/imageUrl";
+import "../styles/Navbar.css";
 
 const NavigationBar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -16,7 +33,6 @@ const NavigationBar: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-
 
   useEffect(() => {
     // Apply the theme class to the body
@@ -46,7 +62,7 @@ const NavigationBar: React.FC = () => {
       setSearchResults([]);
       setShowDropdown(false);
     }
-  };  
+  };
 
   // Handle search input change
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,22 +74,26 @@ const NavigationBar: React.FC = () => {
   const handleSearchBlur = () => {
     // Hide the dropdown after a short delay to allow clicks
     setTimeout(() => setShowDropdown(false), 200);
-  };  
+  };
 
   return (
-    <Navbar
-      className="navbar" variant="{theme}" expand="lg" fixed="top"      
-    >
+    <Navbar className="navbar" variant="{theme}" expand="lg" fixed="top">
       <Container fluid>
         {/* Brand */}
-        <Navbar.Brand as={Link} to="/" className="ms-3 brand">        
+        <Navbar.Brand as={Link} to="/" className="ms-3 brand">
           <img src={theme === "light" ? logo : logoWhite} alt="Trevel Logo" />
         </Navbar.Brand>
 
         {/* Search */}
-        <Form className="d-flex ms-auto position-relative search-bar-form" onSubmit={(e) => e.preventDefault()}>
+        <Form
+          className="d-flex ms-auto position-relative search-bar-form"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <InputGroup>
-            <FontAwesomeIcon icon={faSearch} className="position-absolute text-muted search-bar-icon" />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="position-absolute text-muted search-bar-icon"
+            />
             <FormControl
               type="search"
               placeholder="Search Trevel"
@@ -93,7 +113,11 @@ const NavigationBar: React.FC = () => {
                   className="search-result-item"
                   onClick={() => setShowDropdown(false)}
                 >
-                  <img src={user.profilePicture} alt={user.firstName} className="search-result-image" />
+                  <img
+                    src={getImageUrl(user.profilePicture, "profile")}
+                    alt={user.firstName}
+                    className="search-result-image"
+                  />
                   <span className="search-result-name">
                     {user.firstName} {user.lastName}
                   </span>
@@ -107,12 +131,15 @@ const NavigationBar: React.FC = () => {
         <Navbar.Toggle aria-controls="navbarNav" />
         <Navbar.Collapse
           id="navbarNav"
-          className="d-flex justify-content-between w-100">         
+          className="d-flex justify-content-between w-100"
+        >
           <Nav className="mx-auto">
             <Nav.Link
               as={Link}
               to="/"
-              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/" ? "active text-primary" : ""}`}              
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${
+                location.pathname === "/" ? "active text-primary" : ""
+              }`}
             >
               <FontAwesomeIcon className="navbar-icon" icon={faHome} />
               <span>Home</span>
@@ -121,7 +148,9 @@ const NavigationBar: React.FC = () => {
             <Nav.Link
               as={Link}
               to="/trips"
-              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${location.pathname === "/trips" ? "active text-primary" : ""}`}
+              className={`nav-link nav-link-btn d-flex flex-column align-items-center ${
+                location.pathname === "/trips" ? "active text-primary" : ""
+              }`}
             >
               <FontAwesomeIcon className="navbar-icon" icon={faPlane} />
               <span>Trips</span>
@@ -130,18 +159,21 @@ const NavigationBar: React.FC = () => {
 
           {/* Profile Dropdown */}
           {user && (
-              <NavDropdown           
+            <NavDropdown
               title={
                 <div className="profile-dropdown-wrapper">
                   <img
                     className="profile-picture-3 rounded-circle"
-                    src={user.profilePicture}
+                    src={getImageUrl(user.profilePicture, "profile")}
                     alt="Profile"
                   />
-                  <FontAwesomeIcon icon={faChevronDown} className="custom-caret" />
+                  <FontAwesomeIcon
+                    icon={faChevronDown}
+                    className="custom-caret"
+                  />
                 </div>
               }
-             id="navbarDropdown"
+              id="navbarDropdown"
               align="end"
               className="ms-5 profile-dropdown"
             >
@@ -149,8 +181,8 @@ const NavigationBar: React.FC = () => {
                 <>
                   <img
                     className="profile-picture-3 rounded-circle mr-10"
-                    src={user.profilePicture}
-                    alt="Profile"                    
+                    src={getImageUrl(user.profilePicture, "profile")}
+                    alt="Profile"
                   />
                 </>
                 <span className="fw-semibold">
@@ -163,14 +195,15 @@ const NavigationBar: React.FC = () => {
                 Profile
               </NavDropdown.Item>
               <NavDropdown.Item onClick={logout}>
-                <FontAwesomeIcon className="mr-10"
-                  icon={faSignOutAlt}                  
-                />
+                <FontAwesomeIcon className="mr-10" icon={faSignOutAlt} />
                 Logout
               </NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={toggleTheme}>
-                <FontAwesomeIcon className="mr-10" icon={theme === "light" ? faMoon : faSun} />
+                <FontAwesomeIcon
+                  className="mr-10"
+                  icon={theme === "light" ? faMoon : faSun}
+                />
                 {theme === "light" ? "Dark mode" : "Light mode"}
               </NavDropdown.Item>
             </NavDropdown>

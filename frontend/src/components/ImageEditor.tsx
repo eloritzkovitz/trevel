@@ -2,11 +2,16 @@ import React, { useCallback, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
+import { getImageUrl } from "../utils/imageUrl";
 
 interface ImageEditorProps {
   initialExistingImages: string[];
   initialNewImages: File[];
-  onImagesUpdated: (updatedImages: { existingImages: string[]; newImages: File[]; deletedImages: string[] }) => void;
+  onImagesUpdated: (updatedImages: {
+    existingImages: string[];
+    newImages: File[];
+    deletedImages: string[];
+  }) => void;
 }
 
 const MAX_IMAGES = 6;
@@ -16,7 +21,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   initialNewImages,
   onImagesUpdated,
 }) => {
-  const [existingImages, setExistingImages] = useState<string[]>(initialExistingImages);
+  const [existingImages, setExistingImages] = useState<string[]>(
+    initialExistingImages
+  );
   const [newImages, setNewImages] = useState<File[]>(initialNewImages);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +36,9 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     const updatedData = { existingImages, newImages, deletedImages };
 
     // Prevent infinite re-renders by checking if data actually changed
-    if (JSON.stringify(updatedData) !== localStorage.getItem("lastImagesState")) {
+    if (
+      JSON.stringify(updatedData) !== localStorage.getItem("lastImagesState")
+    ) {
       memoizedOnImagesUpdated(updatedData);
       localStorage.setItem("lastImagesState", JSON.stringify(updatedData));
     }
@@ -39,7 +48,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      const totalImages = existingImages.length + newImages.length + files.length;
+      const totalImages =
+        existingImages.length + newImages.length + files.length;
 
       // Check if the total number of images exceeds the limit
       if (totalImages > MAX_IMAGES) {
@@ -53,7 +63,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   };
 
   // Handle removing an existing image
-  const handleRemoveExistingImage = (image: string) => {    
+  const handleRemoveExistingImage = (image: string) => {
     setExistingImages(existingImages.filter((img) => img !== image));
     setDeletedImages([...deletedImages, image]); // Mark for deletion
   };
@@ -72,7 +82,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
           {existingImages.map((img, index) => (
             <div key={index} className="position-relative me-2">
               <img
-                src={img}
+                src={getImageUrl(img, "image")}
                 alt="Existing"
                 className="img-thumbnail"
                 style={{ width: 100, height: 100 }}

@@ -2,10 +2,16 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisH, faPencil, faTrash, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEllipsisH,
+  faPencil,
+  faTrash,
+  faThumbsUp,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
 import commentService from "../services/comment-service";
 import { formatElapsedTime } from "../utils/date";
+import { getImageUrl } from "../utils/imageUrl";
 import ImageViewer from "./ImageViewer";
 
 interface CommentProps {
@@ -21,33 +27,54 @@ interface CommentProps {
   createdAt: string;
   isOwner: boolean;
   onEdit: (updatedContent: string) => void;
-  onDelete: () => void;  
-  onLikeChange: (commentId: string, isLiked: boolean, likeCount: number) => void;
+  onDelete: () => void;
+  onLikeChange: (
+    commentId: string,
+    isLiked: boolean,
+    likeCount: number
+  ) => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, senderImage, images, likes, likesCount, createdAt, isOwner, onEdit, onDelete, onLikeChange }) => {
+const Comment: React.FC<CommentProps> = ({
+  _id,
+  content,
+  sender,
+  senderName,
+  senderImage,
+  images,
+  likes,
+  likesCount,
+  createdAt,
+  isOwner,
+  onEdit,
+  onDelete,
+  onLikeChange,
+}) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showImageViewer, setImageViewer] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);  
-  const viewer = { _id: useAuth().user?._id };  
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const viewer = { _id: useAuth().user?._id };
   const [isLiked, setIsLiked] = useState(likes.includes(viewer._id || ""));
-  const [likeCount, setLikeCount] = useState(likesCount);  
+  const [likeCount, setLikeCount] = useState(likesCount);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Toggle options dropdown
   const handleToggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
-  
+
   // Hide dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
-  
-    document.addEventListener("mousedown", handleClickOutside);    
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -66,15 +93,18 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
         throw new Error("Comment ID is required");
       }
 
-      const updatedComment = await commentService.likeComment(_id, viewer?._id || "");
-      const updatedIsLiked = updatedComment.likes?.includes(viewer._id || "") || false;
+      const updatedComment = await commentService.likeComment(
+        _id,
+        viewer?._id || ""
+      );
+      const updatedIsLiked =
+        updatedComment.likes?.includes(viewer._id || "") || false;
       const updatedLikeCount = updatedComment.likesCount || 0;
-      
+
       setIsLiked(updatedComment.likes?.includes(viewer?._id || "") || false);
       setLikeCount(updatedComment.likesCount || 0);
 
       onLikeChange(_id, updatedIsLiked, updatedLikeCount);
-
     } catch (error) {
       console.error("Failed to update like status", error);
     }
@@ -87,16 +117,21 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
           <div className="d-flex align-items-center">
             <img
               className="profile-picture-4 rounded-circle mr-10"
-              src={senderImage}
+              src={getImageUrl(senderImage, "profile")}
               alt="Profile"
             />
             <div>
               <h5 className="card-text mb-0">
-                <Link to={`/profile/${sender}`} className="text-muted text-decoration-none">
+                <Link
+                  to={`/profile/${sender}`}
+                  className="text-muted text-decoration-none"
+                >
                   <small>{senderName}</small>
                 </Link>
               </h5>
-              <small className="text-muted">{formatElapsedTime(createdAt)}</small>
+              <small className="text-muted">
+                {formatElapsedTime(createdAt)}
+              </small>
             </div>
           </div>
 
@@ -105,13 +140,18 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
             <DropdownButton
               className="post-options"
               align="end"
-              title={<FontAwesomeIcon className="post-options-btn" icon={faEllipsisH} />}
+              title={
+                <FontAwesomeIcon
+                  className="post-options-btn"
+                  icon={faEllipsisH}
+                />
+              }
               id="dropdown-menu-align-end"
               variant="link"
               onToggle={handleToggleDropdown}
               show={showDropdown}
             >
-              <Dropdown.Item onClick={() => onEdit(content)}>                
+              <Dropdown.Item onClick={() => onEdit(content)}>
                 <FontAwesomeIcon icon={faPencil} className="me-2" />
                 Edit Comment
               </Dropdown.Item>
@@ -126,26 +166,35 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
         <div>
           <p className="mb-1">{content}</p>
           {images && images.length > 0 && (
-          <div className="image-grid">
-            {images.slice(0, 3).map((image, index) => (
-              <div key={index} className="image-grid-item" onClick={() => handleImageClick(index)}>
-                <img
-                  src={image}
-                  alt={`Post image ${index + 1}`}
-                  className="image-grid-img"
-                />
-                {index === 2 && images.length > 3 && (
-                  <div className="image-grid-more" onClick={() => handleImageClick(index)}>
-                    +{images.length - 3} more
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}      
+            <div className="image-grid">
+              {images.slice(0, 3).map((image, index) => (
+                <div
+                  key={index}
+                  className="image-grid-item"
+                  onClick={() => handleImageClick(index)}
+                >
+                  <img
+                    src={getImageUrl(image, "image")}
+                    alt={`Post image ${index + 1}`}
+                    className="image-grid-img"
+                  />
+                  {index === 2 && images.length > 3 && (
+                    <div
+                      className="image-grid-more"
+                      onClick={() => handleImageClick(index)}
+                    >
+                      +{images.length - 3} more
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           <div className="d-flex align-items-center mt-2">
             <button
-              className={`btn btn-sm ${isLiked ? "text-primary" : "text-muted"}`}
+              className={`btn btn-sm ${
+                isLiked ? "text-primary" : "text-muted"
+              }`}
               onClick={handleLikeClick}
             >
               <FontAwesomeIcon icon={faThumbsUp} className="me-1" />
@@ -156,9 +205,9 @@ const Comment: React.FC<CommentProps> = ({ _id, content, sender, senderName, sen
       </div>
 
       {/* Image viewer */}
-      <ImageViewer 
+      <ImageViewer
         show={showImageViewer}
-        images={images || []}
+        images={images ? images.map((img) => getImageUrl(img, "image")) : []}
         currentIndex={currentIndex}
         onClose={() => setImageViewer(false)}
       />

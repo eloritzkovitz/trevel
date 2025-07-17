@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import postService, { Post as PostType } from "../services/post-service";
+import { getImageUrl } from "../utils/imageUrl";
 import ImageEditor from "./ImageEditor";
 
 interface EditPostProps {
@@ -10,7 +11,12 @@ interface EditPostProps {
   onPostUpdated: (post: PostType) => void;
 }
 
-const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpdated }) => {
+const EditPost: React.FC<EditPostProps> = ({
+  show,
+  handleClose,
+  post,
+  onPostUpdated,
+}) => {
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,41 +34,46 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
       existingImages: post.images || [],
       newImages: [] as File[],
       deletedImages: [] as string[],
-    });    
-  }, [post]);  
+    });
+  }, [post]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-  
+
     try {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
-  
+
       // Append existing images that should remain
-      imagesState.existingImages.forEach((img) => formData.append("existingImages", img));
-  
+      imagesState.existingImages.forEach((img) =>
+        formData.append("existingImages", img)
+      );
+
       // Append deleted images (as JSON string)
-      formData.append("deletedImages", JSON.stringify(imagesState.deletedImages));
-  
+      formData.append(
+        "deletedImages",
+        JSON.stringify(imagesState.deletedImages)
+      );
+
       // Append new images
       imagesState.newImages.forEach((file) => formData.append("images", file));
-  
+
       await postService.updatePost(post._id!, formData);
-          
+
       // Update UI after successful update
       const updatedPost = {
         ...post,
-        title,  
+        title,
         content,
         images: imagesState.existingImages.concat(
           imagesState.newImages.map((file) => URL.createObjectURL(file))
         ),
       };
-  
+
       // Use the updated post data from the backend
       onPostUpdated(updatedPost);
       handleClose();
@@ -105,14 +116,21 @@ const EditPost: React.FC<EditPostProps> = ({ show, handleClose, post, onPostUpda
 
           {/* ImageEditor Component */}
           <ImageEditor
-            initialExistingImages={imagesState.existingImages}
+            initialExistingImages={imagesState.existingImages.map((img) =>
+              getImageUrl(img, "image")
+            )}
             initialNewImages={imagesState.newImages}
             onImagesUpdated={(updatedImages) => setImagesState(updatedImages)}
           />
 
           {/* Action buttons */}
           {error && <div className="alert alert-danger mt-3">{error}</div>}
-          <Button variant="primary" type="submit" className="mt-3" disabled={isLoading}>
+          <Button
+            variant="primary"
+            type="submit"
+            className="mt-3"
+            disabled={isLoading}
+          >
             {isLoading ? "Updating..." : "Save"}
           </Button>
         </Form>
