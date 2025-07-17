@@ -12,9 +12,11 @@ export const deleteFile = (filePath: string): void => {
 
 /**
  * Resolves the full path to a file based on the provided relative path.
- * @param relativePath - The relative path to the file.
+ * @param relativePath - The relative path to the file (e.g., /uploads/x.jpg).
  * @returns The full path to the file.
  */
 export const resolveFilePath = (relativePath: string): string => {
-    return relativePath ? path.join(__dirname, '../../', relativePath.replace(`${process.env.BASE_URL}`, '/dist')) : '';          
+    // Remove leading slash if present
+    const rel = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+    return path.join(__dirname, '../../', rel);
 };

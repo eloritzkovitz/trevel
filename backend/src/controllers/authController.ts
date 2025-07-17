@@ -206,7 +206,7 @@ const updateUser = async (req: Request<{ id: string }, {}, UpdateUserRequestBody
       
         // Update the profile picture based on the input
         if (req.file) {
-          user.profilePicture = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+          user.profilePicture = `/uploads/${req.file.filename}`;
         } else {
           user.profilePicture = '/images/default-profile.png'; // Set to default image
         }

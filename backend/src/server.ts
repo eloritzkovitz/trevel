@@ -2,17 +2,29 @@ import dotenv from "dotenv"
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import express, { Express } from "express";
+import path from "path";
+import fs from "fs";
 import authRoutes from "./routes/authRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import tripRoutes from "./routes/tripRoutes";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
-import path from "path";
 
-// Set application
-dotenv.config();
 const app = express();
+
+dotenv.config();
+
+// Ensure the uploads directory exists
+const uploadDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static(uploadDir));
+
+// Serve the API routes
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -24,7 +36,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
 app.use("/auth", authRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '../dist/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use("/trips", tripRoutes);
 
 // Swagger documentation

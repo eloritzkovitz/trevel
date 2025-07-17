@@ -26,7 +26,7 @@ class CommentController extends BaseController<IComment> {
       if (post) {
         const userId = req.params.userId;
         const user = await userModel.findById(userId);
-        const images = req.files ? (req.files as Express.Multer.File[]).map(file => `${process.env.BASE_URL}/uploads/${file.filename}`) : [];
+        const images = req.files ? (req.files as Express.Multer.File[]).map(file => `/uploads/${file.filename}`) : [];
         const comment : IComment =  {
           ...req.body,
           sender: new mongoose.Types.ObjectId(userId),
@@ -83,7 +83,7 @@ class CommentController extends BaseController<IComment> {
     const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
     
     // Handle new images
-    const newImages = req.files ? (req.files as Express.Multer.File[]).map(file => file.path) : [];
+    const newImages = req.files ? (req.files as Express.Multer.File[]).map(file => `/uploads/${file.filename}`) : [];
     const existingImages = req.body.existingImages || [];
 
     // Remove deleted images
