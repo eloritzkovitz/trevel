@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
 import authController from "../controllers/authController";
-import { authMiddleware } from "../middleware/auth";
-import upload from "../middleware/upload";
+import { authenticate } from "@eloritzkovitz/server-essentials";
+import { upload } from "@eloritzkovitz/server-essentials";
 
 /**
 * @swagger
@@ -198,7 +198,7 @@ router.post("/refresh", authController.refresh);
  *       500:
  *         description: Server error
  */
-router.get("/user/:id?", authMiddleware, authController.getUserData);
+router.get("/user/:id?", authenticate, authController.getUserData);
 
 /**
  * @swagger
@@ -242,7 +242,7 @@ router.get("/user/:id?", authMiddleware, authController.getUserData);
  *       500:
  *         description: Server error
  */
-router.get("/users", authMiddleware, authController.getUserByName);
+router.get("/users", authenticate, authController.getUserByName);
 
 /**
  * @swagger
@@ -293,7 +293,7 @@ router.get("/users", authMiddleware, authController.getUserByName);
  *       500:
  *         description: Server error
  */
-router.put("/user/:id", authMiddleware, upload.single("profilePicture"), authController.updateUser);
+router.put("/user/:id", authenticate, upload.single("profilePicture"), authController.updateUser);
 
 /**
  * @swagger

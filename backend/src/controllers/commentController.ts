@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
+import commentModel, { IComment } from "../models/Comment";
 import postModel from "../models/Post";
 import userModel from "../models/User";
-import PostModel from "../models/Post";
-import commentModel, { IComment } from "../models/Comment";
 import BaseController from "./baseController";
-import { deleteFile } from "../utils/fileService";
+import { deleteFile } from "@eloritzkovitz/server-essentials";
 
 class CommentController extends BaseController<IComment> {
   constructor() {
@@ -42,7 +41,7 @@ class CommentController extends BaseController<IComment> {
         super.createItem(req, res);
 
         // Increment the commentsCount in the Post document
-        await PostModel.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
+        await postModel.findByIdAndUpdate(postId, { $inc: { commentsCount: 1 } });
 
       } else {
         res.status(404).send({ message: "Post not found" });
@@ -121,7 +120,7 @@ class CommentController extends BaseController<IComment> {
       
         // Decrement the commentsCount in the Post document
         try {
-          await PostModel.findByIdAndUpdate(comment.postId, { $inc: { commentsCount: -1 } });
+          await postModel.findByIdAndUpdate(comment.postId, { $inc: { commentsCount: -1 } });
         } catch (error) {
           console.error(`Error decrementing commentsCount for post: ${comment.postId}`, error);
         }

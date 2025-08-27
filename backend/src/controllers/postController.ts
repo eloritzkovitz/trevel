@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import postModel, { IPost } from "../models/Post";
 import userModel from "../models/User";
+import postModel, { IPost } from "../models/Post";
 import commentsModel from "../models/Comment";
 import BaseController from "./baseController";
-import { deleteFile } from "../utils/fileService";
+import { deleteFile } from "@eloritzkovitz/server-essentials";
 
 class PostsController extends BaseController<IPost> {
   constructor() {

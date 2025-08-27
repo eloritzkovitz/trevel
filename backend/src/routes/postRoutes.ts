@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
 import postsController from "../controllers/postController";
-import { authMiddleware } from "../middleware/auth";
-import upload from "../middleware/upload";
+import { authenticate } from "@eloritzkovitz/server-essentials";
+import { upload } from "@eloritzkovitz/server-essentials";
 
 /**
  * @swagger
@@ -129,7 +129,7 @@ router.get("/:id", postsController.getById.bind(postsController));
  *       500:
  *         description: Server error
  */
-router.post("/", authMiddleware, upload.array("images", 6), postsController.createItem.bind(postsController));
+router.post("/", authenticate, upload.array("images", 6), postsController.createItem.bind(postsController));
 
 /**
  * @swagger
@@ -169,7 +169,7 @@ router.post("/", authMiddleware, upload.array("images", 6), postsController.crea
  *       500:
  *         description: Server error
  */
-router.put("/:id", authMiddleware, upload.array("images", 6), postsController.updateItem.bind(postsController));
+router.put("/:id", authenticate, upload.array("images", 6), postsController.updateItem.bind(postsController));
 
 /**
  * @swagger
@@ -194,7 +194,7 @@ router.put("/:id", authMiddleware, upload.array("images", 6), postsController.up
  *       500:
  *         description: Server error
  */
-router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsController));
+router.delete("/:id", authenticate, postsController.deleteItem.bind(postsController));
 
 /**
  * @swagger
@@ -236,6 +236,6 @@ router.delete("/:id", authMiddleware, postsController.deleteItem.bind(postsContr
  *       500:
  *         description: Server error
  */
-router.post("/:id/like", authMiddleware, postsController.handleLike.bind(postsController));
+router.post("/:id/like", authenticate, postsController.handleLike.bind(postsController));
 
 export default router;
