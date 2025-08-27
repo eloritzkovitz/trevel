@@ -1,4 +1,4 @@
-# Trevel - A Social Network for Travel Enthusiasts ✈️
+# Trevel - A Social Network for Travel Enthusiasts
 
 ## Overview
 Trevel is a social networking platform designed for users to share their travel experiences, post trip highlights, and interact with fellow travelers. Users can upload photos, write travel stories, comment on posts, and mark their favorite content. The platform integrates **AI-powered content suggestions** to enhance user experience and provide relevant travel insights.
