@@ -1,12 +1,12 @@
 import request from "supertest";
-import initApp from "../src/server";
+import { Express } from "express";
+import path from "path";
 import mongoose from "mongoose";
+import initApp from "../src/server";
 import commentsModel from "../src/models/Comment";
 import postModel from "../src/models/Post";
 import userModel, { IUser } from "../src/models/User";
-import { Express } from "express";
 import testComments from "./testComments.json";
-import path from "path";
 
 var app: Express;
 

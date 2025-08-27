@@ -1,8 +1,8 @@
 import express from "express";
 const router = express.Router();
 import commentsController from "../controllers/commentController";
-import { authMiddleware } from "../middleware/auth";
-import upload from "../middleware/upload";
+import { authenticate } from "@eloritzkovitz/server-essentials";
+import { upload } from "@eloritzkovitz/server-essentials";
 
 /**
  * @swagger
@@ -112,7 +112,7 @@ router.get("/post/:postId", commentsController.getCommentsByPostId.bind(comments
  *       500:
  *         description: Server error
  */
-router.post("/", authMiddleware, upload.array("images", 6), commentsController.createItem.bind(commentsController));
+router.post("/", authenticate, upload.array("images", 6), commentsController.createItem.bind(commentsController));
 
 /**
  * @swagger
@@ -153,7 +153,7 @@ router.post("/", authMiddleware, upload.array("images", 6), commentsController.c
  *       500:
  *         description: Server error
  */
-router.put("/:id", authMiddleware, upload.array("images",6), commentsController.updateItem.bind(commentsController));
+router.put("/:id", authenticate, upload.array("images", 6), commentsController.updateItem.bind(commentsController));
 
 /**
  * @swagger
@@ -178,7 +178,7 @@ router.put("/:id", authMiddleware, upload.array("images",6), commentsController.
  *       500:
  *         description: Server error
  */
-router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(commentsController));
+router.delete("/:id", authenticate, commentsController.deleteItem.bind(commentsController));
 
 /**
  * @swagger
@@ -221,6 +221,6 @@ router.delete("/:id", authMiddleware, commentsController.deleteItem.bind(comment
  *       500:
  *         description: Server error
  */
-router.post("/:id/like", authMiddleware, commentsController.handleLike.bind(commentsController));
+router.post("/:id/like", authenticate, commentsController.handleLike.bind(commentsController));
 
 export default router;

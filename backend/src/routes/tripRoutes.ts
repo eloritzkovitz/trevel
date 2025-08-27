@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { generateTrip, saveTrip, getTrips, deleteTrip } from '../controllers/tripController';
-import { authMiddleware } from "../middleware/auth";
+import { authenticate } from "@eloritzkovitz/server-essentials";
 
 /**
  * @swagger
@@ -72,7 +72,7 @@ import { authMiddleware } from "../middleware/auth";
  *                   type: string
  *                   example: "Failed to generate trip. An unexpected error occurred."
  */
-router.post('/generate', authMiddleware, generateTrip);
+router.post('/generate', authenticate, generateTrip);
 
 /**
  * @swagger
@@ -139,7 +139,7 @@ router.post('/generate', authMiddleware, generateTrip);
  *                   type: string
  *                   example: "Failed to save trip. An unexpected error occurred."
  */
-router.post('/',authMiddleware, saveTrip);
+router.post('/', authenticate, saveTrip);
 
 /**
  * @swagger
@@ -193,7 +193,7 @@ router.post('/',authMiddleware, saveTrip);
  *                   type: string
  *                   example: "Failed to retrieve trips. An unexpected error occurred."
  */
-router.get('/',authMiddleware, getTrips);
+router.get('/', authenticate, getTrips);
 
 /**
  * @swagger
@@ -252,6 +252,6 @@ router.get('/',authMiddleware, getTrips);
  *                   type: string
  *                   example: "Failed to delete trip. An unexpected error occurred."
  */
-router.delete('/:id',authMiddleware, deleteTrip);
+router.delete('/:id', authenticate, deleteTrip);
 
 export default router;

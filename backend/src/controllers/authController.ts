@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { OAuth2Client } from "google-auth-library";
-import userModel from "../models/User";
-import { deleteFile } from "../utils/fileService";
-import { generateToken, verifyRefreshToken } from "../utils/tokenService";
-import postModel from "../models/Post";
 import commentModel from "../models/Comment";
+import postModel from "../models/Post";
+import userModel from "../models/User";
+import { deleteFile } from "@eloritzkovitz/server-essentials";
+import { generateToken, verifyRefreshToken } from "@eloritzkovitz/server-essentials";
+
 import path from "path";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -38,7 +39,7 @@ const googleSignIn = async (req: Request, res: Response) => {
       });
     }
 
-    const tokens = generateToken(user._id);
+    const tokens = generateToken(user._id, "user");
     if (!tokens) {
       res.status(500).send("Server Error");
       return;
@@ -104,7 +105,7 @@ const login = async (req: Request, res: Response) => {
     }
 
     // generate token
-    const tokens = generateToken(user._id);
+    const tokens = generateToken(user._id, "user");
     if (!tokens) {
       res.status(500).send("Server Error");
       return;
@@ -280,7 +281,7 @@ const logout = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = await verifyRefreshToken(refreshToken);
+    const user = await verifyRefreshToken(refreshToken, userModel);
     await user.save();
     res.status(200).send("success");
   } catch (err) {
@@ -291,12 +292,12 @@ const logout = async (req: Request, res: Response) => {
 // Refresh function
 const refresh = async (req: Request, res: Response) => {
   try {
-    const user = await verifyRefreshToken(req.body.refreshToken);
+    const user = await verifyRefreshToken(req.body.refreshToken, userModel);
     if (!user) {
       res.status(400).send("fail");
       return;
     }
-    const tokens = generateToken(user._id);
+    const tokens = generateToken(user._id, "user");
 
     if (!tokens) {
       res.status(500).send("Server Error");

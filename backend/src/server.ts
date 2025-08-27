@@ -1,15 +1,15 @@
 import dotenv from "dotenv"
-import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import express, { Express } from "express";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import mongoose from "mongoose";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerUI from "swagger-ui-express";
 import authRoutes from "./routes/authRoutes";
 import postRoutes from "./routes/postRoutes";
 import commentRoutes from "./routes/commentRoutes";
 import tripRoutes from "./routes/tripRoutes";
-import swaggerJsDoc from "swagger-jsdoc";
-import swaggerUI from "swagger-ui-express";
 
 const app = express();
 
@@ -33,9 +33,9 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   res.header("Access-Control-Allow-Methods", "*");
   next();
 });
+app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
-app.use("/auth", authRoutes);
 app.use("/trips", tripRoutes);
 
 // Swagger documentation

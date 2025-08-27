@@ -5,7 +5,7 @@ import initApp from "../src/server";
 import mongoose from "mongoose";
 import userModel, { IUser } from "../src/models/User";
 import postModel from "../src/models/Post";
-import { generateToken, verifyRefreshToken } from "../src/utils/tokenService";
+import { generateToken, verifyRefreshToken } from "@eloritzkovitz/server-essentials";
 
 var app: Express;
 
@@ -115,7 +115,7 @@ describe("Auth Tests", () => {
     const originalSecret = process.env.TOKEN_SECRET;
     delete process.env.TOKEN_SECRET;
 
-    const result = generateToken("mockUserId");
+    const result = generateToken("mockUserId", "user");
     expect(result).toBeNull();
 
     const response = await request(app).post(baseUrl + "/login").send(testUser);    

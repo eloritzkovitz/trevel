@@ -10,6 +10,7 @@
     "test": "copyfiles .env.test & jest --coverage --runInBand"
   },
   "dependencies": {
+    "@eloritzkovitz/server-essentials": "1.0.4",
     "@google/generative-ai": "^0.24.0",
     "@types/bcrypt": "^5.0.2",
     "axios": "^1.8.4",

@@ -1,11 +1,10 @@
 import request from "supertest";
-import path from "path";
-import initApp from "../src/server";
-import mongoose from "mongoose";
-import postModel from "../src/models/Post";
 import { Express } from "express";
+import path from "path";
+import mongoose from "mongoose";
+import initApp from "../src/server";
+import postModel from "../src/models/Post";
 import userModel, { IUser } from "../src/models/User";
-import { create } from "domain";
 
 var app: Express;
 
