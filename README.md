@@ -1,6 +1,4 @@
 # Trevel - A Social Network for Travel Enthusiasts
-
-## Overview
 Trevel is a social networking platform designed for users to share their travel experiences, post trip highlights, and interact with fellow travelers. Users can upload photos, write travel stories, comment on posts, and mark their favorite content. The platform integrates **AI-powered content suggestions** to enhance user experience and provide relevant travel insights.
 
 ## Features
@@ -29,27 +27,28 @@ Trevel is a social networking platform designed for users to share their travel 
 - **Dark Theme:** Tired of bright colors? You can adjust the appearance for a dark display.
 - **Form Validation:** Secure user input handling.
 
-## **Technology Stack**
+## **Technologies Used**
 
 ### **Backend**
-- **Node.js & Express.js** - Scalable backend framework.
-- **MongoDB** - NoSQL database for efficient data handling.
-- **JWT** - Secure user authentication.
-- **Swagger** - API documentation.
-- **Jest** - Unit testing framework.
+- **Node.js** (TypeScript) — Server-side logic
+- **Express.js** — API routing
+- **MongoDB** — Database
+- **JWT** — Authentication and authorization
+- **Swagger** — API documentation
+- **Jest** — Testing
 
 ### **Frontend**
-- **React.js** - Modern UI library for dynamic user interfaces.
-- **Bootstrap** - Responsive styling for sleek design.
+- **React.js** — Modern UI library for dynamic user interfaces
+- **Bootstrap** — Responsive styling for sleek design
 
 ### **Deployment**
-- **HTTPS & SSL** - Secure connection.
-- **PM2** - Process management.
+- **HTTPS & SSL** — Secure connection
+- **PM2** — Process management
 
 ## API Documentation
 
 - [Swagger API Documentation](http://localhost:3000/api-docs)
 
 ## Authors
-- [Elor Itzkovitz](https://github.com/Elor-Itz)
+- [Elor Itzkovitz](https://github.com/eloritzkovitz)
 - [Adi Cahal](https://github.com/Adica6)
